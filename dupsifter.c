@@ -59,8 +59,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "sam.h"
-// TODO: Test whether khash or khashl is better to use
-#include "khash.h"
+#include "khashl.h"
 #include "util.h"
 #include "refcache.h"
 
@@ -132,9 +131,9 @@ signature_t signature_init() {
 // Initialize hash maps and define functions needed for initialization
 khint_t hash_sig(signature_t s) {
     if (s.pos_start == UINT32_MAX) {
-        return __ac_Wang_hash(s.pos_end);
+        return kh_hash_uint32(s.pos_end);
     } else {
-        return __ac_Wang_hash(s.pos_start);
+        return kh_hash_uint32(s.pos_start);
     }
 }
 
@@ -149,7 +148,7 @@ int sig_equal(signature_t s1, signature_t s2) {
     }
 }
 
-KHASH_INIT(SIGS, signature_t, uint8_t, 1, hash_sig, sig_equal)
+KHASHL_SET_INIT(, SigHash, sh, signature_t, hash_sig, sig_equal)
 //---------------------------------------------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -444,8 +443,8 @@ signature_t create_signature(bam1_t *forward, bam1_t *reverse, mkdup_conf_t *con
 }
 
 void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, mkdup_conf_t *conf, refcache_t *rs, mkdup_bins_t *bins,
-        khash_t(SIGS) *ot_map, khash_t(SIGS) *ot_for, khash_t(SIGS) *ot_rev,
-        khash_t(SIGS) *ob_map, khash_t(SIGS) *ob_for, khash_t(SIGS) *ob_rev) {
+        SigHash *ot_map, SigHash *ot_for, SigHash *ot_rev,
+        SigHash *ob_map, SigHash *ob_for, SigHash *ob_rev) {
     // If unable to determine OT/CTOT or OB/CTOB, defaults to OT/CTOT
     uint8_t bss = determine_bsstrand_from_pair(rs, hdr, last, curr, conf, 0);
 
@@ -507,38 +506,38 @@ void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, mkdup_conf_t *conf
 
     signature_t sig = create_signature(forward, reverse, conf, bins);
 
-    int ret;
+    int not_a_dup;
     if (!is_forward && !is_reverse) {
         return;
     } else if (is_forward && is_reverse) {
         if (bss) {
-            kh_put(SIGS, ob_map, sig, &ret);
+            sh_put(ob_map, sig, &not_a_dup);
         } else {
-            kh_put(SIGS, ot_map, sig, &ret);
+            sh_put(ot_map, sig, &not_a_dup);
         }
-        if (!ret) { // signature found!
+        if (!not_a_dup) { // signature found!
             // Both reads need to marked as duplicates in this case
             forward->core.flag |= BAM_FDUP;
             reverse->core.flag |= BAM_FDUP;
         }
     } else if (is_forward && !is_reverse) {
         if (bss) {
-            kh_put(SIGS, ob_for, sig, &ret);
+            sh_put(ob_for, sig, &not_a_dup);
         } else {
-            kh_put(SIGS, ot_for, sig, &ret);
+            sh_put(ot_for, sig, &not_a_dup);
         }
-        if (!ret) { // signature found!
+        if (!not_a_dup) { // signature found!
             // Only the forward strand read needs to be marked as a duplicate
             // The reverse strand either doesn't exist (SE) or is unmapped (PE)
             forward->core.flag |= BAM_FDUP;
         }
     } else if (!is_forward && is_reverse) {
         if (bss) {
-            kh_put(SIGS, ob_rev, sig, &ret);
+            sh_put(ob_rev, sig, &not_a_dup);
         } else {
-            kh_put(SIGS, ot_rev, sig, &ret);
+            sh_put(ot_rev, sig, &not_a_dup);
         }
-        if (!ret) { // signature found!
+        if (!not_a_dup) { // signature found!
             // Only the reverse strand read needs to be marked as a duplicate
             // The forward strand either doesn't exist (SE) or is unmapped (PE)
             reverse->core.flag |= BAM_FDUP;
@@ -597,12 +596,12 @@ int markdups(mkdup_conf_t *conf) {
     uint8_t  successful_run  = 1; // Run had no errors crop up
 
     // Prepare hash maps
-    khash_t(SIGS) *ot_map = kh_init(SIGS);
-    khash_t(SIGS) *ot_for = kh_init(SIGS);
-    khash_t(SIGS) *ot_rev = kh_init(SIGS);
-    khash_t(SIGS) *ob_map = kh_init(SIGS);
-    khash_t(SIGS) *ob_for = kh_init(SIGS);
-    khash_t(SIGS) *ob_rev = kh_init(SIGS);
+    SigHash *ot_map = sh_init();
+    SigHash *ot_for = sh_init();
+    SigHash *ot_rev = sh_init();
+    SigHash *ob_map = sh_init();
+    SigHash *ob_for = sh_init();
+    SigHash *ob_rev = sh_init();
 
     if (conf->single_end) { // process file as single-end BAM
         bam1_t *curr = bam_init1();
@@ -710,12 +709,12 @@ int markdups(mkdup_conf_t *conf) {
     }
 
     // Clean up
-    kh_destroy(SIGS, ob_rev);
-    kh_destroy(SIGS, ob_for);
-    kh_destroy(SIGS, ob_map);
-    kh_destroy(SIGS, ot_rev);
-    kh_destroy(SIGS, ot_for);
-    kh_destroy(SIGS, ot_map);
+    sh_destroy(ob_rev);
+    sh_destroy(ob_for);
+    sh_destroy(ob_map);
+    sh_destroy(ot_rev);
+    sh_destroy(ot_for);
+    sh_destroy(ot_map);
 
     free_refcache(rs);
 
