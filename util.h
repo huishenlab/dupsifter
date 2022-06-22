@@ -31,6 +31,8 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 #include "sam.h"
 
 // Is a primary alignment (i.e., not secondary or supplementary)
@@ -42,25 +44,41 @@ static inline uint8_t is_primary(bam1_t *b) {
 // Read is flagged as unmapped
 static inline uint8_t is_unmapped(bam1_t *b) {
     bam1_core_t *c = &b->core;
-    return (c->flag & BAM_FUNMAP);
+    if (c->flag & BAM_FUNMAP) {
+        return 1;
+    }
+
+    return 0;
 }
 
 // Read is flagged as PCR duplicate
 static inline uint8_t is_duplicate(bam1_t *b) {
     bam1_core_t *c = &b->core;
-    return ((uint32_t)c->flag & BAM_FDUP);
+    if (c->flag & BAM_FDUP) {
+        return 1;
+    }
+
+    return 0;
 }
 
 // Read is flagged as read 1
 static inline uint8_t is_first_read(bam1_t *b) {
     bam1_core_t *c = &b->core;
-    return (c->flag & BAM_FREAD1);
+    if (c->flag & BAM_FREAD1) {
+        return 1;
+    }
+
+    return 0;
 }
 
 // Read is flagged as read 2
 static inline uint8_t is_second_read(bam1_t *b) {
     bam1_core_t *c = &b->core;
-    return (c->flag & BAM_FREAD2);
+    if (c->flag & BAM_FREAD2) {
+        return 1;
+    }
+
+    return 0;
 }
 
 // Find sum of base qualities for read
@@ -85,6 +103,27 @@ static inline void fatal_error(const char *err, ...) {
     va_end(args);
     fflush(stderr);
     exit(EXIT_FAILURE);
+}
+
+// Timing functions
+// CPU time usage
+static inline double get_cpu_runtime() {
+    struct rusage r;
+    getrusage(RUSAGE_SELF, &r);
+
+    double secs = r.ru_utime.tv_sec + r.ru_stime.tv_sec;
+    double msec = 1e-6 * (r.ru_utime.tv_usec + r.ru_stime.tv_usec);
+
+    return secs + msec;
+}
+
+// Walltime
+static inline double get_current_time() {
+    struct timeval  tp;
+    struct timezone tzp;
+    gettimeofday(&tp, &tzp);
+
+    return tp.tv_sec + 1e-6*tp.tv_usec;
 }
 
 #endif /* _DS_UTILS_H */

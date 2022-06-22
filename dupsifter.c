@@ -1,9 +1,8 @@
-/* mark duplicates in bisulfite-converted reads
+/* Mark duplicates for both WGS and WGBS reads
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 Wanding.Zhou@vai.org
- *               2022 Jacob.Morrison@vai.org
+ * Copyright (c) 2022 Jacob.Morrison@vai.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +63,7 @@
 #include "refcache.h"
 
 //---------------------------------------------------------------------------------------------------------------------
-// Config struct and initialization function
+// Config struct, initialization function, and output function
 typedef struct {
     char     *reffn;               /* reference file name */
     char     *infn;                /* name of input file */
@@ -72,30 +71,49 @@ typedef struct {
     char      out_mode[6];         /* write mode of output file */
     uint32_t  min_base_qual;       /* threshold for high quality bases */
     uint8_t   rm_dup;              /* flag to remove duplicates */
-    uint32_t  cnt_pe_dup;          /* number of PE reads marked as dup */
-    uint32_t  cnt_pe;              /* number of PE reads */
-    uint32_t  cnt_se_dup;          /* number of SE reads marked as dup */
-    uint32_t  cnt_se;              /* number of SE reads */
-    uint32_t  cnt_dangle;          /* number of dangling PE reads */
+    uint32_t  cnt_id_both_map;     /* number of PE reads */
+    uint32_t  cnt_id_forward;      /* number of reads where only one read is mapped and it's on the forward strand */
+    uint32_t  cnt_id_reverse;      /* number of reads where only one read is mapped and it's on the reverse strand */
+    uint32_t  cnt_id_both_dup;     /* number of PE reads marked as dup */
+    uint32_t  cnt_id_forward_dup;  /* number of duplicates on the forward strand */
+    uint32_t  cnt_id_reverse_dup;  /* number of duplicates on the reverse strand */
+    uint32_t  cnt_id_no_map;       /* number of reads with both reads unmapped (PE) or the read is unmapped (SE) */
+    uint32_t  cnt_id_no_prim;      /* number of reads with no primary reads */
     uint8_t   verbose;             /* level of messages to print */
     uint32_t  max_length;          /* max read length allowed */
     uint8_t   single_end;          /* process all reads as single-end */
-} mkdup_conf_t;
+} ds_conf_t;
 
-void mkdup_conf_init(mkdup_conf_t *conf) {
+void ds_conf_init(ds_conf_t *conf) {
     strcpy(conf->out_mode, "w");
 
     conf->outfn = (char *)"-";
     conf->min_base_qual = 0;
     conf->rm_dup = 0;
-    conf->cnt_pe_dup = 0;
-    conf->cnt_pe = 0;
-    conf->cnt_se_dup = 0;
-    conf->cnt_se = 0;
-    conf->cnt_dangle = 0;
+    conf->cnt_id_both_map = 0;
+    conf->cnt_id_forward = 0;
+    conf->cnt_id_reverse = 0;
+    conf->cnt_id_both_dup = 0;
+    conf->cnt_id_forward_dup = 0;
+    conf->cnt_id_reverse_dup = 0;
+    conf->cnt_id_no_map = 0;
+    conf->cnt_id_no_prim = 0;
     conf->verbose = 0;
     conf->max_length = 10000;
     conf->single_end = 0;
+}
+
+void ds_conf_print(ds_conf_t *conf) {
+    fprintf(stderr, "[dupsifter] processing mode: %s\n", (conf->single_end) ? "single-end" : "paired-end");
+    fprintf(stderr, "[dupsifter] number of reads with both reads mapped: %u\n", conf->cnt_id_both_map);
+    fprintf(stderr, "[dupsifter] number of reads with only one read mapped to the forward strand: %u\n", conf->cnt_id_forward);
+    fprintf(stderr, "[dupsifter] number of reads with only one read mapped to the reverse strand: %u\n", conf->cnt_id_reverse);
+    fprintf(stderr, "[dupsifter] number of reads with both reads marked as duplicates: %u\n", conf->cnt_id_both_dup);
+    fprintf(stderr, "[dupsifter] number of reads on the forward strand marked as duplicates: %u\n", conf->cnt_id_forward_dup);
+    fprintf(stderr, "[dupsifter] number of reads on the reverse strand marked as duplicates: %u\n", conf->cnt_id_reverse_dup);
+    fprintf(stderr, "[dupsifter] number of reads with no reads mapped: %u\n", conf->cnt_id_no_map);
+    fprintf(stderr, "[dupsifter] number of reads with no primary reads: %u\n", conf->cnt_id_no_prim);
+    fflush(stderr);
 }
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -159,13 +177,13 @@ typedef struct {
     uint32_t *length;       /* length of contigs */
     uint64_t *offset;       /* offset from start of contigs */
     uint32_t  n_bins;       /* number of bins in genome */
-} mkdup_bins_t;
+} ds_bins_t;
 
-mkdup_bins_t *mkdup_bins_init() {
-    return (mkdup_bins_t *)calloc(1, sizeof(mkdup_bins_t));
+ds_bins_t *ds_bins_init() {
+    return (ds_bins_t *)calloc(1, sizeof(ds_bins_t));
 }
 
-void destroy_mkdup_bins(mkdup_bins_t *b) {
+void destroy_ds_bins(ds_bins_t *b) {
     if (b->length != NULL) { free(b->length); }
     if (b->offset != NULL) { free(b->offset); }
 }
@@ -256,8 +274,13 @@ uint8_t get_bsstrand(refcache_t *rs, bam1_t *b, uint32_t min_base_qual, uint8_t 
     return infer_bsstrand(rs, b, min_base_qual);
 }
 
-uint8_t determine_bsstrand_from_pair(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one, bam1_t *two, mkdup_conf_t *conf, uint8_t allow_u) {
-    refcache_fetch(rs, hdr->target_name[one->core.tid], one->core.pos > 100 ? one->core.pos-100 : 1, one->core.pos + one->core.l_qseq + 100);
+uint8_t determine_bsstrand_from_pair(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one, bam1_t *two,
+        ds_conf_t *conf, uint8_t allow_u) {
+    if (one) {
+        refcache_fetch(rs, hdr->target_name[one->core.tid],
+                one->core.pos > 100 ? one->core.pos-100 : 1,
+                one->core.pos + one->core.l_qseq + 100);
+    }
     int8_t bss1 = one ? get_bsstrand(rs, one, conf->min_base_qual, allow_u) : -1;
 
     refcache_fetch(rs, hdr->target_name[two->core.tid], two->core.pos > 100 ? two->core.pos-100 : 1, two->core.pos + two->core.l_qseq + 100);
@@ -272,7 +295,9 @@ uint8_t determine_bsstrand_from_pair(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one
         else if (bss1 < 0 && bss2 <  0) {
             // Rare case, assume OT/CTOT
             if (conf->verbose) {
-                fprintf(stderr, "[%s] Warning: No valid reads to determine bisulfite strand info. Assuming OT/CTOT strand.\n", __func__);
+                fprintf(stderr,
+                        "[%s] Warning: No valid reads to determine bisulfite strand info. Assuming OT/CTOT strand.\n",
+                        __func__);
                 fflush(stderr);
             }
             return 0;
@@ -306,9 +331,9 @@ uint8_t determine_bsstrand_from_pair(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one
 #define BIN_SHIFT ((uint64_t)27)
 #define BIN_MASK  ((uint64_t)((1 << BIN_SHIFT) - 1))
 
-mkdup_bins_t *prepare_hash_bins(bam_hdr_t *hdr, mkdup_conf_t *conf) {
+ds_bins_t *prepare_hash_bins(bam_hdr_t *hdr, ds_conf_t *conf) {
 
-    mkdup_bins_t *b = mkdup_bins_init();
+    ds_bins_t *b = ds_bins_init();
     b->n_contigs = hdr->n_targets;
 
     uint64_t sum_length = 0;
@@ -400,7 +425,7 @@ parsed_cigar_t parse_cigar(bam1_t *b) {
     return out;
 }
 
-signature_t create_signature(bam1_t *forward, bam1_t *reverse, mkdup_conf_t *conf, mkdup_bins_t *bins) {
+signature_t create_signature(bam1_t *forward, bam1_t *reverse, ds_conf_t *conf, ds_bins_t *bins) {
     // Variables to store things
     parsed_cigar_t cigar;
     uint32_t total_length;
@@ -442,20 +467,22 @@ signature_t create_signature(bam1_t *forward, bam1_t *reverse, mkdup_conf_t *con
     return sig;
 }
 
-void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, mkdup_conf_t *conf, refcache_t *rs, mkdup_bins_t *bins,
+void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs, ds_bins_t *bins,
         SigHash *ot_map, SigHash *ot_for, SigHash *ot_rev,
         SigHash *ob_map, SigHash *ob_for, SigHash *ob_rev) {
-    // If unable to determine OT/CTOT or OB/CTOB, defaults to OT/CTOT
-    uint8_t bss = determine_bsstrand_from_pair(rs, hdr, last, curr, conf, 0);
-
     // Ignore case where both reads are not primary alignments
     if (!is_primary(curr) && !is_primary(last)) {
+        conf->cnt_id_no_prim++;
         return;
     }
 
     if (is_unmapped(curr) && is_unmapped(last)) {
+        conf->cnt_id_no_map++;
         return;
     }
+
+    // If unable to determine OT/CTOT or OB/CTOB, defaults to OT/CTOT
+    uint8_t bss = determine_bsstrand_from_pair(rs, hdr, last, curr, conf, 0);
 
     bam1_t *forward = bam_init1();
     bam1_t *reverse = bam_init1();
@@ -464,16 +491,19 @@ void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, mkdup_conf_t *conf
 
     if (conf->single_end) {
         if (bam_is_rev(curr)) {
+            conf->cnt_id_reverse++;
             forward = NULL;
             reverse = curr;
             is_reverse = 1;
         } else {
+            conf->cnt_id_forward++;
             forward = curr;
             reverse = NULL;
             is_forward = 1;
         }
     } else {
         if (curr->core.flag & BAM_FPROPER_PAIR) {
+            conf->cnt_id_both_map++;
             if (bam_is_rev(curr) && bam_is_mrev(last)) {
                 forward = last;
                 reverse = curr;
@@ -485,18 +515,22 @@ void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, mkdup_conf_t *conf
             is_reverse = 1;
         } else {
             if (is_unmapped(curr) && bam_is_rev(last)) {
+                conf->cnt_id_reverse++;
                 forward = NULL;
                 reverse = last;
                 is_reverse = 1;
             } else if (is_unmapped(curr) && bam_is_mrev(last)) {
+                conf->cnt_id_forward++;
                 forward = last;
                 reverse = NULL;
                 is_forward = 1;
             } else if (is_unmapped(last) && bam_is_rev(curr)) {
+                conf->cnt_id_reverse++;
                 forward = NULL;
                 reverse = curr;
                 is_reverse = 1;
             } else if (is_unmapped(last) && bam_is_mrev(curr)) {
+                conf->cnt_id_forward++;
                 forward = curr;
                 reverse = NULL;
                 is_forward = 1;
@@ -517,6 +551,7 @@ void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, mkdup_conf_t *conf
         }
         if (!not_a_dup) { // signature found!
             // Both reads need to marked as duplicates in this case
+            conf->cnt_id_both_dup++;
             forward->core.flag |= BAM_FDUP;
             reverse->core.flag |= BAM_FDUP;
         }
@@ -527,6 +562,7 @@ void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, mkdup_conf_t *conf
             sh_put(ot_for, sig, &not_a_dup);
         }
         if (!not_a_dup) { // signature found!
+            conf->cnt_id_forward_dup++;
             // Only the forward strand read needs to be marked as a duplicate
             // The reverse strand either doesn't exist (SE) or is unmapped (PE)
             forward->core.flag |= BAM_FDUP;
@@ -538,6 +574,7 @@ void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, mkdup_conf_t *conf
             sh_put(ot_rev, sig, &not_a_dup);
         }
         if (!not_a_dup) { // signature found!
+            conf->cnt_id_reverse_dup++;
             // Only the reverse strand read needs to be marked as a duplicate
             // The forward strand either doesn't exist (SE) or is unmapped (PE)
             reverse->core.flag |= BAM_FDUP;
@@ -545,7 +582,7 @@ void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, mkdup_conf_t *conf
     }
 }
 
-int markdups(mkdup_conf_t *conf) {
+int markdups(ds_conf_t *conf) {
 
     // Read input file and BAM header
     htsFile *infh = hts_open(conf->infn, "r");
@@ -558,7 +595,7 @@ int markdups(mkdup_conf_t *conf) {
     bam_hdr_t *hdr = sam_hdr_read(infh);
 
     // Prepare hash table bins based on input file
-    mkdup_bins_t *bins = prepare_hash_bins(hdr, conf);
+    ds_bins_t *bins = prepare_hash_bins(hdr, conf);
 
     // Open output file
     htsFile *outfh = hts_open(conf->outfn, conf->out_mode);
@@ -695,9 +732,10 @@ int markdups(mkdup_conf_t *conf) {
 
     // Print some processing metrics
     if (successful_run) {
-        fprintf(stderr, "[%s] processing mode: %s\n", __func__, (conf->single_end) ? "single-end" : "paired-end");
-        fprintf(stderr, "[%s] processed number of reads ids: %u\n", __func__, n_read_ids);
-        fflush(stderr);
+        ds_conf_print(conf);
+        //fprintf(stderr, "[%s] processing mode: %s\n", __func__, (conf->single_end) ? "single-end" : "paired-end");
+        //fprintf(stderr, "[%s] processed number of reads ids: %u\n", __func__, n_read_ids);
+        //fflush(stderr);
     } else {
         if (is_coord_sorted) {
             fprintf(stderr, "ERROR: THIS APPEARS TO BE A COORDINATE SORTED BAM. PLEASE NAME SORT (samtools sort -n) AND RETRY.\n");
@@ -719,7 +757,7 @@ int markdups(mkdup_conf_t *conf) {
     free_refcache(rs);
 
     hts_close(outfh);
-    destroy_mkdup_bins(bins);
+    destroy_ds_bins(bins);
     bam_hdr_destroy(hdr);
     hts_close(infh);
 
@@ -740,7 +778,7 @@ int markdups(mkdup_conf_t *conf) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-static int usage(mkdup_conf_t *conf) {
+static int usage(ds_conf_t *conf) {
     fprintf(stderr, "\n");
     fprintf(stderr, "dupsifter [options] <ref.fa> [in.bam]\n");
     fprintf(stderr, "\n");
@@ -765,8 +803,8 @@ static int usage(mkdup_conf_t *conf) {
 int main(int argc, char *argv[]) {
 
     int c;
-    mkdup_conf_t conf = {0};
-    mkdup_conf_init(&conf);
+    ds_conf_t conf = {0};
+    ds_conf_init(&conf);
 
     // TODO: Add functionality for adding mate tags (MC and MQ) to reads
     if (argc < 1) { return usage(&conf); }
@@ -798,25 +836,32 @@ int main(int argc, char *argv[]) {
         return usage(&conf);
     }
 
-    // Set up input file
-    if (strcmp(conf.infn, "-") == 0) {
-        fprintf(stderr, "Reading input from stdin\n");
-    } else {
-        fprintf(stderr, "Reading input from %s\n", conf.infn);
-    }
+    if (conf.verbose) {
+        // Input file location
+        if (strcmp(conf.infn, "-") == 0) {
+            fprintf(stderr, "Reading input from stdin\n");
+        } else {
+            fprintf(stderr, "Reading input from %s\n", conf.infn);
+        }
 
-    // Set up output file
-    if (strcmp(conf.outfn, "-") == 0) {
-        fprintf(stderr, "Writing output to stdout\n");
-    } else {
-        fprintf(stderr, "Writing output to %s\n", conf.outfn);
+        // Output file location
+        if (strcmp(conf.outfn, "-") == 0) {
+            fprintf(stderr, "Writing output to stdout\n");
+        } else {
+            fprintf(stderr, "Writing output to %s\n", conf.outfn);
+        }
     }
 
     // Set write mode, auto-detect from file name, assume no extra compression
     // or other extra additions to the write mode
     sam_open_mode(conf.out_mode+1, conf.outfn, NULL);
 
+    double t1 = get_current_time();
     markdups(&conf);
+    double t2 = get_current_time();
+
+    fprintf(stderr, "[dupsifter:%s] Wall time: %.3f seconds, CPU time: %.3f seconds\n",
+            __func__, t2-t1, get_cpu_runtime());
 
     return 0;
 }
