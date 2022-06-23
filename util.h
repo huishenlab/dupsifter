@@ -38,7 +38,11 @@
 // Is a primary alignment (i.e., not secondary or supplementary)
 static inline uint8_t is_primary(bam1_t *b) {
     bam1_core_t *c = &b->core;
-    return !((c->flag & BAM_FSECONDARY) || (c->flag & BAM_FSUPPLEMENTARY));
+    if (!((c->flag & BAM_FSECONDARY) || (c->flag & BAM_FSUPPLEMENTARY))) {
+        return 1;
+    }
+
+    return 0;
 }
 
 // Read is flagged as unmapped
