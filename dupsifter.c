@@ -276,22 +276,27 @@ uint8_t get_bsstrand(refcache_t *rs, bam1_t *b, uint32_t min_base_qual, uint8_t 
 
 uint8_t determine_bsstrand_from_pair(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one, bam1_t *two,
         ds_conf_t *conf, uint8_t allow_u) {
-    if (one) {
+    int8_t bss1 = -1, bss2 = -1;
+    if (one && !is_unmapped(one)) {
         refcache_fetch(rs, hdr->target_name[one->core.tid],
                 one->core.pos > 100 ? one->core.pos-100 : 1,
                 one->core.pos + one->core.l_qseq + 100);
+        bss1 = get_bsstrand(rs, one, conf->min_base_qual, allow_u);
     }
-    int8_t bss1 = one ? get_bsstrand(rs, one, conf->min_base_qual, allow_u) : -1;
 
-    refcache_fetch(rs, hdr->target_name[two->core.tid], two->core.pos > 100 ? two->core.pos-100 : 1, two->core.pos + two->core.l_qseq + 100);
-    int8_t bss2 = two ? get_bsstrand(rs, two, conf->min_base_qual, allow_u) : -1;
+    if (two && !is_unmapped(two)) {
+        refcache_fetch(rs, hdr->target_name[two->core.tid],
+                two->core.pos > 100 ? two->core.pos-100 : 1,
+                two->core.pos + two->core.l_qseq + 100);
+        bss2 = get_bsstrand(rs, two, conf->min_base_qual, allow_u);
+    }
 
     if (bss1 == bss2 && bss1 >= 0) {
-        return bss1;
+        return (uint8_t)bss1;
     } else {
         // Resolve which bisulfite strand to use
-        if      (bss1 < 0 && bss2 >= 0) { return bss2; }
-        else if (bss2 < 0 && bss1 >= 0) { return bss1; }
+        if      (bss1 < 0 && bss2 >= 0) { return (uint8_t)bss2; }
+        else if (bss2 < 0 && bss1 >= 0) { return (uint8_t)bss1; }
         else if (bss1 < 0 && bss2 <  0) {
             // Rare case, assume OT/CTOT
             if (conf->verbose) {
@@ -308,7 +313,7 @@ uint8_t determine_bsstrand_from_pair(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one
                 fprintf(stderr, "Taking strand from read with higher total base quality.");
                 fflush(stderr);
             }
-            uint8_t out = total_qual(one) > total_qual(two) ? bss1 : bss2;
+            uint8_t out = total_qual(one) > total_qual(two) ? (uint8_t)bss1 : (uint8_t)bss2;
             return out;
         }
     }
@@ -476,6 +481,7 @@ void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, ds_conf_t *conf, r
         return;
     }
 
+    // Ignore case where both reads are unmapped
     if (is_unmapped(curr) && is_unmapped(last)) {
         conf->cnt_id_no_map++;
         return;
