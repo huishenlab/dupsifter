@@ -35,6 +35,16 @@
 #include <sys/resource.h>
 #include "sam.h"
 
+// Read is flagged as paired
+static inline uint8_t is_paired(bam1_t *b) {
+    bam1_core_t *c = &b->core;
+    if (c->flag & BAM_FPAIRED) {
+        return 1;
+    }
+
+    return 0;
+}
+
 // Is a primary alignment (i.e., not secondary or supplementary)
 static inline uint8_t is_primary(bam1_t *b) {
     bam1_core_t *c = &b->core;
@@ -59,6 +69,16 @@ static inline uint8_t is_unmapped(bam1_t *b) {
 static inline uint8_t is_duplicate(bam1_t *b) {
     bam1_core_t *c = &b->core;
     if (c->flag & BAM_FDUP) {
+        return 1;
+    }
+
+    return 0;
+}
+
+// Read is flagged as mate unmapped
+static inline uint8_t is_mate_unmapped(bam1_t *b) {
+    bam1_core_t *c = &b->core;
+    if (c->flag & BAM_FMUNMAP) {
         return 1;
     }
 
@@ -96,6 +116,12 @@ static inline uint32_t total_qual(const bam1_t *b) {
     for (i=0; i<b->core.l_qseq; ++i) { total += qual[i]; }
 
     return total;
+}
+
+static inline void swap_bam1_pointers(bam1_t **b1, bam1_t **b2) {
+    bam1_t *temp = *b1;
+    *b1 = *b2;
+    *b2 = temp;
 }
 
 // Exit with error message and EXIT_FAILURE return

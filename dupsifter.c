@@ -71,6 +71,7 @@ typedef struct {
     char      out_mode[6];         /* write mode of output file */
     uint32_t  min_base_qual;       /* threshold for high quality bases */
     uint8_t   rm_dup;              /* flag to remove duplicates */
+    uint8_t   is_wgs;              /* process reads as WGS instead of WGBS */
     uint32_t  cnt_id_both_map;     /* number of PE reads */
     uint32_t  cnt_id_forward;      /* number of reads where only one read is mapped and it's on the forward strand */
     uint32_t  cnt_id_reverse;      /* number of reads where only one read is mapped and it's on the reverse strand */
@@ -90,6 +91,7 @@ void ds_conf_init(ds_conf_t *conf) {
     conf->outfn = (char *)"-";
     conf->min_base_qual = 0;
     conf->rm_dup = 0;
+    conf->is_wgs = 0;
     conf->cnt_id_both_map = 0;
     conf->cnt_id_forward = 0;
     conf->cnt_id_reverse = 0;
@@ -114,6 +116,66 @@ void ds_conf_print(ds_conf_t *conf) {
     fprintf(stderr, "[dupsifter] number of reads with no reads mapped: %u\n", conf->cnt_id_no_map);
     fprintf(stderr, "[dupsifter] number of reads with no primary reads: %u\n", conf->cnt_id_no_prim);
     fflush(stderr);
+}
+//---------------------------------------------------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------------------------------------------------
+// Struct for storing all reads matching a given read name
+typedef struct bam1_chain bam1_chain_t;
+struct bam1_chain {
+    bam1_t *read;
+    struct bam1_chain *next;
+    uint8_t flag;
+};
+
+bam1_chain_t *bam1_chain_init(bam1_t *b) {
+    bam1_chain_t *out = (bam1_chain_t *)malloc(sizeof(bam1_chain_t));
+    if (b == NULL) { out->read = bam_init1(); }
+    else           { out->read = b; }
+    out->next = NULL;
+    out->flag = 0;
+
+    return out;
+}
+
+void destroy_bam1_chain(bam1_chain_t *b) {
+    if (b == NULL) { return; }
+
+    struct bam1_chain *temp = b;
+    while (temp != NULL) {
+        struct bam1_chain *next = temp->next;
+        if (temp->read != NULL) { bam_destroy1(temp->read); }
+        free(temp);
+        temp = next;
+    }
+    
+    if (temp != NULL) { free(temp); }
+}
+
+void add_new_read_to_chain(bam1_chain_t **head, bam1_t *b) {
+    bam1_chain_t *new  = bam1_chain_init(b);
+    bam1_chain_t *last = *head;
+
+    if (*head == NULL) {
+        *head = new;
+        return;
+    }
+
+    while (last->next != NULL) { last = last->next; }
+    last->next = new;
+
+    return;
+}
+
+uint32_t get_count(bam1_chain_t *bc) {
+    uint32_t count = 0;
+    bam1_chain_t *curr = bc;
+    while (curr != NULL) {
+        count++;
+        curr = curr->next;
+    }
+
+    return count;
 }
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -186,12 +248,12 @@ ds_bins_t *ds_bins_init() {
 void destroy_ds_bins(ds_bins_t *b) {
     if (b->length != NULL) { free(b->length); }
     if (b->offset != NULL) { free(b->offset); }
+    free(b);
 }
 //---------------------------------------------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------------------------------------------------
 // Padding functions
-//
 // These functions account for any reads that may run off the start or end of a chromosome, which may happen due to
 // soft clipped reads
 static inline uint32_t pad_chrom_length(uint32_t length, uint32_t max_length) {
@@ -235,7 +297,7 @@ uint8_t infer_bsstrand(refcache_t *rs, bam1_t *b, uint32_t min_base_qual) {
                 qpos += oplen;
                 break;
             default:
-                fatal_error("Unknown cigar, %u\n", op);
+                fatal_error("[dupsifter] Error: Unknown cigar, %u\n", op);
         }
     }
     if (nC2T >= nG2A) { return 0; }
@@ -417,7 +479,7 @@ parsed_cigar_t parse_cigar(bam1_t *b) {
                 first_op = 0;
                 break;
             default:
-                fatal_error("Unknown cigar operation: %u\n", op);
+                fatal_error("[dupsifter] Error: Unknown cigar operation: %u\n", op);
         }
     }
 
@@ -445,7 +507,7 @@ signature_t create_signature(bam1_t *forward, bam1_t *reverse, ds_conf_t *conf, 
 
         total_length = cigar.sclp + cigar.qlen + cigar.eclp;
         if (total_length > conf->max_length) {
-            fatal_error("Error: read with length %u is longer than max read length %u\n",
+            fatal_error("[dupsifter] Error: Read with length %u is longer than max read length %u\n",
                     total_length, conf->max_length);
         }
 
@@ -460,7 +522,7 @@ signature_t create_signature(bam1_t *forward, bam1_t *reverse, ds_conf_t *conf, 
 
         total_length = cigar.sclp + cigar.qlen + cigar.eclp;
         if (total_length > conf->max_length) {
-            fatal_error("Error: read with length %u is longer than max read length %u\n",
+            fatal_error("[dupsifter] Error: Read with length %u is longer than max read length %u\n",
                     total_length, conf->max_length);
         }
 
@@ -471,85 +533,125 @@ signature_t create_signature(bam1_t *forward, bam1_t *reverse, ds_conf_t *conf, 
 
     return sig;
 }
+//---------------------------------------------------------------------------------------------------------------------
 
-void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs, ds_bins_t *bins,
+//---------------------------------------------------------------------------------------------------------------------
+void problem_chain(bam1_chain_t *bc, uint32_t count) {
+    fatal_error("[dupsifter] Error: Can't find read 1 and/or read 2 in %u reads with read ID: %s. Are these reads coordinate sorted?\n",
+            count, bam_get_qname(bc->read));
+}
+
+void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs, ds_bins_t *bins,
         SigHash *ot_map, SigHash *ot_for, SigHash *ot_rev,
         SigHash *ob_map, SigHash *ob_for, SigHash *ob_rev) {
-    // Ignore case where both reads are not primary alignments
-    if (!is_primary(curr) && !is_primary(last)) {
+    bam1_t *r1 = NULL;
+    bam1_t *r2 = NULL;
+    uint32_t count = 0;
+    for (bam1_chain_t *curr = bc; curr != NULL; curr = curr->next) {
+        count++;
+
+        // Remove any duplicate marks that have already been applied
+        curr->read->core.flag &= ~BAM_FDUP;
+
+        // Secondary and supplementary alignments are not marked as duplicates
+        if (!is_primary(curr->read)) { continue; }
+
+        // If unpaired, set as r1 for creating signature
+        if      (!is_paired(curr->read))     { r1 = curr->read; }
+        // Set reads 1 and 2
+        else if (is_first_read(curr->read))  { r1 = curr->read; }
+        else if (is_second_read(curr->read)) { r2 = curr->read; }
+    }
+
+    if (r1 == NULL && r2 == NULL) {
         conf->cnt_id_no_prim++;
+        fprintf(stderr, "[dupsifter] Warning: No valid primary alignments found for read ID: %s", bam_get_qname(bc->read));
         return;
     }
 
-    // Ignore case where both reads are unmapped
-    if (is_unmapped(curr) && is_unmapped(last)) {
-        conf->cnt_id_no_map++;
-        return;
+    // Check for orphan reads
+    uint8_t is_single = 0;
+    if (r1 == NULL || r2 == NULL) {
+        if (r1 == NULL) { swap_bam1_pointers(&r1, &r2); }
+
+        // If there is only one read that says it's paired, but is unmapped or
+        // it's mate is mapped, then something went wrong
+        if (is_paired(r1) && (is_unmapped(r1) || !is_mate_unmapped(r1))) {
+            problem_chain(bc, count);
+        }
+
+        // If the only read is unmapped, then it isn't a duplicate
+        if (is_unmapped(r1) && !conf->single_end) {
+            problem_chain(bc, count);
+        } else if (is_unmapped(r1) && conf->single_end) {
+            conf->cnt_id_no_map++;
+            return;
+        }
+
+        is_single = 1;
+    } else {
+        // Add MC and MQ tags if desired
+        //if (conf->add_mate_tags) {
+        //    add_MCMQ();
+        //    add_MCMQ();
+        //}
+
+        // Don't mark reads as duplicates if both are unmapped
+        if (is_unmapped(r1) && is_unmapped(r2)) {
+            conf->cnt_id_no_map++;
+            return;
+        }
+
+        // Determine if read is an orphan because it's mate is unmapped
+        is_single = (is_unmapped(r1) || is_unmapped(r2));
+        if (is_unmapped(r1) && !is_unmapped(r2)) {
+            swap_bam1_pointers(&r1, &r2);
+        }
     }
 
     // If unable to determine OT/CTOT or OB/CTOB, defaults to OT/CTOT
-    uint8_t bss = determine_bsstrand_from_pair(rs, hdr, last, curr, conf, 0);
-
-    bam1_t *forward = bam_init1();
-    bam1_t *reverse = bam_init1();
+    // For WGS case, only use OT/CTOT
+    uint8_t bss = 0;
+    if (!conf->is_wgs) {
+        bss = determine_bsstrand_from_pair(rs, hdr, r1, r2, conf, 0);
+    }
 
     uint8_t is_forward = 0, is_reverse = 0;
+    bam1_t *forward = NULL;
+    bam1_t *reverse = NULL;
 
-    if (conf->single_end) {
-        if (bam_is_rev(curr)) {
+    if (is_single) {
+        if (bam_is_rev(r1)) {
             conf->cnt_id_reverse++;
-            forward = NULL;
-            reverse = curr;
             is_reverse = 1;
+            reverse = r1;
         } else {
             conf->cnt_id_forward++;
-            forward = curr;
-            reverse = NULL;
             is_forward = 1;
+            forward = r1;
         }
     } else {
-        if (curr->core.flag & BAM_FPROPER_PAIR) {
-            conf->cnt_id_both_map++;
-            if (bam_is_rev(curr) && bam_is_mrev(last)) {
-                forward = last;
-                reverse = curr;
-            } else {
-                forward = curr;
-                reverse = last;
-            }
-            is_forward = 1;
-            is_reverse = 1;
+        conf->cnt_id_both_map++;
+        is_forward = 1;
+        is_reverse = 1;
+        if (bam_is_rev(r1) && bam_is_mrev(r2)) {
+            forward = r2;
+            reverse = r1;
         } else {
-            if (is_unmapped(curr) && bam_is_rev(last)) {
-                conf->cnt_id_reverse++;
-                forward = NULL;
-                reverse = last;
-                is_reverse = 1;
-            } else if (is_unmapped(curr) && bam_is_mrev(last)) {
-                conf->cnt_id_forward++;
-                forward = last;
-                reverse = NULL;
-                is_forward = 1;
-            } else if (is_unmapped(last) && bam_is_rev(curr)) {
-                conf->cnt_id_reverse++;
-                forward = NULL;
-                reverse = curr;
-                is_reverse = 1;
-            } else if (is_unmapped(last) && bam_is_mrev(curr)) {
-                conf->cnt_id_forward++;
-                forward = curr;
-                reverse = NULL;
-                is_forward = 1;
-            }
+            forward = r1;
+            reverse = r2;
         }
+    }
+    if (!is_forward && !is_reverse) {
+        // Shouldn't ever make it in here, but in case it does, something went wrong
+        fatal_error("[dupsifter] Error: Could not find and forward or reverse read from read 1 and/or read 2");
     }
 
     signature_t sig = create_signature(forward, reverse, conf, bins);
 
+    // Do duplicate marking, either all reads in chain will marked as dups or none will
     int not_a_dup;
-    if (!is_forward && !is_reverse) {
-        return;
-    } else if (is_forward && is_reverse) {
+    if (is_forward && is_reverse) {
         if (bss) {
             sh_put(ob_map, sig, &not_a_dup);
         } else {
@@ -558,8 +660,9 @@ void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, ds_conf_t *conf, r
         if (!not_a_dup) { // signature found!
             // Both reads need to marked as duplicates in this case
             conf->cnt_id_both_dup++;
-            forward->core.flag |= BAM_FDUP;
-            reverse->core.flag |= BAM_FDUP;
+            for (bam1_chain_t *curr = bc; curr != NULL; curr = curr->next) {
+                curr->read->core.flag |= BAM_FDUP;
+            }
         }
     } else if (is_forward && !is_reverse) {
         if (bss) {
@@ -569,9 +672,9 @@ void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, ds_conf_t *conf, r
         }
         if (!not_a_dup) { // signature found!
             conf->cnt_id_forward_dup++;
-            // Only the forward strand read needs to be marked as a duplicate
-            // The reverse strand either doesn't exist (SE) or is unmapped (PE)
-            forward->core.flag |= BAM_FDUP;
+            for (bam1_chain_t *curr = bc; curr != NULL; curr = curr->next) {
+                curr->read->core.flag |= BAM_FDUP;
+            }
         }
     } else if (!is_forward && is_reverse) {
         if (bss) {
@@ -581,15 +684,14 @@ void check_if_dup(bam1_t *curr, bam1_t *last, bam_hdr_t *hdr, ds_conf_t *conf, r
         }
         if (!not_a_dup) { // signature found!
             conf->cnt_id_reverse_dup++;
-            // Only the reverse strand read needs to be marked as a duplicate
-            // The forward strand either doesn't exist (SE) or is unmapped (PE)
-            reverse->core.flag |= BAM_FDUP;
+            for (bam1_chain_t *curr = bc; curr != NULL; curr = curr->next) {
+                curr->read->core.flag |= BAM_FDUP;
+            }
         }
     }
 }
 
-int markdups(ds_conf_t *conf) {
-
+int dupsifter(ds_conf_t *conf) {
     // Read input file and BAM header
     htsFile *infh = hts_open(conf->infn, "r");
     if (infh == NULL) {
@@ -632,11 +734,7 @@ int markdups(ds_conf_t *conf) {
     refcache_t *rs = init_refcache(conf->reffn, 1000, 1000);
     int ret;
 
-    uint32_t n_read_ids      = 0; // Total number of read IDs processed
-    uint32_t n_matching_ids  = 0; // Number of PE read IDs processed that were next to their mate (i.e., name sorted)
-    uint8_t  is_coord_sorted = 0; // File appears to be coordinate sorted (1 if true, 0 if false)
-    uint8_t  is_paired       = 0; // Read is paired-end (1 if true, 0 if false) - used for running in single-end mode
-    uint8_t  successful_run  = 1; // Run had no errors crop up
+    uint32_t n_reads_read    = 0; // Number of reads read from file
 
     // Prepare hash maps
     SigHash *ot_map = sh_init();
@@ -646,113 +744,62 @@ int markdups(ds_conf_t *conf) {
     SigHash *ob_for = sh_init();
     SigHash *ob_rev = sh_init();
 
-    if (conf->single_end) { // process file as single-end BAM
-        bam1_t *curr = bam_init1();
-
-        while ((ret = sam_read1(infh, hdr, curr)) >= 0) {
-            // Check for PE read
-            if (curr->core.flag & BAM_FPAIRED) {
-                successful_run = 0;
-                is_paired = 1;
-                break;
-            }
-
-            // Remove existing duplicate info
-            curr->core.flag &= ~BAM_FDUP;
-
-            check_if_dup(curr, NULL, hdr, conf, rs, bins, ot_map, ot_for, ot_rev, ob_map, ob_for, ob_rev);
-
-            n_read_ids++;
-
-            // Print out read if not marked as a duplicate or user requested they be printed
-            if (!is_duplicate(curr) || (is_duplicate(curr) && !conf->rm_dup)) {
-                sam_write1(outfh, hdr, curr);
-            }
-        }
+    // Read in first read - primes loop through remaining reads as well as
+    // checking to see if there are any reads in the file
+    bam1_t *curr = bam_init1();
+    if ((ret = sam_read1(infh, hdr, curr)) < 0) {
+        fprintf(stderr, "[%s:%d] Error: No reads found in %s\n", __func__,
+                __LINE__, strcmp(conf->infn, "-") ? conf->infn : "stdin");
+        fflush(stderr);
 
         bam_destroy1(curr);
-    } else { // process file as paired-end BAM
-        // Read in first read - primes loop through remaining reads as well as
-        // checking to see if there are any reads in the file
-        bam1_t *last = bam_init1();
-        if ((ret = sam_read1(infh, hdr, last)) < 0) {
-            fprintf(stderr, "[%s:%d] Error: No reads found in %s\n", __func__,
-                    __LINE__, strcmp(conf->infn, "-") ? conf->infn : "stdin");
-            fflush(stderr);
+        hts_close(outfh);
+        bam_hdr_destroy(hdr);
+        hts_close(infh);
 
-            bam_destroy1(last);
-            hts_close(outfh);
-            bam_hdr_destroy(hdr);
-            hts_close(infh);
+        return 1;
+    }
+    n_reads_read = 1;
+    bam1_chain_t *bc_curr = bam1_chain_init(curr);
 
-            return 1;
-        }
-        n_read_ids = 1;
-
-        // Remove existing duplicate info
-        last->core.flag &= ~BAM_FDUP;
-
-        // FIXME: If there is only 1 read in the file, then no reads will be written
-        //        to output. Need to figure out how to handle this edge case.
-        bam1_t *curr = bam_init1();
-        while ((ret = sam_read1(infh, hdr, curr)) >= 0) {
-            // Remove existing duplicate info
-            curr->core.flag &= ~BAM_FDUP;
-
-            if (strcmp(bam_get_qname(last), bam_get_qname(curr)) == 0) {
-                n_matching_ids++;
-                check_if_dup(curr, last, hdr, conf, rs, bins, ot_map, ot_for, ot_rev, ob_map, ob_for, ob_rev);
-
-                // Print lines if not duplicates or user requests that duplicates be printed
-                if (!is_duplicate(last) || (is_duplicate(last) && !conf->rm_dup)) {
-                    sam_write1(outfh, hdr, last);
-                }
-                if (!is_duplicate(curr) || (is_duplicate(curr) && !conf->rm_dup)) {
-                    sam_write1(outfh, hdr, curr);
-                }
-
-                last = curr;
-                curr = bam_init1();
-            } else {
-                last = curr;
-                curr = bam_init1();
-                n_read_ids++;
-
-                if (n_read_ids > 100 && n_matching_ids < 50) {
-                    successful_run = 0;
-                    is_coord_sorted = 1;
-                    break;
-                }
+    bam1_t *next = bam_init1();
+    while ((ret = sam_read1(infh, hdr, next)) >= 0) {
+        n_reads_read++;
+        if (strcmp(bam_get_qname(next), bam_get_qname(bc_curr->read)) != 0) {
+            mark_dup(bc_curr, hdr, conf, rs, bins,
+                    ot_map, ot_for, ot_rev, ob_map, ob_for, ob_rev);
+            for (bam1_chain_t *curr = bc_curr; curr != NULL; curr = curr->next) {
+                // If the first read in the chain is a duplicate then all others will be,
+                // so if we want to remove dupliates, then we can break out right away
+                if (is_duplicate(curr->read) && conf->rm_dup) { break; }
+                sam_write1(outfh, hdr, curr->read);
             }
+            destroy_bam1_chain(bc_curr);
+            bc_curr = bam1_chain_init(next);
+        } else {
+            add_new_read_to_chain(&bc_curr, next);
         }
-
-        bam_destroy1(curr);
-        bam_destroy1(last);
+        next = bam_init1();
     }
 
-    // Verify PE was not coordinate sorted
-    if (!conf->single_end && !is_coord_sorted && n_read_ids <= 100 && n_read_ids > n_matching_ids) {
-        successful_run = 0;
-        is_coord_sorted = 1;
+    if (get_count(bc_curr) > 0) {
+        mark_dup(bc_curr, hdr, conf, rs, bins, 
+                ot_map, ot_for, ot_rev, ob_map, ob_for, ob_rev);
+        for (bam1_chain_t *curr = bc_curr; curr != NULL; curr = curr->next) {
+            // If the first read in the chain is a duplicate then all others will be,
+            // so if we want to remove dupliates, then we can break out right away
+            if (is_duplicate(curr->read) && conf->rm_dup) { break; }
+            sam_write1(outfh, hdr, curr->read);
+        }
     }
 
-    // Print some processing metrics
-    if (successful_run) {
-        ds_conf_print(conf);
-        //fprintf(stderr, "[%s] processing mode: %s\n", __func__, (conf->single_end) ? "single-end" : "paired-end");
-        //fprintf(stderr, "[%s] processed number of reads ids: %u\n", __func__, n_read_ids);
-        //fflush(stderr);
-    } else {
-        if (is_coord_sorted) {
-            fprintf(stderr, "ERROR: THIS APPEARS TO BE A COORDINATE SORTED BAM. PLEASE NAME SORT (samtools sort -n) AND RETRY.\n");
-        }
-        if (is_paired) {
-            fprintf(stderr, "ERROR: PAIRED-END READ FOUND WHEN RUNNING IN SINGLE-END MODE (-s). MIXED BAMS ARE NOT ALLOWED.\n");
-        }
-        fprintf(stderr, "Error occurred. Deleting output BAM (if not streaming)\n");
-    }
+    // Print a little output info
+    fprintf(stderr, "[dupsifter] number of individual reads processed: %u\n", n_reads_read);
 
     // Clean up
+    bam_destroy1(next);
+    destroy_bam1_chain(bc_curr);
+
     sh_destroy(ob_rev);
     sh_destroy(ob_for);
     sh_destroy(ob_map);
@@ -767,21 +814,9 @@ int markdups(ds_conf_t *conf) {
     bam_hdr_destroy(hdr);
     hts_close(infh);
 
-    // Delete output BAM file if there was an error
-    if (!successful_run && strcmp(conf->outfn, "-") != 0) {
-        if (remove(conf->outfn) == 0) {
-            fprintf(stderr, "Successfully deleted %s\n", conf->outfn);
-        } else {
-            fprintf(stderr, "Unable to delete %s\n", conf->outfn);
-        }
-    }
-
-    if (successful_run) {
-        return 0;
-    } else {
-        return 1;
-    }
+    return 0;
 }
+//---------------------------------------------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------------------------------------------------
 static int usage(ds_conf_t *conf) {
@@ -792,8 +827,9 @@ static int usage(ds_conf_t *conf) {
     fprintf(stderr, "    -o STR    name of output file [stdout]\n");
     fprintf(stderr, "Input options:\n");
     fprintf(stderr, "    -s        run for single-end data\n");
-    fprintf(stderr, "    -l INT    maximum read length for paired end duplicate-marking [%d]\n", conf->max_length);
-    fprintf(stderr, "    -b INT    minimum base quality [30].\n");
+    fprintf(stderr, "    -W        process WGS reads instead of WGBS\n");
+    fprintf(stderr, "    -l INT    maximum read length for paired end duplicate-marking [%u]\n", conf->max_length);
+    fprintf(stderr, "    -b INT    minimum base quality [%u].\n", conf->min_base_qual);
     fprintf(stderr, "    -r        toggle to remove marked duplicate.\n");
     fprintf(stderr, "    -v        print extra messages\n");
     fprintf(stderr, "    -h        this help.\n");
@@ -814,11 +850,12 @@ int main(int argc, char *argv[]) {
 
     // TODO: Add functionality for adding mate tags (MC and MQ) to reads
     if (argc < 1) { return usage(&conf); }
-    while ((c = getopt(argc, argv, ":b:l:o:rsqvh")) >= 0) {
+    while ((c = getopt(argc, argv, ":b:l:o:Wrsqvh")) >= 0) {
         switch (c) {
-            case 'b': conf.min_base_qual = atoi(optarg); break;
+            case 'b': conf.min_base_qual = (uint32_t)atoi(optarg); break;
             case 'l': conf.max_length = (uint32_t)atoi(optarg); break;
             case 'o': conf.outfn = optarg; break;
+            case 'W': conf.is_wgs = 1; break;
             case 'r': conf.rm_dup = 1; break;
             case 's': conf.single_end = 1; break;
             case 'v': conf.verbose = 1; break;
@@ -863,9 +900,11 @@ int main(int argc, char *argv[]) {
     sam_open_mode(conf.out_mode+1, conf.outfn, NULL);
 
     double t1 = get_current_time();
-    markdups(&conf);
+    dupsifter(&conf);
     double t2 = get_current_time();
 
+    // Print output of run
+    ds_conf_print(&conf);
     fprintf(stderr, "[dupsifter:%s] Wall time: %.3f seconds, CPU time: %.3f seconds\n",
             __func__, t2-t1, get_cpu_runtime());
 
