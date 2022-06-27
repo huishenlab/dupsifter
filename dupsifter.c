@@ -84,6 +84,7 @@ typedef struct {
     uint8_t   verbose;             /* level of messages to print */
     uint32_t  max_length;          /* max read length allowed */
     uint8_t   single_end;          /* process all reads as single-end */
+    uint8_t   add_mate_tags;       /* add MC and MQ tags to mate reads */
 } ds_conf_t;
 
 void ds_conf_init(ds_conf_t *conf) {
@@ -105,6 +106,7 @@ void ds_conf_init(ds_conf_t *conf) {
     conf->verbose = 0;
     conf->max_length = 10000;
     conf->single_end = 0;
+    conf->add_mate_tags = 0;
 }
 
 void ds_conf_destroy(ds_conf_t *conf) {
@@ -542,6 +544,53 @@ signature_t create_signature(bam1_t *forward, bam1_t *reverse, ds_conf_t *conf, 
 //---------------------------------------------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------------------------------------------------
+// Functions for adding mate (MC/MQ) tags
+static uint8_t create_cigar_string(bam1_t *b, kstring_t *str) {
+    // Empty CIGAR gets a "*"
+    if (b->core.n_cigar == 0) {
+        return (kputc('*', str) == EOF) ? 0 : 1;
+    }
+
+    uint32_t *cigar = bam_get_cigar(b);
+    uint32_t i;
+
+    for (i=0; i<b->core.n_cigar; i++) {
+        if (kputw(bam_cigar_oplen(cigar[i]), str) == EOF) { return 0; }
+        if (kputc(bam_cigar_opchr(cigar[i]), str) == EOF) { return 0; }
+    }
+
+    return 1;
+}
+
+void add_MCMQ(bam1_chain_t *bc, bam1_t *b_read, bam1_t *b_mate) {
+    if (is_unmapped(b_read)) { return; }
+
+    int mask = (b_mate->core.flag & (0x40 | 0x80));
+
+    kstring_t mc = { 0, 0, NULL };
+    if (!create_cigar_string(b_read, &mc)) { return; }
+
+    uint32_t mq = b_read->core.qual;
+
+    for (bam1_chain_t *next = bc; next != NULL; next = next->next) {
+        bam1_t *read = next->read;
+
+        if (read->core.flag & mask) {
+            if (bam_aux_get(read, "MC") == NULL) {
+                bam_aux_append(read, "MC", 'Z', ks_len(&mc)+1, (uint8_t *)ks_str(&mc));
+            }
+
+            if (bam_aux_get(read, "MQ") == NULL) {
+                bam_aux_append(read, "MQ", 'i', sizeof(uint32_t), (uint8_t *)&mq);
+            }
+        }
+    }
+
+    free(mc.s);
+}
+//---------------------------------------------------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------------------------------------------------
 void problem_chain(bam1_chain_t *bc, uint32_t count) {
     fatal_error("[dupsifter] Error: Can't find read 1 and/or read 2 in %u reads with read ID: %s. Are these reads coordinate sorted?\n",
             count, bam_get_qname(bc->read));
@@ -575,7 +624,7 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
         return;
     }
 
-    // Check for orphan reads
+    // Check for singleton (either SE read or PE read with unmapped mate) reads
     uint8_t is_single = 0;
     if (r1 == NULL || r2 == NULL) {
         if (r1 == NULL) { swap_bam1_pointers(&r1, &r2); }
@@ -597,10 +646,10 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
         is_single = 1;
     } else {
         // Add MC and MQ tags if desired
-        //if (conf->add_mate_tags) {
-        //    add_MCMQ();
-        //    add_MCMQ();
-        //}
+        if (conf->add_mate_tags) {
+            add_MCMQ(bc, r1, r2);
+            add_MCMQ(bc, r2, r1);
+        }
 
         // Don't mark reads as duplicates if both are unmapped
         if (is_unmapped(r1) && is_unmapped(r2)) {
@@ -608,7 +657,7 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
             return;
         }
 
-        // Determine if read is an orphan because it's mate is unmapped
+        // Check for unmapped mate
         is_single = (is_unmapped(r1) || is_unmapped(r2));
         if (is_unmapped(r1) && !is_unmapped(r2)) {
             swap_bam1_pointers(&r1, &r2);
@@ -842,6 +891,7 @@ static int usage(ds_conf_t *conf) {
     fprintf(stderr, "    -o STR    name of output file [stdout]\n");
     fprintf(stderr, "Input options:\n");
     fprintf(stderr, "    -s        run for single-end data\n");
+    fprintf(stderr, "    -m        add MC and MQ mate tags to mate reads\n");
     fprintf(stderr, "    -W        process WGS reads instead of WGBS\n");
     fprintf(stderr, "    -l INT    maximum read length for paired end duplicate-marking [%u]\n", conf->max_length);
     fprintf(stderr, "    -b INT    minimum base quality [%u].\n", conf->min_base_qual);
@@ -865,7 +915,7 @@ int main(int argc, char *argv[]) {
 
     // TODO: Add functionality for adding mate tags (MC and MQ) to reads
     if (argc < 1) { return usage(&conf); }
-    while ((c = getopt(argc, argv, ":b:l:o:Wrsqvh")) >= 0) {
+    while ((c = getopt(argc, argv, ":b:l:o:Wrsmqvh")) >= 0) {
         switch (c) {
             case 'b': conf.min_base_qual = (uint32_t)atoi(optarg); break;
             case 'l': conf.max_length = (uint32_t)atoi(optarg); break;
@@ -873,6 +923,7 @@ int main(int argc, char *argv[]) {
             case 'W': conf.is_wgs = 1; break;
             case 'r': conf.rm_dup = 1; break;
             case 's': conf.single_end = 1; break;
+            case 'm': conf.add_mate_tags = 1; break;
             case 'v': conf.verbose = 1; break;
             case 'h': return usage(&conf);
             case ':':
