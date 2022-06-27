@@ -69,6 +69,7 @@ typedef struct {
     char     *infn;                /* name of input file */
     char     *outfn;               /* name of output file */
     char      out_mode[6];         /* write mode of output file */
+    char     *arg_list;            /* input argument list for PG tag */
     uint32_t  min_base_qual;       /* threshold for high quality bases */
     uint8_t   rm_dup;              /* flag to remove duplicates */
     uint8_t   is_wgs;              /* process reads as WGS instead of WGBS */
@@ -89,6 +90,7 @@ void ds_conf_init(ds_conf_t *conf) {
     strcpy(conf->out_mode, "w");
 
     conf->outfn = (char *)"-";
+    conf->arg_list = NULL;
     conf->min_base_qual = 0;
     conf->rm_dup = 0;
     conf->is_wgs = 0;
@@ -103,6 +105,10 @@ void ds_conf_init(ds_conf_t *conf) {
     conf->verbose = 0;
     conf->max_length = 10000;
     conf->single_end = 0;
+}
+
+void ds_conf_destroy(ds_conf_t *conf) {
+    free(conf->arg_list);
 }
 
 void ds_conf_print(ds_conf_t *conf) {
@@ -718,7 +724,17 @@ int dupsifter(ds_conf_t *conf) {
     }
 
     // Write header to output file
-    // TODO: Add new PG line to header before writing
+    if (sam_hdr_add_pg(hdr, "dupsifter", "VN", dupsifter_version(),
+                conf->arg_list ? "CL" : NULL, conf->arg_list ? conf->arg_list : NULL, NULL)) {
+        fprintf(stderr, "[dupsifter] Error: Failed to add PG tag to output header\n");
+        fflush(stderr);
+
+        hts_close(outfh);
+        bam_hdr_destroy(hdr);
+        hts_close(infh);
+
+        return 1;
+    }
     if (sam_hdr_write(outfh, hdr) < 0) {
         fprintf(stderr, "[%s:%d] Error: Header writing failed. Abort.\n", __func__, __LINE__);
         fflush(stderr);
@@ -733,8 +749,7 @@ int dupsifter(ds_conf_t *conf) {
     // Initialize variables for reading
     refcache_t *rs = init_refcache(conf->reffn, 1000, 1000);
     int ret;
-
-    uint32_t n_reads_read    = 0; // Number of reads read from file
+    uint32_t n_reads_read = 0; // Number of reads read from file
 
     // Prepare hash maps
     SigHash *ot_map = sh_init();
@@ -899,6 +914,11 @@ int main(int argc, char *argv[]) {
     // or other extra additions to the write mode
     sam_open_mode(conf.out_mode+1, conf.outfn, NULL);
 
+    // Create argument list string
+    if (!(conf.arg_list = stringify_argv(argc, argv))) {
+        fatal_error("[dupsifter] Error: Unable to create argument list for PG string\n");
+    }
+
     double t1 = get_current_time();
     dupsifter(&conf);
     double t2 = get_current_time();
@@ -907,6 +927,8 @@ int main(int argc, char *argv[]) {
     ds_conf_print(&conf);
     fprintf(stderr, "[dupsifter:%s] Wall time: %.3f seconds, CPU time: %.3f seconds\n",
             __func__, t2-t1, get_cpu_runtime());
+
+    ds_conf_destroy(&conf);
 
     return 0;
 }

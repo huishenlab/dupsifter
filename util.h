@@ -34,6 +34,12 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include "sam.h"
+#include "version.h"
+
+// Return version number
+const char *dupsifter_version() {
+    return DUPSIFTER_VERSION;
+}
 
 // Read is flagged as paired
 static inline uint8_t is_paired(bam1_t *b) {
