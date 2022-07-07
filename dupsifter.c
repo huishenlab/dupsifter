@@ -71,8 +71,13 @@ typedef struct {
     char      out_mode[6];         /* write mode of output file */
     char     *arg_list;            /* input argument list for PG tag */
     uint32_t  min_base_qual;       /* threshold for high quality bases */
+    uint32_t  max_length;          /* max read length allowed */
     uint8_t   rm_dup;              /* flag to remove duplicates */
     uint8_t   is_wgs;              /* process reads as WGS instead of WGBS */
+    uint8_t   verbose;             /* level of messages to print */
+    uint8_t   single_end;          /* process all reads as single-end */
+    uint8_t   add_mate_tags;       /* add MC and MQ tags to mate reads */
+
     uint32_t  cnt_id_both_map;     /* number of PE reads */
     uint32_t  cnt_id_forward;      /* number of reads where only one read is mapped and it's on the forward strand */
     uint32_t  cnt_id_reverse;      /* number of reads where only one read is mapped and it's on the reverse strand */
@@ -81,10 +86,8 @@ typedef struct {
     uint32_t  cnt_id_reverse_dup;  /* number of duplicates on the reverse strand */
     uint32_t  cnt_id_no_map;       /* number of reads with both reads unmapped (PE) or the read is unmapped (SE) */
     uint32_t  cnt_id_no_prim;      /* number of reads with no primary reads */
-    uint8_t   verbose;             /* level of messages to print */
-    uint32_t  max_length;          /* max read length allowed */
-    uint8_t   single_end;          /* process all reads as single-end */
-    uint8_t   add_mate_tags;       /* add MC and MQ tags to mate reads */
+    uint32_t  cnt_id_n_primary;    /* number of primary alignments */
+    uint32_t  cnt_id_n_sec_sup;    /* number of secondary and supplementary alignments */
 } ds_conf_t;
 
 void ds_conf_init(ds_conf_t *conf) {
@@ -93,8 +96,13 @@ void ds_conf_init(ds_conf_t *conf) {
     conf->outfn = (char *)"-";
     conf->arg_list = NULL;
     conf->min_base_qual = 0;
+    conf->max_length = 10000;
     conf->rm_dup = 0;
     conf->is_wgs = 0;
+    conf->verbose = 0;
+    conf->single_end = 0;
+    conf->add_mate_tags = 0;
+
     conf->cnt_id_both_map = 0;
     conf->cnt_id_forward = 0;
     conf->cnt_id_reverse = 0;
@@ -103,10 +111,8 @@ void ds_conf_init(ds_conf_t *conf) {
     conf->cnt_id_reverse_dup = 0;
     conf->cnt_id_no_map = 0;
     conf->cnt_id_no_prim = 0;
-    conf->verbose = 0;
-    conf->max_length = 10000;
-    conf->single_end = 0;
-    conf->add_mate_tags = 0;
+    conf->cnt_id_n_primary = 0;
+    conf->cnt_id_n_sec_sup = 0;
 }
 
 void ds_conf_destroy(ds_conf_t *conf) {
@@ -121,6 +127,8 @@ void ds_conf_print(ds_conf_t *conf) {
     fprintf(stderr, "[dupsifter] number of reads with both reads marked as duplicates: %u\n", conf->cnt_id_both_dup);
     fprintf(stderr, "[dupsifter] number of reads on the forward strand marked as duplicates: %u\n", conf->cnt_id_forward_dup);
     fprintf(stderr, "[dupsifter] number of reads on the reverse strand marked as duplicates: %u\n", conf->cnt_id_reverse_dup);
+    fprintf(stderr, "[dupsifter] number of individual primary-alignment reads: %u\n", conf->cnt_id_n_primary);
+    fprintf(stderr, "[dupsifter] number of individual secondary- and supplementary-alignment reads: %u\n", conf->cnt_id_n_sec_sup);
     fprintf(stderr, "[dupsifter] number of reads with no reads mapped: %u\n", conf->cnt_id_no_map);
     fprintf(stderr, "[dupsifter] number of reads with no primary reads: %u\n", conf->cnt_id_no_prim);
     fflush(stderr);
@@ -608,14 +616,16 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
         // Remove any duplicate marks that have already been applied
         curr->read->core.flag &= ~BAM_FDUP;
 
-        // Secondary and supplementary alignments are not marked as duplicates
-        if (!is_primary(curr->read)) { continue; }
+        // Secondary and supplementary alignments are not used to determine duplicates
+        if (!is_primary(curr->read)) { conf->cnt_id_n_sec_sup++; continue; }
 
         // If unpaired, set as r1 for creating signature
         if      (!is_paired(curr->read))     { r1 = curr->read; }
         // Set reads 1 and 2
         else if (is_first_read(curr->read))  { r1 = curr->read; }
         else if (is_second_read(curr->read)) { r2 = curr->read; }
+
+        conf->cnt_id_n_primary++;
     }
 
     if (r1 == NULL && r2 == NULL) {
