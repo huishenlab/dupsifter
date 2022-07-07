@@ -147,8 +147,8 @@ static inline double get_cpu_runtime() {
     struct rusage r;
     getrusage(RUSAGE_SELF, &r);
 
-    double secs = r.ru_utime.tv_sec + r.ru_stime.tv_sec;
-    double msec = 1e-6 * (r.ru_utime.tv_usec + r.ru_stime.tv_usec);
+    double secs = r.ru_utime.tv_sec;
+    double msec = 1e-6 * (r.ru_utime.tv_usec);
 
     return secs + msec;
 }

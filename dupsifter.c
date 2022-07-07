@@ -78,6 +78,7 @@ typedef struct {
     uint8_t   single_end;          /* process all reads as single-end */
     uint8_t   add_mate_tags;       /* add MC and MQ tags to mate reads */
 
+    uint32_t  n_reads_read;        /* Number of reads read from file */
     uint32_t  cnt_id_both_map;     /* number of PE reads */
     uint32_t  cnt_id_forward;      /* number of reads where only one read is mapped and it's on the forward strand */
     uint32_t  cnt_id_reverse;      /* number of reads where only one read is mapped and it's on the reverse strand */
@@ -103,6 +104,7 @@ void ds_conf_init(ds_conf_t *conf) {
     conf->single_end = 0;
     conf->add_mate_tags = 0;
 
+    conf->n_reads_read = 0;
     conf->cnt_id_both_map = 0;
     conf->cnt_id_forward = 0;
     conf->cnt_id_reverse = 0;
@@ -121,6 +123,7 @@ void ds_conf_destroy(ds_conf_t *conf) {
 
 void ds_conf_print(ds_conf_t *conf) {
     fprintf(stderr, "[dupsifter] processing mode: %s\n", (conf->single_end) ? "single-end" : "paired-end");
+    fprintf(stderr, "[dupsifter] number of individual reads processed: %u\n", conf->n_reads_read);
     fprintf(stderr, "[dupsifter] number of reads with both reads mapped: %u\n", conf->cnt_id_both_map);
     fprintf(stderr, "[dupsifter] number of reads with only one read mapped to the forward strand: %u\n", conf->cnt_id_forward);
     fprintf(stderr, "[dupsifter] number of reads with only one read mapped to the reverse strand: %u\n", conf->cnt_id_reverse);
@@ -808,7 +811,6 @@ int dupsifter(ds_conf_t *conf) {
     // Initialize variables for reading
     refcache_t *rs = init_refcache(conf->reffn, 1000, 1000);
     int ret;
-    uint32_t n_reads_read = 0; // Number of reads read from file
 
     // Prepare hash maps
     SigHash *ot_map = sh_init();
@@ -833,12 +835,12 @@ int dupsifter(ds_conf_t *conf) {
 
         return 1;
     }
-    n_reads_read = 1;
+    conf->n_reads_read = 1;
     bam1_chain_t *bc_curr = bam1_chain_init(curr);
 
     bam1_t *next = bam_init1();
     while ((ret = sam_read1(infh, hdr, next)) >= 0) {
-        n_reads_read++;
+        conf->n_reads_read++;
         if (strcmp(bam_get_qname(next), bam_get_qname(bc_curr->read)) != 0) {
             mark_dup(bc_curr, hdr, conf, rs, bins,
                     ot_map, ot_for, ot_rev, ob_map, ob_for, ob_rev);
@@ -866,9 +868,6 @@ int dupsifter(ds_conf_t *conf) {
             sam_write1(outfh, hdr, curr->read);
         }
     }
-
-    // Print a little output info
-    fprintf(stderr, "[dupsifter] number of individual reads processed: %u\n", n_reads_read);
 
     // Clean up
     bam_destroy1(next);
@@ -981,13 +980,15 @@ int main(int argc, char *argv[]) {
     }
 
     double t1 = get_current_time();
+    double c1 = get_cpu_runtime();
     dupsifter(&conf);
+    double c2 = get_cpu_runtime();
     double t2 = get_current_time();
 
     // Print output of run
     ds_conf_print(&conf);
     fprintf(stderr, "[dupsifter:%s] Wall time: %.3f seconds, CPU time: %.3f seconds\n",
-            __func__, t2-t1, get_cpu_runtime());
+            __func__, t2-t1, c2-c1);
 
     ds_conf_destroy(&conf);
 
