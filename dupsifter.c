@@ -64,10 +64,14 @@
 
 //---------------------------------------------------------------------------------------------------------------------
 // Config struct, initialization function, and output function
+#define DEF_STAT_NAME "dupsifter.stat"
+#define TAG_STAT_NAME ".dupsifter.stat"
+
 typedef struct {
     char     *reffn;               /* reference file name */
     char     *infn;                /* name of input file */
     char     *outfn;               /* name of output file */
+    char     *statfn;               /* name of statistics file */
     char      out_mode[6];         /* write mode of output file */
     char     *arg_list;            /* input argument list for PG tag */
     uint32_t  min_base_qual;       /* threshold for high quality bases */
@@ -96,6 +100,7 @@ void ds_conf_init(ds_conf_t *conf) {
 
     conf->outfn = (char *)"-";
     conf->arg_list = NULL;
+    conf->statfn = NULL;
     conf->min_base_qual = 0;
     conf->max_length = 10000;
     conf->rm_dup = 0;
@@ -119,22 +124,26 @@ void ds_conf_init(ds_conf_t *conf) {
 
 void ds_conf_destroy(ds_conf_t *conf) {
     free(conf->arg_list);
+    if (conf->statfn != NULL) { free(conf->statfn); }
 }
 
 void ds_conf_print(ds_conf_t *conf) {
-    fprintf(stderr, "[dupsifter] processing mode: %s\n", (conf->single_end) ? "single-end" : "paired-end");
-    fprintf(stderr, "[dupsifter] number of individual reads processed: %u\n", conf->n_reads_read);
-    fprintf(stderr, "[dupsifter] number of reads with both reads mapped: %u\n", conf->cnt_id_both_map);
-    fprintf(stderr, "[dupsifter] number of reads with only one read mapped to the forward strand: %u\n", conf->cnt_id_forward);
-    fprintf(stderr, "[dupsifter] number of reads with only one read mapped to the reverse strand: %u\n", conf->cnt_id_reverse);
-    fprintf(stderr, "[dupsifter] number of reads with both reads marked as duplicates: %u\n", conf->cnt_id_both_dup);
-    fprintf(stderr, "[dupsifter] number of reads on the forward strand marked as duplicates: %u\n", conf->cnt_id_forward_dup);
-    fprintf(stderr, "[dupsifter] number of reads on the reverse strand marked as duplicates: %u\n", conf->cnt_id_reverse_dup);
-    fprintf(stderr, "[dupsifter] number of individual primary-alignment reads: %u\n", conf->cnt_id_n_primary);
-    fprintf(stderr, "[dupsifter] number of individual secondary- and supplementary-alignment reads: %u\n", conf->cnt_id_n_sec_sup);
-    fprintf(stderr, "[dupsifter] number of reads with no reads mapped: %u\n", conf->cnt_id_no_map);
-    fprintf(stderr, "[dupsifter] number of reads with no primary reads: %u\n", conf->cnt_id_no_prim);
-    fflush(stderr);
+    FILE *statfh = fopen(conf->statfn, "w");
+
+    fprintf(statfh, "[dupsifter] processing mode: %s\n", (conf->single_end) ? "single-end" : "paired-end");
+    fprintf(statfh, "[dupsifter] number of individual reads processed: %u\n", conf->n_reads_read);
+    fprintf(statfh, "[dupsifter] number of reads with both reads mapped: %u\n", conf->cnt_id_both_map);
+    fprintf(statfh, "[dupsifter] number of reads with only one read mapped to the forward strand: %u\n", conf->cnt_id_forward);
+    fprintf(statfh, "[dupsifter] number of reads with only one read mapped to the reverse strand: %u\n", conf->cnt_id_reverse);
+    fprintf(statfh, "[dupsifter] number of reads with both reads marked as duplicates: %u\n", conf->cnt_id_both_dup);
+    fprintf(statfh, "[dupsifter] number of reads on the forward strand marked as duplicates: %u\n", conf->cnt_id_forward_dup);
+    fprintf(statfh, "[dupsifter] number of reads on the reverse strand marked as duplicates: %u\n", conf->cnt_id_reverse_dup);
+    fprintf(statfh, "[dupsifter] number of individual primary-alignment reads: %u\n", conf->cnt_id_n_primary);
+    fprintf(statfh, "[dupsifter] number of individual secondary- and supplementary-alignment reads: %u\n", conf->cnt_id_n_sec_sup);
+    fprintf(statfh, "[dupsifter] number of reads with no reads mapped: %u\n", conf->cnt_id_no_map);
+    fprintf(statfh, "[dupsifter] number of reads with no primary reads: %u\n", conf->cnt_id_no_prim);
+
+    fclose(statfh);
 }
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -391,7 +400,7 @@ uint8_t determine_bsstrand_from_pair(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one
         else {
             if (conf->verbose) {
                 fprintf(stderr, "[%s] Warning: Inconsistent bisulfite strand info. ", __func__);
-                fprintf(stderr, "Taking strand from read with higher total base quality.");
+                fprintf(stderr, "Taking strand from read with higher total base quality.\n");
                 fflush(stderr);
             }
             uint8_t out = total_qual(one) > total_qual(two) ? (uint8_t)bss1 : (uint8_t)bss2;
@@ -898,6 +907,7 @@ static int usage(ds_conf_t *conf) {
     fprintf(stderr, "\n");
     fprintf(stderr, "Output options:\n");
     fprintf(stderr, "    -o STR    name of output file [stdout]\n");
+    fprintf(stderr, "    -O STR    name of file to write statistics to (see Note 3 for details)\n");
     fprintf(stderr, "Input options:\n");
     fprintf(stderr, "    -s        run for single-end data\n");
     fprintf(stderr, "    -m        add MC and MQ mate tags to mate reads\n");
@@ -908,9 +918,11 @@ static int usage(ds_conf_t *conf) {
     fprintf(stderr, "    -v        print extra messages\n");
     fprintf(stderr, "    -h        this help.\n");
     fprintf(stderr, "\n");
-    fprintf(stderr, "Note, [in.bam] must be name sorted. If not provided, assume the input is stdin.\n");
-    fprintf(stderr, "Another note, assumes either ALL reads are paired-end (default) or single-end.\n");
-    fprintf(stderr, "If a singleton read is found in paired-end mode, the code will break nicely.\n");
+    fprintf(stderr, "Note 1, [in.bam] must be name sorted. If not provided, assume the input is stdin.\n");
+    fprintf(stderr, "Note 2, assumes either ALL reads are paired-end (default) or single-end.\n");
+    fprintf(stderr, "    If a singleton read is found in paired-end mode, the code will break nicely.\n");
+    fprintf(stderr, "Note 3, defaults to dupsifter.stat if streaming or (-o basename).dupsifter.stat \n");
+    fprintf(stderr, "    if the -o option is provided. If -o and -O are provided, then -O will be used.\n");
     fprintf(stderr, "\n");
 
     return 1;
@@ -922,13 +934,13 @@ int main(int argc, char *argv[]) {
     ds_conf_t conf = {0};
     ds_conf_init(&conf);
 
-    // TODO: Add functionality for adding mate tags (MC and MQ) to reads
     if (argc < 1) { return usage(&conf); }
-    while ((c = getopt(argc, argv, ":b:l:o:Wrsmqvh")) >= 0) {
+    while ((c = getopt(argc, argv, ":b:l:o:O:Wrsmqvh")) >= 0) {
         switch (c) {
             case 'b': conf.min_base_qual = (uint32_t)atoi(optarg); break;
             case 'l': conf.max_length = (uint32_t)atoi(optarg); break;
             case 'o': conf.outfn = optarg; break;
+            case 'O': conf.statfn = strdup(optarg); break;
             case 'W': conf.is_wgs = 1; break;
             case 'r': conf.rm_dup = 1; break;
             case 's': conf.single_end = 1; break;
@@ -954,6 +966,19 @@ int main(int argc, char *argv[]) {
         return usage(&conf);
     }
 
+    // Setup statistics filename
+    if (conf.statfn == NULL) {
+        int len = (strcmp(conf.outfn, "-") != 0) ? strlen(conf.outfn)+strlen(TAG_STAT_NAME)+1 : strlen(DEF_STAT_NAME);
+
+        if (strcmp(conf.outfn, "-") != 0) {
+            conf.statfn = (char *)calloc(len, sizeof(char));
+            strncpy(conf.statfn, conf.outfn, strlen(conf.outfn)-4);
+            strcat(conf.statfn, TAG_STAT_NAME);
+        } else {
+            conf.statfn = strdup(DEF_STAT_NAME);
+        }
+    }
+
     if (conf.verbose) {
         // Input file location
         if (strcmp(conf.infn, "-") == 0) {
@@ -968,16 +993,19 @@ int main(int argc, char *argv[]) {
         } else {
             fprintf(stderr, "Writing output to %s\n", conf.outfn);
         }
-    }
 
-    // Set write mode, auto-detect from file name, assume no extra compression
-    // or other extra additions to the write mode
-    sam_open_mode(conf.out_mode+1, conf.outfn, NULL);
+        // Metrics file location
+        fprintf(stderr, "Writing stats to %s\n", conf.statfn);
+    }
 
     // Create argument list string
     if (!(conf.arg_list = stringify_argv(argc, argv))) {
         fatal_error("[dupsifter] Error: Unable to create argument list for PG string\n");
     }
+
+    // Set write mode, auto-detect from file name, assume no extra compression
+    // or other extra additions to the write mode
+    sam_open_mode(conf.out_mode+1, conf.outfn, NULL);
 
     double t1 = get_current_time();
     double c1 = get_cpu_runtime();
