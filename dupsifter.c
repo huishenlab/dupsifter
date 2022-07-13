@@ -155,7 +155,6 @@ typedef struct bam1_chain bam1_chain_t;
 struct bam1_chain {
     bam1_t *read;
     struct bam1_chain *next;
-    uint8_t flag;
 };
 
 bam1_chain_t *bam1_chain_init(bam1_t *b) {
@@ -163,7 +162,6 @@ bam1_chain_t *bam1_chain_init(bam1_t *b) {
     if (b == NULL) { out->read = bam_init1(); }
     else           { out->read = b; }
     out->next = NULL;
-    out->flag = 0;
 
     return out;
 }
