@@ -57,10 +57,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <getopt.h>
 #include "sam.h"
 #include "khashl.h"
 #include "util.h"
 #include "refcache.h"
+#include "version.h"
 
 //---------------------------------------------------------------------------------------------------------------------
 // Config struct, initialization function, and output function
@@ -901,22 +903,32 @@ int dupsifter(ds_conf_t *conf) {
 //---------------------------------------------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------------------------------------------------
+static int print_version() {
+    fprintf(stderr, "Program: dupsifter\n");
+    fprintf(stderr, "Version: %s\n", DUPSIFTER_VERSION);
+    fprintf(stderr, "Contact: Jacob Morrison <jacob.morrison@vai.org>\n");
+
+    return 0;
+}
+
 static int usage(ds_conf_t *conf) {
+    fprintf(stderr, "\n");
+    print_version();
     fprintf(stderr, "\n");
     fprintf(stderr, "dupsifter [options] <ref.fa> [in.bam]\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Output options:\n");
-    fprintf(stderr, "    -o STR    name of output file [stdout]\n");
-    fprintf(stderr, "    -O STR    name of file to write statistics to (see Note 3 for details)\n");
+    fprintf(stderr, "    -o, --output STR             name of output file [stdout]\n");
+    fprintf(stderr, "    -O, --stats-output STR       name of file to write statistics to (see Note 3 for details)\n");
     fprintf(stderr, "Input options:\n");
-    fprintf(stderr, "    -s        run for single-end data\n");
-    fprintf(stderr, "    -m        add MC and MQ mate tags to mate reads\n");
-    fprintf(stderr, "    -W        process WGS reads instead of WGBS\n");
-    fprintf(stderr, "    -l INT    maximum read length for paired end duplicate-marking [%u]\n", conf->max_length);
-    fprintf(stderr, "    -b INT    minimum base quality [%u].\n", conf->min_base_qual);
-    fprintf(stderr, "    -r        toggle to remove marked duplicate.\n");
-    fprintf(stderr, "    -v        print extra messages\n");
-    fprintf(stderr, "    -h        this help.\n");
+    fprintf(stderr, "    -s, --single-end             run for single-end data\n");
+    fprintf(stderr, "    -m, --add-mate-tags          add MC and MQ mate tags to mate reads\n");
+    fprintf(stderr, "    -W, --wgs-only               process WGS reads instead of WGBS\n");
+    fprintf(stderr, "    -l, --max-read-length INT    maximum read length for paired end duplicate-marking [%u]\n", conf->max_length);
+    fprintf(stderr, "    -b, --min-base-qual INT      minimum base quality [%u]\n", conf->min_base_qual);
+    fprintf(stderr, "    -r, --remove-dups            toggle to remove marked duplicate\n");
+    fprintf(stderr, "    -v, --verbose                print extra messages\n");
+    fprintf(stderr, "    -h, --help                   this help\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Note 1, [in.bam] must be name sorted. If not provided, assume the input is stdin.\n");
     fprintf(stderr, "Note 2, assumes either ALL reads are paired-end (default) or single-end.\n");
@@ -934,8 +946,23 @@ int main(int argc, char *argv[]) {
     ds_conf_t conf = {0};
     ds_conf_init(&conf);
 
+    static const struct option loptions[] = {
+        {"output"         , required_argument, NULL, 'o'},
+        {"stats-output"   , required_argument, NULL, 'O'},
+        {"single-end"     , no_argument      , NULL, 's'},
+        {"add-mate-tags"  , no_argument      , NULL, 'm'},
+        {"wgs-only"       , no_argument      , NULL, 'W'},
+        {"max-read-length", required_argument, NULL, 'l'},
+        {"min-base-qual"  , required_argument, NULL, 'b'},
+        {"remove-dups"    , no_argument      , NULL, 'r'},
+        {"verbose"        , no_argument      , NULL, 'v'},
+        {"help"           , no_argument      , NULL, 'h'},
+        {"version"        , no_argument      , NULL, 1},
+        {NULL, 0, NULL, 0}
+    };
+
     if (argc < 1) { return usage(&conf); }
-    while ((c = getopt(argc, argv, ":b:l:o:O:Wrsmqvh")) >= 0) {
+    while ((c = getopt_long(argc, argv, "b:l:o:O:Wrsmqvh", loptions, NULL)) >= 0) {
         switch (c) {
             case 'b': conf.min_base_qual = (uint32_t)atoi(optarg); break;
             case 'l': conf.max_length = (uint32_t)atoi(optarg); break;
@@ -947,14 +974,8 @@ int main(int argc, char *argv[]) {
             case 'm': conf.add_mate_tags = 1; break;
             case 'v': conf.verbose = 1; break;
             case 'h': return usage(&conf);
-            case ':':
-                fprintf(stderr, "Option needs an argument: -%c\n", optopt);
-                return usage(&conf);
-            case '?':
-                fprintf(stderr, "Unrecognized option: -%c\n", optopt);
-                return usage(&conf);
+            case 1: print_version(); return 0;
             default:
-                fprintf(stderr, "[%s:%d] Unrecognized command: -%c\n", __func__, __LINE__, c);
                 return usage(&conf);
         }
     }
