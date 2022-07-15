@@ -216,20 +216,36 @@ typedef struct {
     uint32_t eclp; /* soft/hard clips at end of read */
 } parsed_cigar_t;
 
+// Read orientation possibilities (r1-r2: forward-forward, reverse-reverse, forward-reverse, reverse-forward)
+#define OO_FF 0
+#define OO_RR 1
+#define OO_FR 2
+#define OO_RF 3
+
+// Is read single (or paired with unmapped mate) or paired?
+#define S_N 0
+#define S_Y 1
+
+// Is read1 in paired reads the leftmost read (single/paired with unmapped mate always L_N)?
+#define L_N 0
+#define L_Y 1
+
 typedef struct {
-    uint16_t bin_start; /* bin number for starting position, taken from forward strand read */
-    uint16_t bin_end;   /* bin number for ending position, taken from reverse strand read */
-    uint32_t pos_start; /* bin position for starting position, taken from forward strand read */
-    uint32_t pos_end;   /* bin position for ending position, taken from reverse strand read */
+    uint8_t  l_or_s; /* packed variable, (from leftmost bit) bit 5 = is r1 leftmost read, bit 6/7 = orientation, bit 8 = is single */
+    uint16_t r1_bin; /* bin number for r1 position */
+    uint16_t r2_bin; /* bin number for r2 position */
+    uint32_t r1_pos; /* bin position for r1 position */
+    uint32_t r2_pos; /* bin position for r2 position */
 } signature_t;
 
 signature_t signature_init() {
     // Chances of the bin or position being the max value are very low, so set default value to max value
     signature_t sig = {0};
-    sig.bin_start = UINT16_MAX;
-    sig.bin_end   = UINT16_MAX;
-    sig.pos_start = UINT32_MAX;
-    sig.pos_end   = UINT32_MAX;
+    sig.l_or_s = 128;
+    sig.r1_bin = UINT16_MAX;
+    sig.r2_bin = UINT16_MAX;
+    sig.r1_pos = UINT32_MAX;
+    sig.r2_pos = UINT32_MAX;
 
     return sig;
 }
@@ -238,22 +254,33 @@ signature_t signature_init() {
 //---------------------------------------------------------------------------------------------------------------------
 // Initialize hash maps and define functions needed for initialization
 khint_t hash_sig(signature_t s) {
-    if (s.pos_start == UINT32_MAX) {
-        return kh_hash_uint32(s.pos_end);
-    } else {
-        return kh_hash_uint32(s.pos_start);
-    }
+    khint_t to_hash;
+
+    // Create input value for hashing function
+    // Pull off last 16 bits of r1_pos
+    uint16_t pos = s.r1_pos & 0xffff;
+    // Pull off last 12 bits of r1_bin
+    uint16_t bin = s.r1_bin & 0x0fff;
+
+    // Bit pattern in to_hash
+    // PPPP PPPP PPPP PPPP BBBB BBBB BBBB LOOS
+    // |_________________| |____________| |__|
+    //          |                |         |
+    // |-----------------| |------------| |--|
+    //       Position           Bin       r1_leftmost (L)/orientation (OO)/is_single (S)
+    to_hash = (pos << 16) + (bin << 4) + (s.l_or_s & 0xf);
+
+    return kh_hash_uint32(to_hash);
 }
 
 int sig_equal(signature_t s1, signature_t s2) {
-    if ((s1.bin_start == s2.bin_start) &&
-        (s1.pos_start == s2.pos_start) &&
-        (s1.bin_end   == s2.bin_end  ) &&
-        (s1.pos_end   == s2.pos_end  )) {
-        return 1;
-    } else {
-        return 0;
-    }
+    if (s1.l_or_s != s2.l_or_s) { return 0; }
+    if (s1.r1_bin != s2.r1_bin) { return 0; }
+    if (s1.r1_pos != s2.r1_pos) { return 0; }
+    if (s1.r2_bin != s2.r2_bin) { return 0; }
+    if (s1.r2_pos != s2.r2_pos) { return 0; }
+
+    return 1;
 }
 
 KHASHL_SET_INIT(, SigHash, sh, signature_t, hash_sig, sig_equal)
@@ -364,7 +391,7 @@ uint8_t get_bsstrand(refcache_t *rs, bam1_t *b, uint32_t min_base_qual, uint8_t 
     return infer_bsstrand(rs, b, min_base_qual);
 }
 
-uint8_t determine_bsstrand_from_pair(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one, bam1_t *two,
+uint8_t determine_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one, bam1_t *two,
         ds_conf_t *conf, uint8_t allow_u) {
     int8_t bss1 = -1, bss2 = -1;
     if (one && !is_unmapped(one)) {
@@ -520,44 +547,132 @@ parsed_cigar_t parse_cigar(bam1_t *b) {
     return out;
 }
 
-signature_t create_signature(bam1_t *forward, bam1_t *reverse, ds_conf_t *conf, ds_bins_t *bins) {
-    // Variables to store things
-    parsed_cigar_t cigar;
-    uint32_t total_length;
+signature_t create_single_signature(bam1_t *read, ds_conf_t *conf, ds_bins_t *bins) {
+    if (read == NULL) {
+        fatal_error("[dupsifter] Error: Read information for single or mate-unmapped read is missing\n");
+    }
+
+    parsed_cigar_t cigar = parse_cigar(read);
+    uint32_t total_length = cigar.sclp + cigar.qlen + cigar.eclp;
+    if (total_length > conf->max_length) {
+        fatal_error("[dupsifter] Error: Read with length %u is longer than max read length %u\n",
+                total_length, conf->max_length);
+    }
+
     uint64_t position;
+    uint8_t  orientation;
 
-    // Variables for output
+    if (bam_is_rev(read)) {
+        position = bins->offset[read->core.tid] + read->core.pos + cigar.rlen + cigar.eclp;
+        orientation = OO_RR;
+    } else {
+        position = bins->offset[read->core.tid] + read->core.pos - cigar.sclp;
+        orientation = OO_FF;
+    }
+
     signature_t sig = signature_init();
+    sig.r1_bin = position >> BIN_SHIFT;
+    sig.r1_pos = position &  BIN_MASK;
+    sig.l_or_s = (L_N << 3) + (orientation << 1) + S_Y;
 
-    // Handle forward strand read
-    if (forward != NULL) {
-        cigar = parse_cigar(forward);
+    return sig;
+}
 
-        total_length = cigar.sclp + cigar.qlen + cigar.eclp;
-        if (total_length > conf->max_length) {
-            fatal_error("[dupsifter] Error: Read with length %u is longer than max read length %u\n",
-                    total_length, conf->max_length);
-        }
-
-        position = bins->offset[forward->core.tid] + forward->core.pos - cigar.sclp;
-        sig.bin_start = position >> BIN_SHIFT;
-        sig.pos_start = position &  BIN_MASK;
+signature_t create_paired_signature(bam1_t *read1, bam1_t *read2, ds_conf_t *conf, ds_bins_t *bins) {
+    if (read1 == NULL || read2 == NULL) {
+        fatal_error("[dupsifter] Error: Read information for paired end read is missing\n");
     }
 
-    // Handle reverse strand read
-    if (reverse != NULL) {
-        cigar = parse_cigar(reverse);
+    parsed_cigar_t cigar1 = parse_cigar(read1);
+    parsed_cigar_t cigar2 = parse_cigar(read2);
+    
+    uint32_t total_length_1 = cigar1.sclp + cigar1.qlen + cigar1.eclp;
+    uint32_t total_length_2 = cigar2.sclp + cigar2.qlen + cigar2.eclp;
 
-        total_length = cigar.sclp + cigar.qlen + cigar.eclp;
-        if (total_length > conf->max_length) {
-            fatal_error("[dupsifter] Error: Read with length %u is longer than max read length %u\n",
-                    total_length, conf->max_length);
-        }
-
-        position = bins->offset[reverse->core.tid] + reverse->core.pos + cigar.rlen + cigar.eclp;
-        sig.bin_end = position >> BIN_SHIFT;
-        sig.pos_end = position &  BIN_MASK;
+    if (total_length_1 > conf->max_length) {
+        fatal_error("[dupsifter] Error: Read with length %u is longer than max read length %u\n",
+                total_length_1, conf->max_length);
     }
+    if (total_length_2 > conf->max_length) {
+        fatal_error("[dupsifter] Error: Read with length %u is longer than max read length %u\n",
+                total_length_2, conf->max_length);
+    }
+
+    uint64_t pos1, pos2, beg1, beg2, end1, end2;
+    uint32_t ref1, ref2;
+    uint8_t  r1_leftmost, orientation;
+
+    beg1 = bins->offset[read1->core.tid] + read1->core.pos - cigar1.sclp;
+    beg2 = bins->offset[read2->core.tid] + read2->core.pos - cigar2.sclp;
+    end1 = bins->offset[read1->core.tid] + read1->core.pos + cigar1.rlen + cigar1.eclp;
+    end2 = bins->offset[read2->core.tid] + read2->core.pos + cigar2.rlen + cigar2.eclp;
+
+    ref1 = read1->core.tid;
+    ref2 = read2->core.tid;
+
+    // Work out if read1 is leftmost in pair
+    if (ref1 != ref2) {
+        r1_leftmost = ref1 < ref2;
+    } else {
+        if (bam_is_rev(read1) == bam_is_rev(read1)) {
+            if (!bam_is_rev(read1)) {
+                r1_leftmost = beg1 <= beg2;
+            } else {
+                r1_leftmost = end1 <= end2;
+            }
+        } else {
+            if (bam_is_rev(read1)) {
+                r1_leftmost = end1 <= end2;
+            } else {
+                r1_leftmost = beg1 <= beg2;
+            }
+        }
+    }
+    r1_leftmost = r1_leftmost ? L_Y : L_N;
+
+    // Determine orientation of reads
+    if (bam_is_rev(read1) == bam_is_rev(read2)) {
+        if (!bam_is_rev(read1)) {
+            orientation = OO_FF;
+        } else {
+            orientation = OO_RR;
+        }
+    } else {
+        if (!bam_is_rev(read1)) {
+            orientation = OO_FR;
+        } else {
+            orientation = OO_RF;
+        }
+    }
+
+    // Find final positions
+    switch (orientation) {
+        case OO_FF:
+            pos1 = beg1;
+            pos2 = beg2;
+            break;
+        case OO_RR:
+            pos1 = end1;
+            pos2 = end2;
+            break;
+        case OO_FR:
+            pos1 = beg1;
+            pos2 = end2;
+            break;
+        case OO_RF:
+            pos1 = end1;
+            pos2 = beg2;
+            break;
+        default:
+            fatal_error("[dupsifter] Error: Unknown orientation found.\n");
+    }
+
+    signature_t sig = signature_init();
+    sig.r1_bin = pos1 >> BIN_SHIFT;
+    sig.r1_pos = pos1 &  BIN_MASK;
+    sig.r1_bin = pos2 >> BIN_SHIFT;
+    sig.r1_pos = pos2 &  BIN_MASK;
+    sig.l_or_s = (r1_leftmost << 3) + (orientation << 1) + S_N;
 
     return sig;
 }
@@ -690,45 +805,30 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
     // For WGS case, only use OT/CTOT
     uint8_t bss = 0;
     if (!conf->is_wgs) {
-        bss = determine_bsstrand_from_pair(rs, hdr, r1, r2, conf, 0);
+        bss = determine_bsstrand(rs, hdr, r1, r2, conf, 0);
     }
 
-    uint8_t is_forward = 0, is_reverse = 0;
-    bam1_t *forward = NULL;
-    bam1_t *reverse = NULL;
+    uint8_t is_forward = 0; // used only for single reads to determine strand
+    signature_t sig = signature_init();
 
     if (is_single) {
         if (bam_is_rev(r1)) {
             conf->cnt_id_reverse++;
-            is_reverse = 1;
-            reverse = r1;
         } else {
             conf->cnt_id_forward++;
             is_forward = 1;
-            forward = r1;
         }
+
+        sig = create_single_signature(r1, conf, bins);
     } else {
         conf->cnt_id_both_map++;
-        is_forward = 1;
-        is_reverse = 1;
-        if (bam_is_rev(r1) && bam_is_mrev(r2)) {
-            forward = r2;
-            reverse = r1;
-        } else {
-            forward = r1;
-            reverse = r2;
-        }
-    }
-    if (!is_forward && !is_reverse) {
-        // Shouldn't ever make it in here, but in case it does, something went wrong
-        fatal_error("[dupsifter] Error: Could not find and forward or reverse read from read 1 and/or read 2");
-    }
 
-    signature_t sig = create_signature(forward, reverse, conf, bins);
+        sig = create_paired_signature(r1, r2, conf, bins);
+    }
 
     // Do duplicate marking, either all reads in chain will marked as dups or none will
     int not_a_dup;
-    if (is_forward && is_reverse) {
+    if (!is_single) {
         if (bss) {
             sh_put(ob_map, sig, &not_a_dup);
         } else {
@@ -741,28 +841,30 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
                 curr->read->core.flag |= BAM_FDUP;
             }
         }
-    } else if (is_forward && !is_reverse) {
-        if (bss) {
-            sh_put(ob_for, sig, &not_a_dup);
-        } else {
-            sh_put(ot_for, sig, &not_a_dup);
-        }
-        if (!not_a_dup) { // signature found!
-            conf->cnt_id_forward_dup++;
-            for (bam1_chain_t *curr = bc; curr != NULL; curr = curr->next) {
-                curr->read->core.flag |= BAM_FDUP;
+    } else {
+        if (is_forward) {
+            if (bss) {
+                sh_put(ob_for, sig, &not_a_dup);
+            } else {
+                sh_put(ot_for, sig, &not_a_dup);
             }
-        }
-    } else if (!is_forward && is_reverse) {
-        if (bss) {
-            sh_put(ob_rev, sig, &not_a_dup);
+            if (!not_a_dup) { // signature found!
+                conf->cnt_id_forward_dup++;
+                for (bam1_chain_t *curr = bc; curr != NULL; curr = curr->next) {
+                    curr->read->core.flag |= BAM_FDUP;
+                }
+            }
         } else {
-            sh_put(ot_rev, sig, &not_a_dup);
-        }
-        if (!not_a_dup) { // signature found!
-            conf->cnt_id_reverse_dup++;
-            for (bam1_chain_t *curr = bc; curr != NULL; curr = curr->next) {
-                curr->read->core.flag |= BAM_FDUP;
+            if (bss) {
+                sh_put(ob_rev, sig, &not_a_dup);
+            } else {
+                sh_put(ot_rev, sig, &not_a_dup);
+            }
+            if (!not_a_dup) { // signature found!
+                conf->cnt_id_reverse_dup++;
+                for (bam1_chain_t *curr = bc; curr != NULL; curr = curr->next) {
+                    curr->read->core.flag |= BAM_FDUP;
+                }
             }
         }
     }
