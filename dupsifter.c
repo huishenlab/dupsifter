@@ -453,7 +453,7 @@ uint8_t determine_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one, bam1_t *
 #define BIN_SHIFT ((uint64_t)27)
 #define BIN_MASK  ((uint64_t)((1 << BIN_SHIFT) - 1))
 
-ds_bins_t *prepare_hash_bins(bam_hdr_t *hdr, ds_conf_t *conf) {
+ds_bins_t *prepare_bin_offsets(bam_hdr_t *hdr, ds_conf_t *conf) {
 
     ds_bins_t *b = ds_bins_init();
     b->n_contigs = hdr->n_targets;
@@ -882,7 +882,7 @@ int dupsifter(ds_conf_t *conf) {
     bam_hdr_t *hdr = sam_hdr_read(infh);
 
     // Prepare hash table bins based on input file
-    ds_bins_t *bins = prepare_hash_bins(hdr, conf);
+    ds_bins_t *bins = prepare_bin_offsets(hdr, conf);
 
     // Open output file
     htsFile *outfh = hts_open(conf->outfn, conf->out_mode);
