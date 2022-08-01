@@ -22,8 +22,13 @@ PROG = dupsifter
 
 build: exportcf $(PROG)
 
+profile: CF_OPTIMIZE := 0
+profile: CFLAGS += -pg
+profile: CFLAGS := $(filter-out -O3,$(CFLAGS))
+profile: build
+
 debug: CF_OPTIMIZE := 0
-debug: CFLAGS += -g -pg
+debug: CFLAGS += -g
 debug: CFLAGS := $(filter-out -O3,$(CFLAGS))
 debug: build
 
