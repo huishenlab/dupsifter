@@ -318,8 +318,12 @@ static inline uint32_t pad_chrom_length(uint32_t length, uint32_t max_length) {
 
 //---------------------------------------------------------------------------------------------------------------------
 // Bisulfite strand functions
-uint8_t infer_bsstrand(refcache_t *rs, bam1_t *b, uint32_t min_base_qual) {
+uint8_t infer_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *b, uint32_t min_base_qual) {
     bam1_core_t *c = &b->core;
+
+    // Cache reference
+    refcache_fetch(rs, hdr->target_name[c->tid], c->pos > 100 ? c->pos-100 : 1, c->pos + c->l_qseq + 100);
+
     uint32_t rpos = c->pos+1, qpos = 0, nC2T = 0, nG2A = 0;
     uint32_t i, op, oplen;
     char rb, qb;
@@ -359,7 +363,7 @@ uint8_t infer_bsstrand(refcache_t *rs, bam1_t *b, uint32_t min_base_qual) {
     else              { return 1; }
 }
 
-uint8_t get_bsstrand(refcache_t *rs, bam1_t *b, uint32_t min_base_qual, uint8_t allow_u) {
+uint8_t get_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *b, uint32_t min_base_qual, uint8_t allow_u) {
     uint8_t *s;
   
     /* bwa-meth flag has highest priority */
@@ -388,24 +392,18 @@ uint8_t get_bsstrand(refcache_t *rs, bam1_t *b, uint32_t min_base_qual, uint8_t 
     }
 
     /* otherwise, guess the bsstrand from nCT and nGA */
-    return infer_bsstrand(rs, b, min_base_qual);
+    return infer_bsstrand(rs, hdr, b, min_base_qual);
 }
 
 uint8_t determine_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one, bam1_t *two,
         ds_conf_t *conf, uint8_t allow_u) {
     int8_t bss1 = -1, bss2 = -1;
     if (one && !is_unmapped(one)) {
-        refcache_fetch(rs, hdr->target_name[one->core.tid],
-                one->core.pos > 100 ? one->core.pos-100 : 1,
-                one->core.pos + one->core.l_qseq + 100);
-        bss1 = get_bsstrand(rs, one, conf->min_base_qual, allow_u);
+        bss1 = get_bsstrand(rs, hdr, one, conf->min_base_qual, allow_u);
     }
 
     if (two && !is_unmapped(two)) {
-        refcache_fetch(rs, hdr->target_name[two->core.tid],
-                two->core.pos > 100 ? two->core.pos-100 : 1,
-                two->core.pos + two->core.l_qseq + 100);
-        bss2 = get_bsstrand(rs, two, conf->min_base_qual, allow_u);
+        bss2 = get_bsstrand(rs, hdr, two, conf->min_base_qual, allow_u);
     }
 
     if (bss1 == bss2 && bss1 >= 0) {
@@ -454,7 +452,6 @@ uint8_t determine_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one, bam1_t *
 #define BIN_MASK  ((uint64_t)((1 << BIN_SHIFT) - 1))
 
 ds_bins_t *prepare_bin_offsets(bam_hdr_t *hdr, ds_conf_t *conf) {
-
     ds_bins_t *b = ds_bins_init();
     b->n_contigs = hdr->n_targets;
 
@@ -670,8 +667,8 @@ signature_t create_paired_signature(bam1_t *read1, bam1_t *read2, ds_conf_t *con
     signature_t sig = signature_init();
     sig.r1_bin = pos1 >> BIN_SHIFT;
     sig.r1_pos = pos1 &  BIN_MASK;
-    sig.r1_bin = pos2 >> BIN_SHIFT;
-    sig.r1_pos = pos2 &  BIN_MASK;
+    sig.r2_bin = pos2 >> BIN_SHIFT;
+    sig.r2_pos = pos2 &  BIN_MASK;
     sig.l_or_s = (r1_leftmost << 3) + (orientation << 1) + S_N;
 
     return sig;
@@ -957,7 +954,7 @@ int dupsifter(ds_conf_t *conf) {
                     ot_map, ot_for, ot_rev, ob_map, ob_for, ob_rev);
             for (bam1_chain_t *curr = bc_curr; curr != NULL; curr = curr->next) {
                 // If the first read in the chain is a duplicate then all others will be,
-                // so if we want to remove dupliates, then we can break out right away
+                // so if we want to remove duplicates, then we can break out right away
                 if (is_duplicate(curr->read) && conf->rm_dup) { break; }
                 sam_write1(outfh, hdr, curr->read);
             }
@@ -974,7 +971,7 @@ int dupsifter(ds_conf_t *conf) {
                 ot_map, ot_for, ot_rev, ob_map, ob_for, ob_rev);
         for (bam1_chain_t *curr = bc_curr; curr != NULL; curr = curr->next) {
             // If the first read in the chain is a duplicate then all others will be,
-            // so if we want to remove dupliates, then we can break out right away
+            // so if we want to remove duplicates, then we can break out right away
             if (is_duplicate(curr->read) && conf->rm_dup) { break; }
             sam_write1(outfh, hdr, curr->read);
         }
@@ -1057,7 +1054,7 @@ int main(int argc, char *argv[]) {
         {"remove-dups"    , no_argument      , NULL, 'r'},
         {"verbose"        , no_argument      , NULL, 'v'},
         {"help"           , no_argument      , NULL, 'h'},
-        {"version"        , no_argument      , NULL, 1},
+        {"version"        , no_argument      , NULL,  1 },
         {NULL, 0, NULL, 0}
     };
 
