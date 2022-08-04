@@ -18,7 +18,7 @@ INCLUDE = include
 
 PROG = dupsifter
 
-.PHONY : setdebug debug build
+.PHONY : profile debug build
 
 build: exportcf $(PROG)
 
@@ -60,3 +60,17 @@ clean:
 
 purge: clean
 	make -C $(LHTSLIB_DIR) clean
+
+## clean to make a release zip
+.PHONY: release
+release:
+	rm -rf release-source.zip dupsifter-release
+	git clone . dupsifter-release
+	make -C dupsifter-release cleanse
+	zip -r release-source.zip dupsifter-release
+	rm -rf dupsifter-release
+
+# removes git history, for release internal use
+cleanse : purge
+	rm -f **/*.o .gitignore
+	rm -rf .git
