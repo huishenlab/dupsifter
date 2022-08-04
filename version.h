@@ -1,1 +1,1 @@
-#define DUPSIFTER_VERSION "0.1.0.dev"
+#define DUPSIFTER_VERSION "1.0.0"
