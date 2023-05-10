@@ -86,7 +86,7 @@ Note 3, defaults to dupsifter.stat if streaming or (-o basename).dupsifter.stat
   - WGBS with streaming input and output
     - `biscuit ref.fa read1.fq.gz read2.fq.gz | dupsifter ref.fa | samtools sort -o output.bam`
   - WGBS with no streaming
-    - `dupsifter -o output.bam ref.fa input.bam
+    - `dupsifter -o output.bam ref.fa input.bam`
   - WGS with streamed input and specified output file
     - `bwa ref.fa read1.fq.gz read2.fq.gz | dupsifter -W -o output.bam ref.fa`
   - WGS single-end data with input BAM and streamed output
