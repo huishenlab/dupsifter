@@ -1026,6 +1026,7 @@ static int usage(ds_conf_t *conf) {
     fprintf(stderr, "    -r, --remove-dups            toggle to remove marked duplicate\n");
     fprintf(stderr, "    -v, --verbose                print extra messages\n");
     fprintf(stderr, "    -h, --help                   this help\n");
+    fprintf(stderr, "        --version                print version info and exit\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Note 1, [in.bam] must be name sorted. If not provided, assume the input is stdin.\n");
     fprintf(stderr, "Note 2, assumes either ALL reads are paired-end (default) or single-end.\n");
