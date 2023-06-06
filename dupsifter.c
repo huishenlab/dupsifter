@@ -1008,7 +1008,10 @@ static int print_version() {
     return 0;
 }
 
-static int usage(ds_conf_t *conf) {
+static int usage() {
+    ds_conf_t conf = {0};
+    ds_conf_init(&conf);
+
     fprintf(stderr, "\n");
     print_version();
     fprintf(stderr, "\n");
@@ -1021,8 +1024,8 @@ static int usage(ds_conf_t *conf) {
     fprintf(stderr, "    -s, --single-end             run for single-end data\n");
     fprintf(stderr, "    -m, --add-mate-tags          add MC and MQ mate tags to mate reads\n");
     fprintf(stderr, "    -W, --wgs-only               process WGS reads instead of WGBS\n");
-    fprintf(stderr, "    -l, --max-read-length INT    maximum read length for paired end duplicate-marking [%u]\n", conf->max_length);
-    fprintf(stderr, "    -b, --min-base-qual INT      minimum base quality [%u]\n", conf->min_base_qual);
+    fprintf(stderr, "    -l, --max-read-length INT    maximum read length for paired end duplicate-marking [%u]\n", conf.max_length);
+    fprintf(stderr, "    -b, --min-base-qual INT      minimum base quality [%u]\n", conf.min_base_qual);
     fprintf(stderr, "    -r, --remove-dups            toggle to remove marked duplicate\n");
     fprintf(stderr, "    -v, --verbose                print extra messages\n");
     fprintf(stderr, "    -h, --help                   this help\n");
@@ -1034,6 +1037,8 @@ static int usage(ds_conf_t *conf) {
     fprintf(stderr, "Note 3, defaults to dupsifter.stat if streaming or (-o basename).dupsifter.stat \n");
     fprintf(stderr, "    if the -o option is provided. If -o and -O are provided, then -O will be used.\n");
     fprintf(stderr, "\n");
+
+    ds_conf_destroy(&conf);
 
     return 1;
 }
@@ -1059,7 +1064,7 @@ int main(int argc, char *argv[]) {
         {NULL, 0, NULL, 0}
     };
 
-    if (argc < 1) { return usage(&conf); }
+    if (argc < 1) { return usage(); }
     while ((c = getopt_long(argc, argv, "b:l:o:O:Wrsmqvh", loptions, NULL)) >= 0) {
         switch (c) {
             case 'b': conf.min_base_qual = (uint32_t)atoi(optarg); break;
@@ -1071,10 +1076,10 @@ int main(int argc, char *argv[]) {
             case 's': conf.single_end = 1; break;
             case 'm': conf.add_mate_tags = 1; break;
             case 'v': conf.verbose = 1; break;
-            case 'h': return usage(&conf);
+            case 'h': return usage();
             case 1: print_version(); return 0;
             default:
-                return usage(&conf);
+                return usage();
         }
     }
 
@@ -1082,7 +1087,7 @@ int main(int argc, char *argv[]) {
     conf.infn  = optind < argc ? argv[optind++] : "-";
     if (!conf.reffn) {
         fprintf(stderr, "Please provide a reference\n");
-        return usage(&conf);
+        return usage();
     }
 
     // Setup statistics filename
