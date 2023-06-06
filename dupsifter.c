@@ -83,6 +83,7 @@ typedef struct {
     uint8_t   verbose;             /* level of messages to print */
     uint8_t   single_end;          /* process all reads as single-end */
     uint8_t   add_mate_tags;       /* add MC and MQ tags to mate reads */
+    uint8_t   barcode_length;      /* number of bases in barcode / UMI */
 
     uint32_t  n_reads_read;        /* Number of reads read from file */
     uint32_t  cnt_id_both_map;     /* number of PE reads */
@@ -110,6 +111,7 @@ void ds_conf_init(ds_conf_t *conf) {
     conf->verbose = 0;
     conf->single_end = 0;
     conf->add_mate_tags = 0;
+    conf->barcode_length = 0;
 
     conf->n_reads_read = 0;
     conf->cnt_id_both_map = 0;
@@ -236,6 +238,7 @@ typedef struct {
     uint16_t r2_bin; /* bin number for r2 position */
     uint32_t r1_pos; /* bin position for r1 position */
     uint32_t r2_pos; /* bin position for r2 position */
+    uint64_t barcod; /* packed cell barcode (or UMI) */
 } signature_t;
 
 signature_t signature_init() {
@@ -246,6 +249,7 @@ signature_t signature_init() {
     sig.r2_bin = UINT16_MAX;
     sig.r1_pos = UINT32_MAX;
     sig.r2_pos = UINT32_MAX;
+    sig.barcod = 0;
 
     return sig;
 }
@@ -279,6 +283,7 @@ int sig_equal(signature_t s1, signature_t s2) {
     if (s1.r1_pos != s2.r1_pos) { return 0; }
     if (s1.r2_bin != s2.r2_bin) { return 0; }
     if (s1.r2_pos != s2.r2_pos) { return 0; }
+    if (s1.barcod != s2.barcod) { return 0; }
 
     return 1;
 }
@@ -544,7 +549,7 @@ parsed_cigar_t parse_cigar(bam1_t *b) {
     return out;
 }
 
-signature_t create_single_signature(bam1_t *read, ds_conf_t *conf, ds_bins_t *bins) {
+signature_t create_single_signature(bam1_t *read, ds_conf_t *conf, ds_bins_t *bins, uint64_t packed_barcode) {
     if (read == NULL) {
         fatal_error("[dupsifter] Error: Read information for single or mate-unmapped read is missing\n");
     }
@@ -571,11 +576,13 @@ signature_t create_single_signature(bam1_t *read, ds_conf_t *conf, ds_bins_t *bi
     sig.r1_bin = position >> BIN_SHIFT;
     sig.r1_pos = position &  BIN_MASK;
     sig.l_or_s = (L_N << 3) + (orientation << 1) + S_Y;
+    sig.barcod = packed_barcode;
 
     return sig;
 }
 
-signature_t create_paired_signature(bam1_t *read1, bam1_t *read2, ds_conf_t *conf, ds_bins_t *bins) {
+signature_t create_paired_signature(bam1_t *read1, bam1_t *read2, ds_conf_t *conf, ds_bins_t *bins,
+        uint64_t packed_barcode) {
     if (read1 == NULL || read2 == NULL) {
         fatal_error("[dupsifter] Error: Read information for paired end read is missing\n");
     }
@@ -670,6 +677,7 @@ signature_t create_paired_signature(bam1_t *read1, bam1_t *read2, ds_conf_t *con
     sig.r2_bin = pos2 >> BIN_SHIFT;
     sig.r2_pos = pos2 &  BIN_MASK;
     sig.l_or_s = (r1_leftmost << 3) + (orientation << 1) + S_N;
+    sig.barcod = packed_barcode;
 
     return sig;
 }
@@ -728,6 +736,25 @@ void problem_chain(bam1_chain_t *bc, uint32_t count) {
             count, bam_get_qname(bc->read));
 }
 
+uint64_t get_packed_barcode(bam1_t *read1, ds_conf_t *conf) {
+    // Barcode is packed by placing two bases per byte (1 base = 4 bytes)
+    // Bases are placed from right to left in the packed integer:
+    //
+    // Byte 1   Byte 2   Byte 3   Byte 4   Byte 5   Byte 6   Byte 7   Byte 8
+    // FFFFEEEE DDDDCCCC BBBBAAAA 99998888 77776666 55554444 33332222 11110000
+    //
+    // for bases 0 through 15 (in hexadecimal). By doing this, shorter barcodes
+    // will have smaller values.
+    uint64_t out = 0;
+    size_t i;
+    for (i=0; i<conf->barcode_length; i++) {
+        char base = seq_nt16_str[bam_seqi(bam_get_seq(read1), i)];
+        out |= (nuc_to_uint8[(uint8_t)base] << 4*i);
+    }
+
+    return out;
+}
+
 void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs, ds_bins_t *bins,
         SigHash *ot_map, SigHash *ot_for, SigHash *ot_rev,
         SigHash *ob_map, SigHash *ob_for, SigHash *ob_rev) {
@@ -759,7 +786,10 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
     }
 
     // Check for singleton (either SE read or PE read with unmapped mate) reads
+    // Generate packed barcode now as the barcode will be on read 1, but in the case where read 1 is unmapped, then
+    // read 2 will be treated as a singleton "read 1" for the signature creation
     uint8_t is_single = 0;
+    uint64_t packed_barcode = 0;
     if (r1 == NULL || r2 == NULL) {
         if (r1 == NULL) { swap_bam1_pointers(&r1, &r2); }
 
@@ -791,6 +821,11 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
             return;
         }
 
+        // Extract packed barcode before shifting around singletons
+        if (conf->barcode_length > 0) {
+            packed_barcode = get_packed_barcode(r1, conf);
+        }
+
         // Check for unmapped mate
         is_single = (is_unmapped(r1) || is_unmapped(r2));
         if (is_unmapped(r1) && !is_unmapped(r2)) {
@@ -816,11 +851,15 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
             is_forward = 1;
         }
 
-        sig = create_single_signature(r1, conf, bins);
+        // Singleton signature's still need a barcode because paired-end reads
+        // with one unmapped read will still have a barcode. Single-end reads
+        // are okay to have a barcode entered, since it will default to zero
+        // for all reads.
+        sig = create_single_signature(r1, conf, bins, packed_barcode);
     } else {
         conf->cnt_id_both_map++;
 
-        sig = create_paired_signature(r1, r2, conf, bins);
+        sig = create_paired_signature(r1, r2, conf, bins, packed_barcode);
     }
 
     // Do duplicate marking, either all reads in chain will marked as dups or none will
@@ -1026,6 +1065,7 @@ static int usage() {
     fprintf(stderr, "    -W, --wgs-only               process WGS reads instead of WGBS\n");
     fprintf(stderr, "    -l, --max-read-length INT    maximum read length for paired end duplicate-marking [%u]\n", conf.max_length);
     fprintf(stderr, "    -b, --min-base-qual INT      minimum base quality [%u]\n", conf.min_base_qual);
+    fprintf(stderr, "    -n, --barcode-length INT     number of bases in barcode (see Note 4 for details) [0]\n");
     fprintf(stderr, "    -r, --remove-dups            toggle to remove marked duplicate\n");
     fprintf(stderr, "    -v, --verbose                print extra messages\n");
     fprintf(stderr, "    -h, --help                   this help\n");
@@ -1036,6 +1076,10 @@ static int usage() {
     fprintf(stderr, "    If a singleton read is found in paired-end mode, the code will break nicely.\n");
     fprintf(stderr, "Note 3, defaults to dupsifter.stat if streaming or (-o basename).dupsifter.stat \n");
     fprintf(stderr, "    if the -o option is provided. If -o and -O are provided, then -O will be used.\n");
+    fprintf(stderr, "Note 4, barcode length must be 0 <= N <= 16. If no barcodes exist in the dataset (whether\n");
+    fprintf(stderr, "    there were no barcodes initially or they were removed during demultiplexing), then set the\n");
+    fprintf(stderr, "    length to 0. Barcode is assumed to be in the first N bases of read 1 and assumes exact matches\n");
+    fprintf(stderr, "    across barcodes (i.e., no mismatches). Only used for paired-end data.\n");
     fprintf(stderr, "\n");
 
     ds_conf_destroy(&conf);
@@ -1057,6 +1101,7 @@ int main(int argc, char *argv[]) {
         {"wgs-only"       , no_argument      , NULL, 'W'},
         {"max-read-length", required_argument, NULL, 'l'},
         {"min-base-qual"  , required_argument, NULL, 'b'},
+        {"barcode-length" , required_argument, NULL, 'n'},
         {"remove-dups"    , no_argument      , NULL, 'r'},
         {"verbose"        , no_argument      , NULL, 'v'},
         {"help"           , no_argument      , NULL, 'h'},
@@ -1065,10 +1110,11 @@ int main(int argc, char *argv[]) {
     };
 
     if (argc < 1) { return usage(); }
-    while ((c = getopt_long(argc, argv, "b:l:o:O:Wrsmqvh", loptions, NULL)) >= 0) {
+    while ((c = getopt_long(argc, argv, "b:l:n:o:O:Wrsmqvh", loptions, NULL)) >= 0) {
         switch (c) {
             case 'b': conf.min_base_qual = (uint32_t)atoi(optarg); break;
             case 'l': conf.max_length = (uint32_t)atoi(optarg); break;
+            case 'n': conf.barcode_length = (uint8_t)atoi(optarg); break;
             case 'o': conf.outfn = optarg; break;
             case 'O': conf.statfn = strdup(optarg); break;
             case 'W': conf.is_wgs = 1; break;
@@ -1083,10 +1129,19 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // Check inputs
     conf.reffn = optind < argc ? argv[optind++] : NULL;
     conf.infn  = optind < argc ? argv[optind++] : "-";
     if (!conf.reffn) {
         fprintf(stderr, "Please provide a reference\n");
+        return usage();
+    }
+
+    // Note, using a uint8_t for barcode length means that if you have a sufficiently large negative number
+    // you can wrap back around to barcode length <= 16, which means this check would fail. For now, I'm
+    // acknowledging that this issue exists, but I'm not going to address it unless someone raises an issue.
+    if (conf.barcode_length > 16) {
+        fprintf(stderr, "`-n|--barcode-length` must be in the range 0 <= n <= 16\n");
         return usage();
     }
 
