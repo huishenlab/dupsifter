@@ -36,6 +36,27 @@
 #include "sam.h"
 #include "version.h"
 
+// Convert a nucleotide char into a uint8_t
+// A / a ---> 0
+// C / c ---> 1
+// G / g ---> 2
+// T / t ---> 3
+// Other ---> 4
+const uint8_t nuc_to_uint8[128] = {
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+    4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+/*     A  B  C   D  E  F  G   H  I  J  K   L  M  N  O */
+    4, 0, 4, 1,  4, 4, 4, 2,  4, 4, 4, 4,  4, 4, 4, 4,
+/*  P  Q  R  S   T  U  V  W   X  Y  Z                 */
+    4, 4, 4, 4,  3, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4,
+/*     a  b  c   d  e  f  g   h  i  j  k   l  m  n  o */
+    4, 0, 4, 1,  4, 4, 4, 2,  4, 4, 4, 4,  4, 4, 4, 4,
+/*  p  q  r  s   t  u  v  w   x  y  z                 */
+    4, 4, 4, 4,  3, 4, 4, 4,  4, 4, 4, 4,  4, 4, 4, 4
+};
+
 // Return version number
 const char *dupsifter_version() {
     return DUPSIFTER_VERSION;
