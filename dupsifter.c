@@ -1096,7 +1096,7 @@ int main(int argc, char *argv[]) {
 
         if (strcmp(conf.outfn, "-") != 0) {
             conf.statfn = (char *)calloc(len, sizeof(char));
-            strncpy(conf.statfn, conf.outfn, strlen(conf.outfn)-4);
+            memcpy(conf.statfn, conf.outfn, strlen(conf.outfn)-4);
             strcat(conf.statfn, TAG_STAT_NAME);
         } else {
             conf.statfn = strdup(DEF_STAT_NAME);
