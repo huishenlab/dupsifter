@@ -27,6 +27,7 @@
 #define _WZ_REFSEQ_H_
 
 #include <stdint.h>
+#include <ctype.h>
 #include "faidx.h"
 #include "util.h"
 
