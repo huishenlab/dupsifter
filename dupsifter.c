@@ -83,7 +83,7 @@ typedef struct {
     uint8_t   verbose;             /* level of messages to print */
     uint8_t   single_end;          /* process all reads as single-end */
     uint8_t   add_mate_tags;       /* add MC and MQ tags to mate reads */
-    uint8_t   barcode_length;      /* number of bases in barcode / UMI */
+    uint8_t   has_barcode;         /* barcode included in reads */
 
     uint32_t  n_reads_read;        /* Number of reads read from file */
     uint32_t  cnt_id_both_map;     /* number of PE reads */
@@ -111,7 +111,7 @@ void ds_conf_init(ds_conf_t *conf) {
     conf->verbose = 0;
     conf->single_end = 0;
     conf->add_mate_tags = 0;
-    conf->barcode_length = 0;
+    conf->has_barcode = 0;
 
     conf->n_reads_read = 0;
     conf->cnt_id_both_map = 0;
@@ -238,7 +238,7 @@ typedef struct {
     uint16_t r2_bin; /* bin number for r2 position */
     uint32_t r1_pos; /* bin position for r1 position */
     uint32_t r2_pos; /* bin position for r2 position */
-    uint64_t barcod; /* packed cell barcode (or UMI) */
+    uint64_t barcod; /* packed cell barcode */
 } signature_t;
 
 signature_t signature_init() {
@@ -745,12 +745,94 @@ uint64_t get_packed_barcode(bam1_t *read1, ds_conf_t *conf) {
     // for bases 0 through 15 (in hexadecimal). By doing this, shorter barcodes
     // will have smaller values.
     uint64_t out = 0;
-    size_t i;
-    for (i=0; i<conf->barcode_length; i++) {
-        char base = seq_nt16_str[bam_seqi(bam_get_seq(read1), i)];
-        out |= (nuc_to_uint8[(uint8_t)base] << 4*i);
+    uint8_t *s;
+
+    // Since we can only pack 16 bases in the integer, need to track how many bases
+    // we've looked at.
+    uint8_t count = 0;
+
+    // TODO: Right now, for CB/CR/parse if it's a barcode with multiple elements (separated by either "+" or "-")
+    //       the separator is treated as an "N". It would be better to handle multiple parts separately, whether
+    //       that is a unique packed int for each one, or packing everything into one int as best as possible
+    // TODO: Add ability to handle UMIs (MI and OX SAM tags), also found in read name at times
+    //       Right now, there are few (if any) WGBS preps that include UMIs, so this is low priority at this
+    //       time (June 2023)
+
+    // Start by looking for the CB auxiliary tag (cell identifier)
+    // This could be a corrected sequence, which should hopefully avoid any basecalling errors
+    s = bam_aux_get(read1, "CB");
+    if (s) {
+        s++;
+        while (*s) {
+            out |= (nuc_to_uint8[*s] << 4*count);
+
+            count++;
+            if (count == 16) {
+                // Maxed out the number of characters allowed in the packed int
+                if (conf->verbose) {
+                    fprintf(stderr, "[dupsifter] DEBUG: Barcode length > 16. Capping length at 16 for signature.\n");
+                }
+                break;
+            }
+            s++;
+        }
+
+        return out;
     }
 
+    // If CB cannot be found, try finding the CR tag, which is the uncorrected sequence that comes off the sequencer
+    s = bam_aux_get(read1, "CR");
+    if (s) {
+        s++;
+        while (*s) {
+            out |= (nuc_to_uint8[*s] << 4*count);
+
+            count++;
+            if (count == 16) {
+                // Maxed out the number of characters allowed in the packed int
+                if (conf->verbose) {
+                    fprintf(stderr, "[dupsifter] DEBUG: Barcode length > 16. Capping length at 16 for signature.\n");
+                }
+                break;
+            }
+            s++;
+        }
+
+        return out;
+    }
+
+    // If CB and CR can't be found, then try parsing the read name
+    // For now, follow the Bismark requirement where the barcode must be the last element in the read name
+    //     (separator = ":")
+    char *qname = bam_get_qname(read1);
+    char *last = strrchr(qname, ':');
+    char *full = last+1;
+    if (last) {
+        last++;
+        while (*last) {
+            if (*last != 'A' && *last != 'C' && *last != 'G' && *last != 'T' && *last != '+' && *last != '-') {
+                fprintf(stderr, "[dupsifter] WARNING: Unable to parse barcode from read name ('barcode': %s). Using default barcode.\n", full);
+
+                return 0;
+            }
+            out |= (nuc_to_uint8[(uint8_t)*last] << 4*count);
+
+            count++;
+            if (count == 16) {
+                // Maxed out the number of characters allowed in the packed int
+                if (conf->verbose) {
+                    fprintf(stderr, "[dupsifter] DEBUG: Barcode length > 16. Capping length at 16 for signature.\n");
+                }
+                break;
+            }
+            last++;
+        }
+
+        return out;
+    }
+
+    // Default to 0 if we couldn't find the CB or CR tags or parse from the read name
+    fprintf(stderr, "[dupsifter] WARNING: Could not find CB or CR SAM tags or parse barcode from read name. Using default barcode.\n");
     return out;
 }
 
@@ -821,7 +903,7 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
         }
 
         // Extract packed barcode before shifting around singletons
-        if (conf->barcode_length > 0) {
+        if (conf->has_barcode) {
             packed_barcode = get_packed_barcode(r1, conf);
         }
 
@@ -1061,7 +1143,7 @@ static int usage() {
     fprintf(stderr, "    -W, --wgs-only               process WGS reads instead of WGBS\n");
     fprintf(stderr, "    -l, --max-read-length INT    maximum read length for paired end duplicate-marking [%u]\n", conf.max_length);
     fprintf(stderr, "    -b, --min-base-qual INT      minimum base quality [%u]\n", conf.min_base_qual);
-    fprintf(stderr, "    -n, --barcode-length INT     number of bases in barcode (see Note 4 for details) [0]\n");
+    fprintf(stderr, "    -B, --has-barcode            reads in file have barcodes (see Note 4 for details)\n");
     fprintf(stderr, "    -r, --remove-dups            toggle to remove marked duplicate\n");
     fprintf(stderr, "    -v, --verbose                print extra messages\n");
     fprintf(stderr, "    -h, --help                   this help\n");
@@ -1072,10 +1154,12 @@ static int usage() {
     fprintf(stderr, "    If a singleton read is found in paired-end mode, the code will break nicely.\n");
     fprintf(stderr, "Note 3, defaults to dupsifter.stat if streaming or (-o basename).dupsifter.stat \n");
     fprintf(stderr, "    if the -o option is provided. If -o and -O are provided, then -O will be used.\n");
-    fprintf(stderr, "Note 4, barcode length must be 0 <= N <= 16. If no barcodes exist in the dataset (whether\n");
-    fprintf(stderr, "    there were no barcodes initially or they were removed during demultiplexing), then set the\n");
-    fprintf(stderr, "    length to 0. Barcode is assumed to be in the first N bases of read 1 and assumes exact matches\n");
-    fprintf(stderr, "    across barcodes (i.e., no mismatches). Only used for paired-end data.\n");
+    fprintf(stderr, "Note 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SAM tag, then\n");
+    fprintf(stderr, "    tries to parse the read name. If the barcode is in the read name, it must be the last element\n");
+    fprintf(stderr, "    and be separated by a ':' (i.e., @12345:678:9101112:1234_1:N:0:ACGTACGT). Any separators\n");
+    fprintf(stderr, "    found in the barcode (e.g., '+' or '-') are treated as 'N's and the additional parts of the\n");
+    fprintf(stderr, "    barcode are included up to a maximum length of 16 bases/characters. Barcodes are taken from\n");
+    fprintf(stderr, "    read 1 in paired-end sequencing only.\n");
     fprintf(stderr, "\n");
 
     ds_conf_destroy(&conf);
@@ -1097,7 +1181,7 @@ int main(int argc, char *argv[]) {
         {"wgs-only"       , no_argument      , NULL, 'W'},
         {"max-read-length", required_argument, NULL, 'l'},
         {"min-base-qual"  , required_argument, NULL, 'b'},
-        {"barcode-length" , required_argument, NULL, 'n'},
+        {"has-barcode"    , no_argument      , NULL, 'B'},
         {"remove-dups"    , no_argument      , NULL, 'r'},
         {"verbose"        , no_argument      , NULL, 'v'},
         {"help"           , no_argument      , NULL, 'h'},
@@ -1106,13 +1190,13 @@ int main(int argc, char *argv[]) {
     };
 
     if (argc < 1) { return usage(); }
-    while ((c = getopt_long(argc, argv, "b:l:n:o:O:Wrsmqvh", loptions, NULL)) >= 0) {
+    while ((c = getopt_long(argc, argv, "b:l:o:O:BWrsmqvh", loptions, NULL)) >= 0) {
         switch (c) {
             case 'b': conf.min_base_qual = (uint32_t)atoi(optarg); break;
             case 'l': conf.max_length = (uint32_t)atoi(optarg); break;
-            case 'n': conf.barcode_length = (uint8_t)atoi(optarg); break;
             case 'o': conf.outfn = optarg; break;
             case 'O': conf.statfn = strdup(optarg); break;
+            case 'B': conf.has_barcode = 1; break;
             case 'W': conf.is_wgs = 1; break;
             case 'r': conf.rm_dup = 1; break;
             case 's': conf.single_end = 1; break;
@@ -1130,14 +1214,6 @@ int main(int argc, char *argv[]) {
     conf.infn  = optind < argc ? argv[optind++] : "-";
     if (!conf.reffn) {
         fprintf(stderr, "Please provide a reference\n");
-        return usage();
-    }
-
-    // Note, using a uint8_t for barcode length means that if you have a sufficiently large negative number
-    // you can wrap back around to barcode length <= 16, which means this check would fail. For now, I'm
-    // acknowledging that this issue exists, but I'm not going to address it unless someone raises an issue.
-    if (conf.barcode_length > 16) {
-        fprintf(stderr, "`-n|--barcode-length` must be in the range 0 <= n <= 16\n");
         return usage();
     }
 
