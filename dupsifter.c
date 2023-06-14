@@ -361,7 +361,7 @@ uint8_t infer_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *b, uint32_t min_b
                 qpos += oplen;
                 break;
             default:
-                fatal_error("[dupsifter] Error: Unknown cigar, %u\n", op);
+                fatal_error("[dupsifter] ERROR: Unknown cigar, %u\n", op);
         }
     }
     if (nC2T >= nG2A) { return 0; }
@@ -421,15 +421,14 @@ uint8_t determine_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one, bam1_t *
             // Rare case, assume OT/CTOT
             if (conf->verbose) {
                 fprintf(stderr,
-                        "[%s] Warning: No valid reads to determine bisulfite strand info. Assuming OT/CTOT strand.\n",
-                        __func__);
+                        "[dupsifter] DEBUG: No valid reads to determine bisulfite strand info. Assuming OT/CTOT strand.\n");
                 fflush(stderr);
             }
             return 0;
         }
         else {
             if (conf->verbose) {
-                fprintf(stderr, "[%s] Warning: Inconsistent bisulfite strand info. ", __func__);
+                fprintf(stderr, "[dupsifter] DEBUG: Inconsistent bisulfite strand info. ");
                 fprintf(stderr, "Taking strand from read with higher total base quality.\n");
                 fflush(stderr);
             }
@@ -482,7 +481,7 @@ ds_bins_t *prepare_bin_offsets(bam_hdr_t *hdr, ds_conf_t *conf) {
     b->n_bins = (sum_length >> BIN_SHIFT) + 1;
     if (b->n_bins >= BIN_RESIZE) {
         // NOTE: exiting here may cause a memory leak, depending on how clean up is handled
-        fprintf(stderr, "[%s:%d] Error: Too many contigs found in BAM header\n", __func__, __LINE__);
+        fprintf(stderr, "[dupsifter] ERROR: Too many contigs found in BAM header\n");
         exit(1);
     }
 
@@ -536,7 +535,7 @@ parsed_cigar_t parse_cigar(bam1_t *b) {
                 first_op = 0;
                 break;
             default:
-                fatal_error("[dupsifter] Error: Unknown cigar operation: %u\n", op);
+                fatal_error("[dupsifter] ERROR: Unknown cigar operation: %u\n", op);
         }
     }
 
@@ -551,13 +550,13 @@ parsed_cigar_t parse_cigar(bam1_t *b) {
 
 signature_t create_single_signature(bam1_t *read, ds_conf_t *conf, ds_bins_t *bins, uint64_t packed_barcode) {
     if (read == NULL) {
-        fatal_error("[dupsifter] Error: Read information for single or mate-unmapped read is missing\n");
+        fatal_error("[dupsifter] ERROR: Read information for single or mate-unmapped read is missing\n");
     }
 
     parsed_cigar_t cigar = parse_cigar(read);
     uint32_t total_length = cigar.sclp + cigar.qlen + cigar.eclp;
     if (total_length > conf->max_length) {
-        fatal_error("[dupsifter] Error: Read with length %u is longer than max read length %u\n",
+        fatal_error("[dupsifter] ERROR: Read with length %u is longer than max read length %u\n",
                 total_length, conf->max_length);
     }
 
@@ -584,7 +583,7 @@ signature_t create_single_signature(bam1_t *read, ds_conf_t *conf, ds_bins_t *bi
 signature_t create_paired_signature(bam1_t *read1, bam1_t *read2, ds_conf_t *conf, ds_bins_t *bins,
         uint64_t packed_barcode) {
     if (read1 == NULL || read2 == NULL) {
-        fatal_error("[dupsifter] Error: Read information for paired end read is missing\n");
+        fatal_error("[dupsifter] ERROR: Read information for paired end read is missing\n");
     }
 
     parsed_cigar_t cigar1 = parse_cigar(read1);
@@ -594,11 +593,11 @@ signature_t create_paired_signature(bam1_t *read1, bam1_t *read2, ds_conf_t *con
     uint32_t total_length_2 = cigar2.sclp + cigar2.qlen + cigar2.eclp;
 
     if (total_length_1 > conf->max_length) {
-        fatal_error("[dupsifter] Error: Read with length %u is longer than max read length %u\n",
+        fatal_error("[dupsifter] ERROR: Read with length %u is longer than max read length %u\n",
                 total_length_1, conf->max_length);
     }
     if (total_length_2 > conf->max_length) {
-        fatal_error("[dupsifter] Error: Read with length %u is longer than max read length %u\n",
+        fatal_error("[dupsifter] ERROR: Read with length %u is longer than max read length %u\n",
                 total_length_2, conf->max_length);
     }
 
@@ -668,7 +667,7 @@ signature_t create_paired_signature(bam1_t *read1, bam1_t *read2, ds_conf_t *con
             pos2 = beg2;
             break;
         default:
-            fatal_error("[dupsifter] Error: Unknown orientation found.\n");
+            fatal_error("[dupsifter] ERROR: Unknown orientation found.\n");
     }
 
     signature_t sig = signature_init();
@@ -732,7 +731,7 @@ void add_MCMQ(bam1_chain_t *bc, bam1_t *b_read, bam1_t *b_mate) {
 
 //---------------------------------------------------------------------------------------------------------------------
 void problem_chain(bam1_chain_t *bc, uint32_t count) {
-    fatal_error("[dupsifter] Error: Can't find read 1 and/or read 2 in %u reads with read ID: %s. Are these reads coordinate sorted?\n",
+    fatal_error("[dupsifter] ERROR: Can't find read 1 and/or read 2 in %u reads with read ID: %s. Are these reads coordinate sorted?\n",
             count, bam_get_qname(bc->read));
 }
 
@@ -781,7 +780,7 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
 
     if (r1 == NULL && r2 == NULL) {
         conf->cnt_id_no_prim++;
-        fprintf(stderr, "[dupsifter] Warning: No valid primary alignments found for read ID: %s", bam_get_qname(bc->read));
+        fprintf(stderr, "[dupsifter] WARNING: No valid primary alignments found for read ID: %s", bam_get_qname(bc->read));
         return;
     }
 
@@ -910,8 +909,7 @@ int dupsifter(ds_conf_t *conf) {
     // Read input file and BAM header
     htsFile *infh = hts_open(conf->infn, "r");
     if (infh == NULL) {
-        fprintf(stderr, "[%s:%d] Error: Unable to read from %s\n",
-                __func__, __LINE__, strcmp(conf->infn, "-") == 0 ? "stdin" : conf->infn);
+        fprintf(stderr, "[dupsifter] ERROR: Unable to read from %s\n", strcmp(conf->infn, "-") == 0 ? "stdin" : conf->infn);
         fflush(stderr);
         return 1;
     }
@@ -923,8 +921,7 @@ int dupsifter(ds_conf_t *conf) {
     // Open output file
     htsFile *outfh = hts_open(conf->outfn, conf->out_mode);
     if (outfh == NULL) {
-        fprintf(stderr, "[%s:%d] Error: Unable to write to %s\n",
-                __func__, __LINE__, strcmp(conf->outfn, "-") == 0 ? "stdout" : conf->outfn);
+        fprintf(stderr, "[dupsifter] ERROR: Unable to write to %s\n", strcmp(conf->outfn, "-") == 0 ? "stdout" : conf->outfn);
         fflush(stderr);
 
         hts_close(infh);
@@ -935,7 +932,7 @@ int dupsifter(ds_conf_t *conf) {
     // Write header to output file
     if (sam_hdr_add_pg(hdr, "dupsifter", "VN", dupsifter_version(),
                 conf->arg_list ? "CL" : NULL, conf->arg_list ? conf->arg_list : NULL, NULL)) {
-        fprintf(stderr, "[dupsifter] Error: Failed to add PG tag to output header\n");
+        fprintf(stderr, "[dupsifter] ERROR: Failed to add PG tag to output header\n");
         fflush(stderr);
 
         hts_close(outfh);
@@ -945,7 +942,7 @@ int dupsifter(ds_conf_t *conf) {
         return 1;
     }
     if (sam_hdr_write(outfh, hdr) < 0) {
-        fprintf(stderr, "[%s:%d] Error: Header writing failed. Abort.\n", __func__, __LINE__);
+        fprintf(stderr, "[dupsifter] ERROR: Header writing failed. Abort.\n");
         fflush(stderr);
 
         hts_close(outfh);
@@ -971,8 +968,7 @@ int dupsifter(ds_conf_t *conf) {
     // checking to see if there are any reads in the file
     bam1_t *curr = bam_init1();
     if ((ret = sam_read1(infh, hdr, curr)) < 0) {
-        fprintf(stderr, "[%s:%d] Error: No reads found in %s\n", __func__,
-                __LINE__, strcmp(conf->infn, "-") ? conf->infn : "stdin");
+        fprintf(stderr, "[dupsifter] ERROR: No reads found in %s\n", strcmp(conf->infn, "-") ? conf->infn : "stdin");
         fflush(stderr);
 
         bam_destroy1(curr);
@@ -1161,25 +1157,25 @@ int main(int argc, char *argv[]) {
     if (conf.verbose) {
         // Input file location
         if (strcmp(conf.infn, "-") == 0) {
-            fprintf(stderr, "Reading input from stdin\n");
+            fprintf(stderr, "[dupsifter] DEBUG: Reading input from stdin\n");
         } else {
-            fprintf(stderr, "Reading input from %s\n", conf.infn);
+            fprintf(stderr, "[dupsifter] DEBUG: Reading input from %s\n", conf.infn);
         }
 
         // Output file location
         if (strcmp(conf.outfn, "-") == 0) {
-            fprintf(stderr, "Writing output to stdout\n");
+            fprintf(stderr, "[dupsifter] DEBUG: Writing output to stdout\n");
         } else {
-            fprintf(stderr, "Writing output to %s\n", conf.outfn);
+            fprintf(stderr, "[dupsifter] DEBUG: Writing output to %s\n", conf.outfn);
         }
 
         // Metrics file location
-        fprintf(stderr, "Writing stats to %s\n", conf.statfn);
+        fprintf(stderr, "[dupsifter] DEBUG: Writing stats to %s\n", conf.statfn);
     }
 
     // Create argument list string
     if (!(conf.arg_list = stringify_argv(argc, argv))) {
-        fatal_error("[dupsifter] Error: Unable to create argument list for PG string\n");
+        fatal_error("[dupsifter] ERROR: Unable to create argument list for PG string\n");
     }
 
     // Set write mode, auto-detect from file name, assume no extra compression
