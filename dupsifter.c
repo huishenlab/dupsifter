@@ -762,8 +762,14 @@ uint64_t get_packed_barcode(bam1_t *read1, ds_conf_t *conf) {
     // This could be a corrected sequence, which should hopefully avoid any basecalling errors
     s = bam_aux_get(read1, "CB");
     if (s) {
+        char *full = s+1;
         s++;
         while (*s) {
+            if (*s != 'A' && *s != 'C' && *s != 'G' && *s != 'T' && *s != '+' && *s != '-') {
+                fprintf(stderr, "[dupsifter] WARNING: Unable to parse barcode from CB tag ('barcode': %s). Using default barcode.\n", full);
+
+                return 0;
+            }
             out |= (nuc_to_uint8[*s] << 4*count);
 
             count++;
@@ -783,8 +789,14 @@ uint64_t get_packed_barcode(bam1_t *read1, ds_conf_t *conf) {
     // If CB cannot be found, try finding the CR tag, which is the uncorrected sequence that comes off the sequencer
     s = bam_aux_get(read1, "CR");
     if (s) {
+        char *full = s+1;
         s++;
         while (*s) {
+            if (*s != 'A' && *s != 'C' && *s != 'G' && *s != 'T' && *s != '+' && *s != '-') {
+                fprintf(stderr, "[dupsifter] WARNING: Unable to parse barcode from CB tag ('barcode': %s). Using default barcode.\n", full);
+
+                return 0;
+            }
             out |= (nuc_to_uint8[*s] << 4*count);
 
             count++;
