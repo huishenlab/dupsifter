@@ -45,6 +45,10 @@ make
 
 ### Help
 ```
+Program: dupsifter
+Version: 1.1.1
+Contact: Jacob Morrison <jacob.morrison@vai.org>
+
 dupsifter [options] <ref.fa> [in.bam]
 
 Output options:
@@ -56,15 +60,23 @@ Input options:
     -W, --wgs-only               process WGS reads instead of WGBS
     -l, --max-read-length INT    maximum read length for paired end duplicate-marking [10000]
     -b, --min-base-qual INT      minimum base quality [0]
+    -B, --has-barcode            reads in file have barcodes (see Note 4 for details)
     -r, --remove-dups            toggle to remove marked duplicate
     -v, --verbose                print extra messages
     -h, --help                   this help
+        --version                print version info and exit
 
 Note 1, [in.bam] must be name sorted. If not provided, assume the input is stdin.
 Note 2, assumes either ALL reads are paired-end (default) or single-end.
     If a singleton read is found in paired-end mode, the code will break nicely.
 Note 3, defaults to dupsifter.stat if streaming or (-o basename).dupsifter.stat
     if the -o option is provided. If -o and -O are provided, then -O will be used.
+Note 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SAM tag, then
+    tries to parse the read name. If the barcode is in the read name, it must be the last element
+    and be separated by a ':' (i.e., @12345:678:9101112:1234_1:N:0:ACGTACGT). Any separators
+    found in the barcode (e.g., '+' or '-') are treated as 'N's and the additional parts of the
+    barcode are included up to a maximum length of 16 bases/characters. Barcodes are taken from
+    read 1 in paired-end sequencing only.
 ```
 
 ### Option Descriptions
@@ -77,6 +89,7 @@ Note 3, defaults to dupsifter.stat if streaming or (-o basename).dupsifter.stat
 |     -W       |    --wgs-only     |     none      | Process WGS data instead of WGBS (see Documentation for differences in processing) |
 |     -l       | --max-read-length |    integer    | Maximum read length (handles padding for reference genome windows)                 |
 |     -b       |  --min-base-qual  |    integer    | Minimum bae quality (used in determiningg bisulfite strand if tags not provided)   |
+|     -B       |   --has-barcode   |     none      | Use when reads have cell barcodes and you want to mark duplicates accordingly      |
 |     -r       |   --remove-dups   |     none      | Remove reads that are flagged as duplicates                                        |
 |     -v       |     --verbose     |     none      | Print extra messages when running                                                  |
 |     -h       |      --help       |     none      | Print usage help message and exit                                                  |
@@ -120,6 +133,7 @@ categories (descriptions below):
   5. Read 1 Leftmost in Pair?
   6. Orientation
   7. Single-End?
+  8. Cell barcode
 
 Descriptions:
 
@@ -132,6 +146,7 @@ Descriptions:
   forward-reverse, reverse-forward. For reference, forward-reverse is generally
   considered a "proper pair."
   - *Single-End?:* Is the read a single-end read?
+  - *Cell barcode:* Described below
 
 PCR duplicates are found for single-end and paired-end reads using the same
 set of categories, with a few minor notes. First, single-end reads and
@@ -181,6 +196,35 @@ into can be determined, as well as the position within the bin itself. By way of
 example, the human genome from GENCODE contains over 600 contigs (both primary
 chromosomes and additional contigs). Rather than having 600+ bins, there are
 approximately 25 bins using the described method.
+
+### Cell Barcodes
+
+Cell barcodes are commonly used in single-cell sequencing in order to multiplex
+many cells into a pool, primarily to increase throughput and to overcome
+sequencer input requirements. It also allows for streamlined processing, as many
+cells can be processed at once. These barcodes must be included when defining
+reads that are duplicates as two fragments may be from the same location in the
+genome, but be from two different cells. By default, dupsifter does not look for
+barcodes; however, an option is available (`-B|--has-barcode`) when duplicate
+marking data with barcodes. Dupsifter handles barcodes in the following way:
+
+  1. Looks for the `CB` SAM tag.
+  2. If not found, look for the `CR` SAM tag.
+  3. If neither are found, parse the read name. The barcode must be the last
+  element in the name where the elements are separated by `:`.
+  4. If a barcode can't be found in any of these locations, a warning is
+  printed and a default value is used (thereby negating any benefits of
+  using barcodes).
+
+In all three cases, up to 16 bases are packed into a single integer for defining
+the barcode. If your barcode is longer than 16 bases, it will be truncated to a
+length of 16. Additionally, separators (only `+` and `-` allowed) are treated as
+Ns and count towards the maximum length of 16.
+
+<!-- Room for improvement: -->
+<!--   - Allow barcodes longer than 16 base pairs. -->
+<!--   - Handle barcodes with dual indexes. -->
+<!--   - Include UMI capabilities. -->
 
 ### Bisulfite Strand Determination
 The bisulfite strand for a read (both single-end and paired-end reads) is
