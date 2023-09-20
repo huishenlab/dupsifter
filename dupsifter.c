@@ -368,7 +368,7 @@ uint8_t infer_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *b, uint32_t min_b
     else              { return 1; }
 }
 
-uint8_t get_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *b, uint32_t min_base_qual, uint8_t allow_u) {
+uint8_t get_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *b, uint32_t min_base_qual, uint8_t allow_u, uint8_t verbose) {
     uint8_t *s;
   
     /* bwa-meth flag has highest priority */
@@ -397,18 +397,24 @@ uint8_t get_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *b, uint32_t min_bas
     }
 
     /* otherwise, guess the bsstrand from nCT and nGA */
-    return infer_bsstrand(rs, hdr, b, min_base_qual);
+    uint8_t bss = infer_bsstrand(rs, hdr, b, min_base_qual);
+    if (verbose) {
+        fprintf(stderr, "[dupsifter] DEBUG: read name: %s, inferred bisulfite strand: %s\n",
+                bam_get_qname(b), bss ? "OB/CTOB" : "OT/CTOT");
+    }
+
+    return bss;
 }
 
 uint8_t determine_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *one, bam1_t *two,
         ds_conf_t *conf, uint8_t allow_u) {
     int8_t bss1 = -1, bss2 = -1;
     if (one && !is_unmapped(one)) {
-        bss1 = get_bsstrand(rs, hdr, one, conf->min_base_qual, allow_u);
+        bss1 = get_bsstrand(rs, hdr, one, conf->min_base_qual, allow_u, conf->verbose);
     }
 
     if (two && !is_unmapped(two)) {
-        bss2 = get_bsstrand(rs, hdr, two, conf->min_base_qual, allow_u);
+        bss2 = get_bsstrand(rs, hdr, two, conf->min_base_qual, allow_u, conf->verbose);
     }
 
     if (bss1 == bss2 && bss1 >= 0) {
