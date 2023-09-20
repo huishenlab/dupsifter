@@ -1287,8 +1287,7 @@ int main(int argc, char *argv[]) {
 
     // Print output of run
     ds_conf_print(&conf);
-    fprintf(stderr, "[dupsifter:%s] Wall time: %.3f seconds, CPU time: %.3f seconds\n",
-            __func__, t2-t1, c2-c1);
+    fprintf(stderr, "[dupsifter] Wall time: %.3f seconds, CPU time: %.3f seconds\n", t2-t1, c2-c1);
 
     ds_conf_destroy(&conf);
 
