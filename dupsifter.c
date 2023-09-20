@@ -1243,6 +1243,9 @@ int main(int argc, char *argv[]) {
     }
 
     if (conf.verbose) {
+        // Reference file location
+        fprintf(stderr, "[dupsifter] DEBUG: Reading reference from %s\n", conf.reffn);
+
         // Input file location
         if (strcmp(conf.infn, "-") == 0) {
             fprintf(stderr, "[dupsifter] DEBUG: Reading input from stdin\n");
