@@ -1225,7 +1225,13 @@ int main(int argc, char *argv[]) {
     conf.reffn = optind < argc ? argv[optind++] : NULL;
     conf.infn  = optind < argc ? argv[optind++] : "-";
     if (!conf.reffn) {
-        fprintf(stderr, "Please provide a reference\n");
+        fprintf(stderr, "[dupsifter] ERROR: Please provide a reference\n");
+        return usage();
+    }
+    int len = strlen(conf.reffn);
+    if (!(strstr(conf.reffn+len-3, ".fa") || strstr(conf.reffn+len-6, ".fa.gz") ||
+          strstr(conf.reffn+len-6, ".fasta") || strstr(conf.reffn+len-9, ".fasta.gz"))) {
+        fprintf(stderr, "[dupsifter] ERROR: Reference must end in .fa/.fa.gz/.fasta/.fasta.gz\n");
         return usage();
     }
 
