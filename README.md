@@ -64,12 +64,37 @@ cd dupsifter
 make
 ```
 
-A `Dockerfile` is available to build a `dupsifter` container:
+A `Dockerfile` is available to build a `dupsifter` container from the latest
+release version:
 ```
 git clone git@github.com:huishenlab/dupsifter.git
-cd dupsifter
-docker build --no-cache -t dupsifter_latest .
+cd dupsifter/container
+docker build --no-cache --tag dupsifter_latest --file Dockerfile_latest .
 docker run -it dupsifter_latest /bin/bash
+```
+
+If you want to create a `Dockerfile` for a specific version of `dupsifter`, you
+can do that via:
+```
+git clone git@github.com:huishenlab/dupsifter.git
+cd dupsifter/container
+python create_container.py -v X.Y.Z
+docker build --no-cache --tag dupsifter_vX.Y.Z --file Dockerfile_vX.Y.Z .
+docker run -it dupsifter_vX.Y.Z /bin/bash
+```
+`X.Y.Z` is the version number you want a container file for.
+
+If you don't want to build the container yourself, a pre-built container is
+available on [DockerHub](https://hub.docker.com/r/varishenlab/dupsifter) and can
+be pulled down with either Docker or Singularity:
+```
+# Docker
+docker pull varishenlab/dupsifter:dupsifter
+docker run -it varishenlab:dupsifter /bin/bash
+
+# Singularity
+singularity pull dupsifter.sif docker://varishenlab/dupsifter:dupsifter
+singularity shell dupsifter.sif
 ```
 
 ## Usage
