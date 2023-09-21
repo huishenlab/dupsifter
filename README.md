@@ -31,6 +31,8 @@ libcurl
 
 All releases are available on [GitHub](https://github.com/huishenlab/dupsifter/releases).
 
+### Precompiled Binaries
+
 Precompiled binaries are available for macOS and linux:
 ```
 # macOS
@@ -45,6 +47,8 @@ curl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/la
 mv dupsifter_* dupsifter
 chmod +x dupsifter
 ```
+
+### Build from Source
 
 `dupsifter` can also be downloaded and built from source.
 
@@ -63,6 +67,8 @@ unzip release-source.zip
 cd dupsifter-release
 make
 ```
+
+### Containers
 
 A `Dockerfile` is available to build a `dupsifter` container from the latest
 release version:
