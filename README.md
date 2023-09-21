@@ -100,7 +100,9 @@ docker run -it varishenlab:dupsifter /bin/bash
 
 # Singularity
 singularity pull dupsifter.sif docker://varishenlab/dupsifter:dupsifter
-singularity shell dupsifter.sif
+singularity shell -B /path/to/dupsifter/code dupsifter.sif
+Singularity> cd /path/to/dupsifter/code
+Singularity> make
 ```
 
 ## Usage
