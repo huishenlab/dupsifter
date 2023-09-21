@@ -60,7 +60,7 @@ Or, via `curl`:
 curl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |
     grep browser_download_url | grep release-source.zip | cut -d '"' -f 4)
 unzip release-source.zip
-cd dupsifter
+cd dupsifter-release
 make
 ```
 
