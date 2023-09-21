@@ -4,6 +4,17 @@
 datasets. It is based on the [samblaster](https://github.com/GregoryFaust/samblaster)
 methodology for finding and marking duplicates.
 
+## External Dependencies
+
+`dupsifter` requires the following external libraries:
+
+```
+zlib
+libbz2
+liblzma
+libcurl
+```
+
 ## Download and Install
 
 All releases are available on [GitHub](https://github.com/huishenlab/dupsifter/releases).
