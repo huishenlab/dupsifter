@@ -6,8 +6,20 @@ methodology for finding and marking duplicates.
 
 ## External Dependencies
 
-`dupsifter` requires the following external libraries:
+`dupsifter` requires the following tools to compile from source:
+```
+gcc
+make
+```
 
+Helpful tools for retrieving pre-compiled binaries or source code from GitHub:
+```
+git
+curl
+unzip
+```
+
+`dupsifter` requires the following external libraries:
 ```
 zlib
 libbz2
@@ -50,6 +62,14 @@ curl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/la
 unzip release-source.zip
 cd dupsifter
 make
+```
+
+A `Dockerfile` is available to build a `dupsifter` container:
+```
+git clone git@github.com:huishenlab/dupsifter.git
+cd dupsifter
+docker build --no-cache -t dupsifter_latest .
+docker run -it dupsifter_latest /bin/bash
 ```
 
 ## Usage
