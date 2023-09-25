@@ -160,14 +160,8 @@ Note 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SA
 |              |     --version     |     none      | Print `dupsifter` version and exit                                                 |
 
 ### Examples
-  - WGBS with streaming input and output
-    - `biscuit ref.fa read1.fq.gz read2.fq.gz | dupsifter ref.fa | samtools sort -o output.bam`
-  - WGBS with no streaming
-    - `dupsifter -o output.bam ref.fa input.bam`
-  - WGS with streamed input and specified output file
-    - `bwa ref.fa read1.fq.gz read2.fq.gz | dupsifter -W -o output.bam ref.fa`
-  - WGS single-end data with input BAM and streamed output
-    - `dupsifter -W -s ref.fa input.se.wgs.bam | samtools sort -o output.bam`
+[Detailed usage examples](example/README.md) and test cases can be found in the
+`example` directory.
 
 ## Documentation
 
