@@ -105,6 +105,13 @@ Singularity> cd /path/to/dupsifter/code
 Singularity> make
 ```
 
+### Bioconda
+
+`dupsifter` is also available via `conda`/`mamba` (starting with version 1.2.0):
+```
+conda install -c bioconda dupsifter
+```
+
 ## Usage
 
 ### Help
