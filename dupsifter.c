@@ -337,7 +337,13 @@ uint8_t infer_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *b, uint32_t min_b
         op    = bam_cigar_op(bam_get_cigar(b)[i]);
         oplen = bam_cigar_oplen(bam_get_cigar(b)[i]);
         switch(op) {
+            // While in theory Equal (=) should mean the query base matches the reference base,
+            // it's possible that some WGBS aligners use '=' to denote bases where cytosine
+            // conversion occurred. Therefore, group Match (M), Equal (=), and Different (X)
+            // together for processing
             case BAM_CMATCH:
+            case BAM_CEQUAL:
+            case BAM_CDIFF:
                 for (j=0; j<oplen; ++j) {
                     rb = refcache_getbase_upcase(rs, rpos+j);
                     qb = bscall(b, qpos+j);
