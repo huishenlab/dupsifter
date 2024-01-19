@@ -106,11 +106,11 @@ available on [DockerHub](https://hub.docker.com/r/varishenlab/dupsifter) and can
 be pulled down with either Docker or Singularity:
 ```
 # Docker
-docker pull varishenlab/dupsifter:dupsifter
+docker pull varishenlab/dupsifter:dupsifter_v1.2.1
 docker run -it varishenlab:dupsifter /bin/bash
 
 # Singularity
-singularity pull dupsifter.sif docker://varishenlab/dupsifter:dupsifter
+singularity pull dupsifter.sif docker://varishenlab/dupsifter:dupsifter_v1.2.1
 singularity shell -B /path/to/dupsifter/code dupsifter.sif
 Singularity> cd /path/to/dupsifter/code
 Singularity> make
