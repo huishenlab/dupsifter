@@ -4,6 +4,17 @@
 datasets. It is based on the [samblaster](https://github.com/GregoryFaust/samblaster)
 methodology for finding and marking duplicates.
 
+## Publication
+
+If you use dupsifter, kindly [cite](https://doi.org/10.1093/bioinformatics/btad729):
+
+```
+Jacob Morrison, Wanding Zhou, Benjamin K Johnson, Hui Shen,
+Dupsifter: a lightweight duplicate marking tool for whole genome bisulfite sequencing,
+Bioinformatics, Volume 39, Issue 12, December 2023, btad729,
+https://doi.org/10.1093/bioinformatics/btad729
+```
+
 ## External Dependencies
 
 `dupsifter` requires the following tools to compile from source:
