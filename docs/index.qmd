@@ -5,3 +5,8 @@ title: "Dupsifter Documentation"
 This is a documentation website.
 
 To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+
+## Issues
+
+Issues and bugs can be submitted to:
+[https://github.com/huishenlab/dupsifter/issues](https://github.com/huishenlab/dupsifter/issues).
