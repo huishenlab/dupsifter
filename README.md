@@ -325,6 +325,11 @@ resolved.
   qualities) > sum(read 2 base qualities)`, then `bss1` is used, else `bss2` is
   used.
 
+## Issues
+
+Issues and bugs can be submitted to:
+[https://github.com/huishenlab/dupsifter/issues](https://github.com/huishenlab/dupsifter/issues).
+
 ## Acknowledgments
 
   - This work is based on Gregory Faust's [samblaster](https://github.com/GregoryFaust/samblaster).
