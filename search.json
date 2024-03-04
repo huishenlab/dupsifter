@@ -4,28 +4,44 @@
     "href": "install.html",
     "title": "Installation",
     "section": "",
-    "text": "Note, if you plan to use the Docker container or install via conda/mamba you can skip this section as all dependencies are wrapped up in these methods.\nIf you plan to compile your own copy of dupsifter or run the pre-compiled binaries, there are several external dependencies that are needed:\nzlib\nlibbz2\nliblzma\nlibcurl\nSome helpful tools for retrieving the pre-compiled binaries or the source code from GitHub are:\ngit\ncurl\nunzip\nIf you are compiling dupsifter yourself, you will also need:\ngcc\nmake"
+    "text": "Note, if you plan to use the Docker container or install via conda/mamba you can skip this section as all dependencies are wrapped up in these methods.\nIf you plan to compile your own copy of dupsifter or run the pre-compiled binaries, there are several external dependencies that are needed:\nzlib\nlibbz2\nliblzma\nlibcurl\nSome helpful tools for retrieving the pre-compiled binaries or the source code from GitHub are:\ngit\ncurl\nunzip\nIf you are compiling dupsifter yourself, you will also need:\ngcc\nmake",
+    "crumbs": [
+      "Home",
+      "Installation"
+    ]
   },
   {
     "objectID": "install.html#external-dependencies",
     "href": "install.html#external-dependencies",
     "title": "Installation",
     "section": "",
-    "text": "Note, if you plan to use the Docker container or install via conda/mamba you can skip this section as all dependencies are wrapped up in these methods.\nIf you plan to compile your own copy of dupsifter or run the pre-compiled binaries, there are several external dependencies that are needed:\nzlib\nlibbz2\nliblzma\nlibcurl\nSome helpful tools for retrieving the pre-compiled binaries or the source code from GitHub are:\ngit\ncurl\nunzip\nIf you are compiling dupsifter yourself, you will also need:\ngcc\nmake"
+    "text": "Note, if you plan to use the Docker container or install via conda/mamba you can skip this section as all dependencies are wrapped up in these methods.\nIf you plan to compile your own copy of dupsifter or run the pre-compiled binaries, there are several external dependencies that are needed:\nzlib\nlibbz2\nliblzma\nlibcurl\nSome helpful tools for retrieving the pre-compiled binaries or the source code from GitHub are:\ngit\ncurl\nunzip\nIf you are compiling dupsifter yourself, you will also need:\ngcc\nmake",
+    "crumbs": [
+      "Home",
+      "Installation"
+    ]
   },
   {
     "objectID": "install.html#download-and-install",
     "href": "install.html#download-and-install",
     "title": "Installation",
     "section": "Download and Install",
-    "text": "Download and Install\nAll releases are available on GitHub.\n\nPrecompiled Binaries\nPrecompiled binaries are available for macOS and Linux:\n# macOS\ncurl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |\n    grep browser_download_url | grep darwin_amd64 | cut -d '\"' -f 4)\nmv dupsifter_* dupsifter\nchmod +x dupsifter\n\n# Linux\ncurl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |\n    grep browser_download_url | grep linux_amd64 | cut -d '\"' -f 4)\nmv dupsifter_* dupsifter\nchmod +x dupsifter\n\n\nBuild from Source\ndupsifter can also be downloaded and built from source.\nVia git:\ngit clone git@github.com:huishenlab/dupsifter.git\ncd dupsifter\nmake\nOr, via curl:\ncurl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |\n    grep browser_download_url | grep release-source.zip | cut -d '\"' -f 4)\nunzip release-source.zip\ncd dupsifter-release\nmake\n\n\nContainers\nA Dockerfile is available to build a dupsifter container for the latest release version:\ngit clone git@github.com:huishenlab/dupsifter.git\ncd dupsifter/container\ndocker build --no-cache --tag dupsifter_latest --file Dockerfile_latest .\ndocker run -it dupsifter_latest /bin/bash\nIf you want to create a Dockerfile for a specific version of dupsifter, you can do that via:\ngit clone git@github.com:huishenlab/dupsifter.git\ncd dupsifter/container\npython create_container.py -v X.Y.Z\ndocker build --no-cache --tag dupsifter_vX.Y.Z --file Dockerfile_vX.Y.Z .\ndocker run -it dupsifter_vX.Y.Z /bin/bash\nX.Y.Z is the version number you want a container file for.\nIf you don’t want to build the container yourself, a pre-built container is available on DockerHub and can be pulled down with either Docker or Singularity:\n# Docker\ndocker pull varishenlab/dupsifter:dupsifter_v1.2.1\ndocker run -it varishenlab:dupsifter /bin/bash\n\n# Singularity\nsingularity pull dupsifter.sif docker://varishenlab/dupsifter:dupsifter_v1.2.1\nsingularity shell -B /path/to/dupsifter/code dupsifter.sif\nSingularity&gt; cd /path/to/dupsifter/code\nSingularity&gt; make\n\n\nBioconda\ndupsifter is also available via conda/mamba (starting with version 1.2.0):\nconda install -c bioconda dupsifter"
+    "text": "Download and Install\nAll releases are available on GitHub.\n\nPrecompiled Binaries\nPrecompiled binaries are available for macOS and Linux:\n# macOS\ncurl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |\n    grep browser_download_url | grep darwin_amd64 | cut -d '\"' -f 4)\nmv dupsifter_* dupsifter\nchmod +x dupsifter\n\n# Linux\ncurl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |\n    grep browser_download_url | grep linux_amd64 | cut -d '\"' -f 4)\nmv dupsifter_* dupsifter\nchmod +x dupsifter\n\n\nBuild from Source\ndupsifter can also be downloaded and built from source.\nVia git:\ngit clone git@github.com:huishenlab/dupsifter.git\ncd dupsifter\nmake\nOr, via curl:\ncurl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |\n    grep browser_download_url | grep release-source.zip | cut -d '\"' -f 4)\nunzip release-source.zip\ncd dupsifter-release\nmake\n\n\nContainers\nA Dockerfile is available to build a dupsifter container for the latest release version:\ngit clone git@github.com:huishenlab/dupsifter.git\ncd dupsifter/container\ndocker build --no-cache --tag dupsifter_latest --file Dockerfile_latest .\ndocker run -it dupsifter_latest /bin/bash\nIf you want to create a Dockerfile for a specific version of dupsifter, you can do that via:\ngit clone git@github.com:huishenlab/dupsifter.git\ncd dupsifter/container\npython create_container.py -v X.Y.Z\ndocker build --no-cache --tag dupsifter_vX.Y.Z --file Dockerfile_vX.Y.Z .\ndocker run -it dupsifter_vX.Y.Z /bin/bash\nX.Y.Z is the version number you want a container file for.\nIf you don’t want to build the container yourself, a pre-built container is available on DockerHub and can be pulled down with either Docker or Singularity:\n# Docker\ndocker pull varishenlab/dupsifter:dupsifter_v1.2.1\ndocker run -it varishenlab:dupsifter /bin/bash\n\n# Singularity\nsingularity pull dupsifter.sif docker://varishenlab/dupsifter:dupsifter_v1.2.1\nsingularity shell -B /path/to/dupsifter/code dupsifter.sif\nSingularity&gt; cd /path/to/dupsifter/code\nSingularity&gt; make\n\n\nBioconda\ndupsifter is also available via conda/mamba (starting with version 1.2.0):\nconda install -c bioconda dupsifter",
+    "crumbs": [
+      "Home",
+      "Installation"
+    ]
   },
   {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this site"
+    "text": "About this site",
+    "crumbs": [
+      "Home",
+      "About"
+    ]
   },
   {
     "objectID": "index.html",
