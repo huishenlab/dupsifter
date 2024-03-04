@@ -7,6 +7,22 @@ project:
 website:
   title: "Dupsifter Documentation"
   description: "Documentation site for dupsifter, a WGBS/WGS duplicate marking tool"
+  page-footer:
+    left: "Copyright 2024, Jacob Morrison"
+    right:
+      - icon: github
+        href: https://github.com/huishenlab/dupsifter
+  sidebar:
+    style: "docked"
+    search: true
+    contents: auto
+    tools:
+      - icon: github
+        menu:
+          - text: Source Code
+            url: https://github.com/huishenlab/dupsifter
+          - text: Report a Bug
+            url: https://github.com/huishenlab/dupsifter/issues
   navbar:
     left:
       - href: index.qmd
