@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Dupsifter Documentation - About</title>
+<title>Dupsifter Documentation - Installation</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -93,7 +93,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./install.html"> 
+    <a class="nav-link active" href="./install.html" aria-current="page"> 
 <span class="menu-text">Download/Install</span></a>
   </li>  
   <li class="nav-item">
@@ -127,14 +127,27 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#external-dependencies" id="toc-external-dependencies" class="nav-link active" data-scroll-target="#external-dependencies">External Dependencies</a></li>
+  <li><a href="#download-and-install" id="toc-download-and-install" class="nav-link" data-scroll-target="#download-and-install">Download and Install</a>
+  <ul class="collapse">
+  <li><a href="#precompiled-binaries" id="toc-precompiled-binaries" class="nav-link" data-scroll-target="#precompiled-binaries">Precompiled Binaries</a></li>
+  <li><a href="#build-from-source" id="toc-build-from-source" class="nav-link" data-scroll-target="#build-from-source">Build from Source</a></li>
+  <li><a href="#containers" id="toc-containers" class="nav-link" data-scroll-target="#containers">Containers</a></li>
+  <li><a href="#bioconda" id="toc-bioconda" class="nav-link" data-scroll-target="#bioconda">Bioconda</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">About</h1>
+<h1 class="title">Installation</h1>
 </div>
 
 
@@ -151,9 +164,87 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>About this site</p>
+<section id="external-dependencies" class="level2">
+<h2 class="anchored" data-anchor-id="external-dependencies">External Dependencies</h2>
+<p>Note, if you plan to use the Docker container or install via <code>conda</code>/<code>mamba</code> you can skip this section as all dependencies are wrapped up in these methods.</p>
+<p>If you plan to compile your own copy of <code>dupsifter</code> or run the pre-compiled binaries, there are several external dependencies that are needed:</p>
+<pre><code>zlib
+libbz2
+liblzma
+libcurl</code></pre>
+<p>Some helpful tools for retrieving the pre-compiled binaries or the source code from GitHub are:</p>
+<pre><code>git
+curl
+unzip</code></pre>
+<p>If you are compiling <code>dupsifter</code> yourself, you will also need:</p>
+<pre><code>gcc
+make</code></pre>
+</section>
+<section id="download-and-install" class="level2">
+<h2 class="anchored" data-anchor-id="download-and-install">Download and Install</h2>
+<p>All releases are available on <a href="https://github.com/huishenlab/dupsifter/releases">GitHub</a>.</p>
+<section id="precompiled-binaries" class="level3">
+<h3 class="anchored" data-anchor-id="precompiled-binaries">Precompiled Binaries</h3>
+<p>Precompiled binaries are available for macOS and Linux:</p>
+<pre><code># macOS
+curl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |
+    grep browser_download_url | grep darwin_amd64 | cut -d '"' -f 4)
+mv dupsifter_* dupsifter
+chmod +x dupsifter
+
+# Linux
+curl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |
+    grep browser_download_url | grep linux_amd64 | cut -d '"' -f 4)
+mv dupsifter_* dupsifter
+chmod +x dupsifter</code></pre>
+</section>
+<section id="build-from-source" class="level3">
+<h3 class="anchored" data-anchor-id="build-from-source">Build from Source</h3>
+<p><code>dupsifter</code> can also be downloaded and built from source.</p>
+<p>Via <code>git</code>:</p>
+<pre><code>git clone git@github.com:huishenlab/dupsifter.git
+cd dupsifter
+make</code></pre>
+<p>Or, via <code>curl</code>:</p>
+<pre><code>curl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |
+    grep browser_download_url | grep release-source.zip | cut -d '"' -f 4)
+unzip release-source.zip
+cd dupsifter-release
+make</code></pre>
+</section>
+<section id="containers" class="level3">
+<h3 class="anchored" data-anchor-id="containers">Containers</h3>
+<p>A <code>Dockerfile</code> is available to build a <code>dupsifter</code> container for the latest release version:</p>
+<pre><code>git clone git@github.com:huishenlab/dupsifter.git
+cd dupsifter/container
+docker build --no-cache --tag dupsifter_latest --file Dockerfile_latest .
+docker run -it dupsifter_latest /bin/bash</code></pre>
+<p>If you want to create a <code>Dockerfile</code> for a specific version of <code>dupsifter</code>, you can do that via:</p>
+<pre><code>git clone git@github.com:huishenlab/dupsifter.git
+cd dupsifter/container
+python create_container.py -v X.Y.Z
+docker build --no-cache --tag dupsifter_vX.Y.Z --file Dockerfile_vX.Y.Z .
+docker run -it dupsifter_vX.Y.Z /bin/bash</code></pre>
+<p><code>X.Y.Z</code> is the version number you want a container file for.</p>
+<p>If you don’t want to build the container yourself, a pre-built container is available on <a href="https://hub.docker.com/r/varishenlab/dupsifter">DockerHub</a> and can be pulled down with either Docker or Singularity:</p>
+<pre><code># Docker
+docker pull varishenlab/dupsifter:dupsifter_v1.2.1
+docker run -it varishenlab:dupsifter /bin/bash
+
+# Singularity
+singularity pull dupsifter.sif docker://varishenlab/dupsifter:dupsifter_v1.2.1
+singularity shell -B /path/to/dupsifter/code dupsifter.sif
+Singularity&gt; cd /path/to/dupsifter/code
+Singularity&gt; make</code></pre>
+</section>
+<section id="bioconda" class="level3">
+<h3 class="anchored" data-anchor-id="bioconda">Bioconda</h3>
+<p><code>dupsifter</code> is also available via <code>conda</code>/<code>mamba</code> (starting with version 1.2.0):</p>
+<pre><code>conda install -c bioconda dupsifter</code></pre>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

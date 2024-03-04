@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://huishenlab.github.io/dupsifter/index.html</loc>
-    <lastmod>2024-02-27T20:05:14.750Z</lastmod>
+    <loc>https://huishenlab.github.io/dupsifter/install.html</loc>
+    <lastmod>2024-03-04T18:35:26.846Z</lastmod>
+  </url>
+  <url>
+    <loc>https://huishenlab.github.io/dupsifter/releases.html</loc>
+    <lastmod>2024-03-04T18:35:26.846Z</lastmod>
   </url>
   <url>
     <loc>https://huishenlab.github.io/dupsifter/about.html</loc>
-    <lastmod>2024-02-27T20:05:14.750Z</lastmod>
+    <lastmod>2024-03-04T18:35:26.846Z</lastmod>
+  </url>
+  <url>
+    <loc>https://huishenlab.github.io/dupsifter/methodology.html</loc>
+    <lastmod>2024-03-04T18:35:26.846Z</lastmod>
+  </url>
+  <url>
+    <loc>https://huishenlab.github.io/dupsifter/index.html</loc>
+    <lastmod>2024-03-04T18:35:26.846Z</lastmod>
+  </url>
+  <url>
+    <loc>https://huishenlab.github.io/dupsifter/usage.html</loc>
+    <lastmod>2024-03-04T18:35:26.846Z</lastmod>
   </url>
 </urlset>

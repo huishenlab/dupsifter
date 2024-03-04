@@ -93,8 +93,27 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
-<span class="menu-text">About</span></a>
+    <a class="nav-link" href="./install.html"> 
+<span class="menu-text">Download/Install</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./usage.html"> 
+<span class="menu-text">Usage</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./methodology.html"> 
+<span class="menu-text">Methodology</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./releases.html"> 
+<span class="menu-text">Releases</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/huishenlab/dupsifter"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -112,7 +131,9 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#issues" id="toc-issues" class="nav-link active" data-scroll-target="#issues">Issues</a></li>
+  <li><a href="#publication" id="toc-publication" class="nav-link active" data-scroll-target="#publication">Publication</a></li>
+  <li><a href="#issues" id="toc-issues" class="nav-link" data-scroll-target="#issues">Issues</a></li>
+  <li><a href="#acknowledgments" id="toc-acknowledgments" class="nav-link" data-scroll-target="#acknowledgments">Acknowledgments</a></li>
   </ul>
 </nav>
     </div>
@@ -138,11 +159,25 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>This is a documentation website.</p>
-<p>To learn more about Quarto websites visit <a href="https://quarto.org/docs/websites" class="uri">https://quarto.org/docs/websites</a>.</p>
+<p><code>dupsifter</code> is a command line tool for marking PCR duplicates in both WGS and WGBS datasets. It is based on the <a href="https://github.com/GregoryFaust/samblaster">samblaster</a> methodology for finding and marking duplicates.</p>
+<section id="publication" class="level2">
+<h2 class="anchored" data-anchor-id="publication">Publication</h2>
+<p>If you use dupsifter, kindly <a href="https://doi.org/10.1093/bioinformatics/btad729">cite</a>:</p>
+<pre><code>Jacob Morrison, Wanding Zhou, Benjamin K Johnson, Hui Shen,
+Dupsifter: a lightweight duplicate marking tool for whole genome bisulfite sequencing,
+Bioinformatics, Volume 39, Issue 12, December 2023, btad729,
+https://doi.org/10.1093/bioinformatics/btad729</code></pre>
+</section>
 <section id="issues" class="level2">
 <h2 class="anchored" data-anchor-id="issues">Issues</h2>
 <p>Issues and bugs can be submitted to: <a href="https://github.com/huishenlab/dupsifter/issues">https://github.com/huishenlab/dupsifter/issues</a>.</p>
+</section>
+<section id="acknowledgments" class="level2">
+<h2 class="anchored" data-anchor-id="acknowledgments">Acknowledgments</h2>
+<ul>
+<li>This work is based on Gregory Faust’s <a href="https://github.com/GregoryFaust/samblaster">samblaster</a>.</li>
+<li>This work is supported by NIH/NCI R37CA230748.</li>
+</ul>
 
 
 </section>
