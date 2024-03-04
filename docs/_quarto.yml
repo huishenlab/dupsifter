@@ -56,7 +56,7 @@ website:
 format:
   html:
     theme: flatly
-    highlight-style: github
+    highlight-style: solarized
     css: styles.css
     toc: true
     code-copy: true
