@@ -11,15 +11,11 @@ website:
     left: "Copyright 2024, The Shen Lab at Van Andel Institute"
     right:
       - icon: github
-        menu:
-          - text: Source Code
-            url: https://github.com/huishenlab/dupsifter
-          - text: Report a Bug
-            url: https://github.com/huishenlab/dupsifter/issues
+        href: https://github.com/huishenlab/dupsifter
   sidebar:
     style: "docked"
-    background: "primary"
-    foreground: "secondary"
+    background: "secondary"
+    foreground: "primary"
     search: true
     contents:
       - href: install.qmd
