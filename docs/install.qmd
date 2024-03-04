@@ -1,0 +1,112 @@
+---
+title: "Installation"
+---
+
+## External Dependencies
+
+Note, if you plan to use the Docker container or install via `conda`/`mamba` you can skip this section as all
+dependencies are wrapped up in these methods.
+
+If you plan to compile your own copy of `dupsifter` or run the pre-compiled binaries, there are several external
+dependencies that are needed:
+```
+zlib
+libbz2
+liblzma
+libcurl
+```
+
+Some helpful tools for retrieving the pre-compiled binaries or the source code from GitHub are:
+```
+git
+curl
+unzip
+```
+
+If you are compiling `dupsifter` yourself, you will also need:
+```
+gcc
+make
+```
+
+## Download and Install
+
+All releases are available on [GitHub](https://github.com/huishenlab/dupsifter/releases).
+
+### Precompiled Binaries
+
+Precompiled binaries are available for macOS and Linux:
+```
+# macOS
+curl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |
+    grep browser_download_url | grep darwin_amd64 | cut -d '"' -f 4)
+mv dupsifter_* dupsifter
+chmod +x dupsifter
+
+# Linux
+curl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |
+    grep browser_download_url | grep linux_amd64 | cut -d '"' -f 4)
+mv dupsifter_* dupsifter
+chmod +x dupsifter
+```
+
+### Build from Source
+
+`dupsifter` can also be downloaded and built from source.
+
+Via `git`:
+```
+git clone git@github.com:huishenlab/dupsifter.git
+cd dupsifter
+make
+```
+
+Or, via `curl`:
+```
+curl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |
+    grep browser_download_url | grep release-source.zip | cut -d '"' -f 4)
+unzip release-source.zip
+cd dupsifter-release
+make
+```
+
+### Containers
+
+A `Dockerfile` is available to build a `dupsifter` container for the latest release version:
+```
+git clone git@github.com:huishenlab/dupsifter.git
+cd dupsifter/container
+docker build --no-cache --tag dupsifter_latest --file Dockerfile_latest .
+docker run -it dupsifter_latest /bin/bash
+```
+
+If you want to create a `Dockerfile` for a specific version of `dupsifter`, you can do that via:
+```
+git clone git@github.com:huishenlab/dupsifter.git
+cd dupsifter/container
+python create_container.py -v X.Y.Z
+docker build --no-cache --tag dupsifter_vX.Y.Z --file Dockerfile_vX.Y.Z .
+docker run -it dupsifter_vX.Y.Z /bin/bash
+```
+`X.Y.Z` is the version number you want a container file for.
+
+If you don't want to build the container yourself, a pre-built container is available on
+[DockerHub](https://hub.docker.com/r/varishenlab/dupsifter) and can be pulled down with either Docker or Singularity:
+```
+# Docker
+docker pull varishenlab/dupsifter:dupsifter_v1.2.1
+docker run -it varishenlab:dupsifter /bin/bash
+
+# Singularity
+singularity pull dupsifter.sif docker://varishenlab/dupsifter:dupsifter_v1.2.1
+singularity shell -B /path/to/dupsifter/code dupsifter.sif
+Singularity> cd /path/to/dupsifter/code
+Singularity> make
+```
+
+### Bioconda
+
+`dupsifter` is also available via `conda`/`mamba` (starting with version 1.2.0):
+```
+conda install -c bioconda dupsifter
+```
