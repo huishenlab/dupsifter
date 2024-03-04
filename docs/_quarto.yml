@@ -1,19 +1,37 @@
 project:
   type: website
+  preview:
+    host: 0.0.0.0
+    port: 4000
 
 website:
   title: "Dupsifter Documentation"
+  description: "Documentation site for dupsifter, a WGBS/WGS duplicate marking tool"
   navbar:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
+      - href: install.qmd
+        text: Download/Install
+      - href: usage.qmd
+        text: Usage
+      - href: methodology.qmd
+        text: Methodology
+      - href: releases.qmd
+        text: Releases
+    right:
+      - icon: github
+        href: https://github.com/huishenlab/dupsifter
 
 format:
   html:
     theme: flatly
+    highlight-style: github
     css: styles.css
     toc: true
+    code-copy: true
+    code-block-border-left: "#000000"
+    code-block-bg: "#F3F3F3"
 
 
 
