@@ -9,7 +9,7 @@ dependencies are wrapped up in these methods.
 
 If you plan to compile your own copy of `dupsifter` or run the pre-compiled binaries, there are several external
 dependencies that are needed:
-```bash
+```default
 zlib
 libbz2
 liblzma
@@ -17,14 +17,14 @@ libcurl
 ```
 
 Some helpful tools for retrieving the pre-compiled binaries or the source code from GitHub are:
-```bash
+```default
 git
 curl
 unzip
 ```
 
 If you are compiling `dupsifter` yourself, you will also need:
-```bash
+```default
 gcc
 make
 ```

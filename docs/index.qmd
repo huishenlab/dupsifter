@@ -9,7 +9,7 @@ title: "Dupsifter Documentation"
 
 If you use dupsifter, kindly [cite](https://doi.org/10.1093/bioinformatics/btad729):
 
-```
+```default
 Jacob Morrison, Wanding Zhou, Benjamin K Johnson, Hui Shen,
 Dupsifter: a lightweight duplicate marking tool for whole genome bisulfite sequencing,
 Bioinformatics, Volume 39, Issue 12, December 2023, btad729,
