@@ -128,7 +128,7 @@ conda install -c bioconda dupsifter
 ### Help
 ```
 Program: dupsifter
-Version: 1.1.1
+Version: 1.2.1
 Contact: Jacob Morrison <jacob.morrison@vai.org>
 
 dupsifter [options] <ref.fa> [in.bam]
