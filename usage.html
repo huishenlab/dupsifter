@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -165,32 +199,8 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./404.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Page Not Found</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./about.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">About</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./install.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Installation</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./methodology.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Duplicate Marking Methodology</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./releases.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Releases</span></a>
+ <span class="menu-text">Download/Install</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -199,13 +209,32 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Usage</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./methodology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Methodology</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./releases.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Releases</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#help" id="toc-help" class="nav-link active" data-scroll-target="#help">Help</a></li>
+  <li><a href="#option-descriptions" id="toc-option-descriptions" class="nav-link" data-scroll-target="#option-descriptions">Option Descriptions</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -229,8 +258,136 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="help" class="level2">
+<h2 class="anchored" data-anchor-id="help">Help</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Program: dupsifter</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Version: 1.2.1</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Contact: Jacob Morrison &lt;jacob.morrison@vai.org&gt;</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>dupsifter [options] &lt;ref.fa&gt; [in.bam]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>Output options:</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    -o, --output STR             name of output file [stdout]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    -O, --stats-output STR       name of file to write statistics to (see Note 3 for details)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>Input options:</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    -s, --single-end             run for single-end data</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    -m, --add-mate-tags          add MC and MQ mate tags to mate reads</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    -W, --wgs-only               process WGS reads instead of WGBS</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    -l, --max-read-length INT    maximum read length for paired end duplicate-marking [10000]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    -b, --min-base-qual INT      minimum base quality [0]</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    -B, --has-barcode            reads in file have barcodes (see Note 4 for details)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    -r, --remove-dups            toggle to remove marked duplicate</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    -v, --verbose                print extra messages</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    -h, --help                   this help</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        --version                print version info and exit</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>Note 1, [in.bam] must be name sorted. If not provided, assume the input is stdin.</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>Note 2, assumes either ALL reads are paired-end (default) or single-end.</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    If a singleton read is found in paired-end mode, the code will break nicely.</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>Note 3, defaults to dupsifter.stat if streaming or (-o basename).dupsifter.stat</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    if the -o option is provided. If -o and -O are provided, then -O will be used.</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>Note 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SAM tag, then</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    tries to parse the read name. If the barcode is in the read name, it must be the last element</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    and be separated by a ':' (i.e., @12345:678:9101112:1234_1:N:0:ACGTACGT). Any separators</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    found in the barcode (e.g., '+' or '-') are treated as 'N's and the additional parts of the</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    barcode are included up to a maximum length of 16 bases/characters. Barcodes are taken from</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    read 1 in paired-end sequencing only.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="option-descriptions" class="level2">
+<h2 class="anchored" data-anchor-id="option-descriptions">Option Descriptions</h2>
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 14%">
+<col style="width: 11%">
+<col style="width: 63%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Short Option</th>
+<th style="text-align: center;">Long Option</th>
+<th style="text-align: center;">Argument Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">-o</td>
+<td style="text-align: center;">–output</td>
+<td style="text-align: center;">string</td>
+<td>Name of output file (either .sam or .bam)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">-O</td>
+<td style="text-align: center;">–stats-output</td>
+<td style="text-align: center;">string</td>
+<td>Name of file to write statistics to (end with <code>.dupsifter.stat</code>)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">-s</td>
+<td style="text-align: center;">–single-end</td>
+<td style="text-align: center;">none</td>
+<td>Run for single-end data (only do this if you know the data is SE)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">-m</td>
+<td style="text-align: center;">–add-mate-tags</td>
+<td style="text-align: center;">none</td>
+<td>Add MC (mate CIGAR) and MQ mate MAPQ) mate tags to mated reads</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">-W</td>
+<td style="text-align: center;">–wgs-only</td>
+<td style="text-align: center;">none</td>
+<td>Process WGS data instead of WGBS (see Documentation for differences in processing)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">-l</td>
+<td style="text-align: center;">–max-read-length</td>
+<td style="text-align: center;">integer</td>
+<td>Maximum read length (handles padding for reference genome windows)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">-b</td>
+<td style="text-align: center;">–min-base-qual</td>
+<td style="text-align: center;">integer</td>
+<td>Minimum bae quality (used in determiningg bisulfite strand if tags not provided)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">-B</td>
+<td style="text-align: center;">–has-barcode</td>
+<td style="text-align: center;">none</td>
+<td>Use when reads have cell barcodes and you want to mark duplicates accordingly</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">-r</td>
+<td style="text-align: center;">–remove-dups</td>
+<td style="text-align: center;">none</td>
+<td>Remove reads that are flagged as duplicates</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">-v</td>
+<td style="text-align: center;">–verbose</td>
+<td style="text-align: center;">none</td>
+<td>Print extra messages when running</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">-h</td>
+<td style="text-align: center;">–help</td>
+<td style="text-align: center;">none</td>
+<td>Print usage help message and exit</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"></td>
+<td style="text-align: center;">–version</td>
+<td style="text-align: center;">none</td>
+<td>Print <code>dupsifter</code> version and exit</td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -624,18 +781,16 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>Copyright 2024, Jacob Morrison</p>
+<p>Copyright 2024, The Shen Lab at Van Andel Institute</p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;
     </div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
-    <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/huishenlab/dupsifter">
+    <li class="nav-item">
       <i class="bi bi-github" role="img">
 </i> 
-    </a>
   </li>  
 </ul>
     </div>

@@ -7,7 +7,7 @@
     "text": "Note, if you plan to use the Docker container or install via conda/mamba you can skip this section as all dependencies are wrapped up in these methods.\nIf you plan to compile your own copy of dupsifter or run the pre-compiled binaries, there are several external dependencies that are needed:\nzlib\nlibbz2\nliblzma\nlibcurl\nSome helpful tools for retrieving the pre-compiled binaries or the source code from GitHub are:\ngit\ncurl\nunzip\nIf you are compiling dupsifter yourself, you will also need:\ngcc\nmake",
     "crumbs": [
       "Home",
-      "Installation"
+      "Download/Install"
     ]
   },
   {
@@ -18,7 +18,7 @@
     "text": "Note, if you plan to use the Docker container or install via conda/mamba you can skip this section as all dependencies are wrapped up in these methods.\nIf you plan to compile your own copy of dupsifter or run the pre-compiled binaries, there are several external dependencies that are needed:\nzlib\nlibbz2\nliblzma\nlibcurl\nSome helpful tools for retrieving the pre-compiled binaries or the source code from GitHub are:\ngit\ncurl\nunzip\nIf you are compiling dupsifter yourself, you will also need:\ngcc\nmake",
     "crumbs": [
       "Home",
-      "Installation"
+      "Download/Install"
     ]
   },
   {
@@ -29,18 +29,7 @@
     "text": "Download and Install\nAll releases are available on GitHub.\n\nPrecompiled Binaries\nPrecompiled binaries are available for macOS and Linux:\n# macOS\ncurl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |\n    grep browser_download_url | grep darwin_amd64 | cut -d '\"' -f 4)\nmv dupsifter_* dupsifter\nchmod +x dupsifter\n\n# Linux\ncurl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |\n    grep browser_download_url | grep linux_amd64 | cut -d '\"' -f 4)\nmv dupsifter_* dupsifter\nchmod +x dupsifter\n\n\nBuild from Source\ndupsifter can also be downloaded and built from source.\nVia git:\ngit clone git@github.com:huishenlab/dupsifter.git\ncd dupsifter\nmake\nOr, via curl:\ncurl -OL $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |\n    grep browser_download_url | grep release-source.zip | cut -d '\"' -f 4)\nunzip release-source.zip\ncd dupsifter-release\nmake\n\n\nContainers\nA Dockerfile is available to build a dupsifter container for the latest release version:\ngit clone git@github.com:huishenlab/dupsifter.git\ncd dupsifter/container\ndocker build --no-cache --tag dupsifter_latest --file Dockerfile_latest .\ndocker run -it dupsifter_latest /bin/bash\nIf you want to create a Dockerfile for a specific version of dupsifter, you can do that via:\ngit clone git@github.com:huishenlab/dupsifter.git\ncd dupsifter/container\npython create_container.py -v X.Y.Z\ndocker build --no-cache --tag dupsifter_vX.Y.Z --file Dockerfile_vX.Y.Z .\ndocker run -it dupsifter_vX.Y.Z /bin/bash\nX.Y.Z is the version number you want a container file for.\nIf you don’t want to build the container yourself, a pre-built container is available on DockerHub and can be pulled down with either Docker or Singularity:\n# Docker\ndocker pull varishenlab/dupsifter:dupsifter_v1.2.1\ndocker run -it varishenlab:dupsifter /bin/bash\n\n# Singularity\nsingularity pull dupsifter.sif docker://varishenlab/dupsifter:dupsifter_v1.2.1\nsingularity shell -B /path/to/dupsifter/code dupsifter.sif\nSingularity&gt; cd /path/to/dupsifter/code\nSingularity&gt; make\n\n\nBioconda\ndupsifter is also available via conda/mamba (starting with version 1.2.0):\nconda install -c bioconda dupsifter",
     "crumbs": [
       "Home",
-      "Installation"
-    ]
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site",
-    "crumbs": [
-      "Home",
-      "About"
+      "Download/Install"
     ]
   },
   {
@@ -70,5 +59,38 @@
     "title": "Dupsifter Documentation",
     "section": "Acknowledgments",
     "text": "Acknowledgments\n\nThis work is based on Gregory Faust’s samblaster.\nThis work is supported by NIH/NCI R37CA230748."
+  },
+  {
+    "objectID": "usage.html",
+    "href": "usage.html",
+    "title": "Usage",
+    "section": "",
+    "text": "Program: dupsifter\nVersion: 1.2.1\nContact: Jacob Morrison &lt;jacob.morrison@vai.org&gt;\n\ndupsifter [options] &lt;ref.fa&gt; [in.bam]\n\nOutput options:\n    -o, --output STR             name of output file [stdout]\n    -O, --stats-output STR       name of file to write statistics to (see Note 3 for details)\nInput options:\n    -s, --single-end             run for single-end data\n    -m, --add-mate-tags          add MC and MQ mate tags to mate reads\n    -W, --wgs-only               process WGS reads instead of WGBS\n    -l, --max-read-length INT    maximum read length for paired end duplicate-marking [10000]\n    -b, --min-base-qual INT      minimum base quality [0]\n    -B, --has-barcode            reads in file have barcodes (see Note 4 for details)\n    -r, --remove-dups            toggle to remove marked duplicate\n    -v, --verbose                print extra messages\n    -h, --help                   this help\n        --version                print version info and exit\n\nNote 1, [in.bam] must be name sorted. If not provided, assume the input is stdin.\nNote 2, assumes either ALL reads are paired-end (default) or single-end.\n    If a singleton read is found in paired-end mode, the code will break nicely.\nNote 3, defaults to dupsifter.stat if streaming or (-o basename).dupsifter.stat\n    if the -o option is provided. If -o and -O are provided, then -O will be used.\nNote 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SAM tag, then\n    tries to parse the read name. If the barcode is in the read name, it must be the last element\n    and be separated by a ':' (i.e., @12345:678:9101112:1234_1:N:0:ACGTACGT). Any separators\n    found in the barcode (e.g., '+' or '-') are treated as 'N's and the additional parts of the\n    barcode are included up to a maximum length of 16 bases/characters. Barcodes are taken from\n    read 1 in paired-end sequencing only.",
+    "crumbs": [
+      "Home",
+      "Usage"
+    ]
+  },
+  {
+    "objectID": "usage.html#help",
+    "href": "usage.html#help",
+    "title": "Usage",
+    "section": "",
+    "text": "Program: dupsifter\nVersion: 1.2.1\nContact: Jacob Morrison &lt;jacob.morrison@vai.org&gt;\n\ndupsifter [options] &lt;ref.fa&gt; [in.bam]\n\nOutput options:\n    -o, --output STR             name of output file [stdout]\n    -O, --stats-output STR       name of file to write statistics to (see Note 3 for details)\nInput options:\n    -s, --single-end             run for single-end data\n    -m, --add-mate-tags          add MC and MQ mate tags to mate reads\n    -W, --wgs-only               process WGS reads instead of WGBS\n    -l, --max-read-length INT    maximum read length for paired end duplicate-marking [10000]\n    -b, --min-base-qual INT      minimum base quality [0]\n    -B, --has-barcode            reads in file have barcodes (see Note 4 for details)\n    -r, --remove-dups            toggle to remove marked duplicate\n    -v, --verbose                print extra messages\n    -h, --help                   this help\n        --version                print version info and exit\n\nNote 1, [in.bam] must be name sorted. If not provided, assume the input is stdin.\nNote 2, assumes either ALL reads are paired-end (default) or single-end.\n    If a singleton read is found in paired-end mode, the code will break nicely.\nNote 3, defaults to dupsifter.stat if streaming or (-o basename).dupsifter.stat\n    if the -o option is provided. If -o and -O are provided, then -O will be used.\nNote 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SAM tag, then\n    tries to parse the read name. If the barcode is in the read name, it must be the last element\n    and be separated by a ':' (i.e., @12345:678:9101112:1234_1:N:0:ACGTACGT). Any separators\n    found in the barcode (e.g., '+' or '-') are treated as 'N's and the additional parts of the\n    barcode are included up to a maximum length of 16 bases/characters. Barcodes are taken from\n    read 1 in paired-end sequencing only.",
+    "crumbs": [
+      "Home",
+      "Usage"
+    ]
+  },
+  {
+    "objectID": "usage.html#option-descriptions",
+    "href": "usage.html#option-descriptions",
+    "title": "Usage",
+    "section": "Option Descriptions",
+    "text": "Option Descriptions\n\n\n\n\n\n\n\n\n\nShort Option\nLong Option\nArgument Type\nDescription\n\n\n\n\n-o\n–output\nstring\nName of output file (either .sam or .bam)\n\n\n-O\n–stats-output\nstring\nName of file to write statistics to (end with .dupsifter.stat)\n\n\n-s\n–single-end\nnone\nRun for single-end data (only do this if you know the data is SE)\n\n\n-m\n–add-mate-tags\nnone\nAdd MC (mate CIGAR) and MQ mate MAPQ) mate tags to mated reads\n\n\n-W\n–wgs-only\nnone\nProcess WGS data instead of WGBS (see Documentation for differences in processing)\n\n\n-l\n–max-read-length\ninteger\nMaximum read length (handles padding for reference genome windows)\n\n\n-b\n–min-base-qual\ninteger\nMinimum bae quality (used in determiningg bisulfite strand if tags not provided)\n\n\n-B\n–has-barcode\nnone\nUse when reads have cell barcodes and you want to mark duplicates accordingly\n\n\n-r\n–remove-dups\nnone\nRemove reads that are flagged as duplicates\n\n\n-v\n–verbose\nnone\nPrint extra messages when running\n\n\n-h\n–help\nnone\nPrint usage help message and exit\n\n\n\n–version\nnone\nPrint dupsifter version and exit",
+    "crumbs": [
+      "Home",
+      "Usage"
+    ]
   }
 ]
