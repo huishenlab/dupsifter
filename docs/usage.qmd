@@ -41,6 +41,7 @@ Note 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SA
 
 ## Option Descriptions
 
+:::{.column-page-inset-right}
 | Short Option |    Long Option    | Argument Type | Description                                                                        |
 |:------------:|:------------------|:-------------:|------------------------------------------------------------------------------------|
 |     -o       |     --output      |    string     | Name of output file (either .sam or .bam)                                          |
@@ -55,3 +56,4 @@ Note 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SA
 |     -v       |     --verbose     |     none      | Print extra messages when running                                                  |
 |     -h       |      --help       |     none      | Print usage help message and exit                                                  |
 |              |     --version     |     none      | Print `dupsifter` version and exit                                                 |
+:::
