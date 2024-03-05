@@ -5,7 +5,9 @@ title: Duplicate Marking Methodology
 ## Input / Output
 
 `dupsifter` is able to accept input from `stdin` or from an input SAM/BAM file. Output can be directed either to
-`stdout` or to an output SAM/BAM. Input and output options can be mised as needed (i.e., input BAM to streamed output).
+`stdout` or to an output SAM/BAM. Input and output options can be mixed as needed (i.e., input BAM to streamed output).
+Note, the input to `dupsifter` is expected to be read-name grouped (i.e., reads with same name next to one another in
+the BAM).
 
 ## Run Statistics
 
