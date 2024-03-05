@@ -1,3 +1,123 @@
 ---
 title: Duplicate Marking Methodology
 ---
+
+## Input / Output
+
+`dupsifter` is able to accept input from `stdin` or from an input SAM/BAM file. Output can be directed either to
+`stdout` or to an output SAM/BAM. Input and output options can be mised as needed (i.e., input BAM to streamed output).
+
+## Run Statistics
+
+Each run of `dupsifter` calculates statistics related to the number of duplicates and the types of reads processed. By
+default, the output file is named `dupsifter.stat` if the output is streamed of `basename.dupsifter.stat` if the output
+file is defined (`-o basename.bam`). The statistics file name can also be defined with the `-O` option (i.e.,
+`dupsifter -O output.dupsifter.stat ref.fa input.bam`). If using the `-O` option, the file should end with
+`.dupsifter.stat`. If both `-o` and `-O` are provided, then the `-O` file name will be used.
+
+## PCR Duplicate Marking Philosophy
+
+At its most basic, PCR duplicates are those that match in all of the following categories (descriptions below):
+
+1. Read 1 Bin Number
+2. Read 1 Bin Position
+3. Read 2 Bin Number
+4. Read 2 Bin Position
+5. Read 1 Leftmost in Pair?
+6. Orientation
+7. Single-end?
+8. Cell barcode
+
+### Descriptions
+
+- *Read 1/2 Bin Number:* Bin number determination described in the next section.
+- *Read 1/2 Bin Position:* Position in bin described in the next section.
+- *Read 1 Leftmost in Pair?:* If paired-end, is read 1 the leftmost read? If single-end, then this is always false (0).
+- *Orientation:* How reads are oriented, which can be one of four possibilities: (read1-read2) forward-forward, reverse-
+  reverse, forward-reverse, reverse-forward. For reference, forward-reverse is generally considered a "proper pair."
+- *Single-end?:* Is the read a single-end read?
+- *Cell barcode:* Cell barcode for read. More details given below.
+
+### Notes
+
+PCR duplicates are found for single-end and paired-end reads using the same set of categories, with a few minor notes.
+First, single-end reads and paired-end reads with one unmapped read in the pair are always considered to be "read 1"
+(read 2 is set to default values). The orientation can then be used to distinguish between reads on the forward and
+reverse strands. Second, the bin number and position are calculated individually for reads 1 and 2 in paired-end mode,
+which allows split and discordant reads to be properly marked as duplicates.
+
+With respect to which read (or read pair) is chosen as the "non-duplicate," `dupsifter` follows the likes of
+`samblaster` and `deduplicate_bismark`. Rather than choosing the read with the highest quality (usually using the base
+qualities to determine quality), `dupsifter` sets the first read found in a set of duplicates as the non-duplicate. The
+authors of `samblaster` showed that choosing the first read, instead of the highest quality read, has
+[little impact](https://github.com/GregoryFaust/samblaster/blob/master/SAMBLASTER_Supplemental.pdf) on the quality of
+reads going into downstream analyses. Further, it requires only one pass through the data, instead of two passes, which
+is required for methods that select the highest quality read.
+
+## Reference Padding and Binning
+
+Padding the length of chromosomes and other contigs occurs due to the possibility of soft clipped reads. `dupsifter`
+uses the unclipped read length in order to determine duplicates, which requires adding or subtracting the number of
+clipped bases from the end or start position, respectively. In the extreme case where this occurs at the start or end of
+the chromosome/contig, the position can occur outside of the defined chromosome bounds. Therefore, the maximum read
+length (set by the `-l/--max-read-length`) is added to each end of the chromosome/contig to account for this
+possibility. In the instance a read is longer than the maximum read length, the code will produce an error requesting
+the user to rerun with a longer maximum read length set.
+
+Generally, duplicate marking tools bin the genome based on the number of contigs (1 contig = 1 bin). For genomes with a
+small number of contigs, this isn't a problem. However, for genomes with a large number of contigs (e.g., plant
+genomes), this becomes impractical. `dupsifter`, on the other hand, takes a different approach (based on the solution
+proposed in [this issue](https://github.com/GregoryFaust/samblaster/issues/21) raised on `samblaster`'s GitHub page). In
+this method, the entire genome is combined into one supercontig, which is then divided into equal sized bins. By
+combining the contigs in the order listed in the SAM header, an offset from the start of the first contig can be
+calculated for each additional contig. This offset includes padding at the start and end of each previous contig
+(described above), plus the padding at the start of the current contig. By adding the position on the contig (using the
+read's CIGAR string) to the offset, the specific bin the read falls into can be determined, as well as the position
+within the bin itself. By way of example, the human genome from GENCODE contains over 600 contigs (both primary
+chromosomes and additional contigs). Rather than having 600+ bins, there are approximately 25 bins using the described
+method.
+
+## Cell Barcodes
+
+Cell barcodes are commonly used in single-cell sequencing in order to multiplex many cells into a pool, primarily to
+increase throughput and to overcome sequencer input requirements. It also allows for streamlined processing, as many
+cells can be processed at once. These barcodes must be included when defining reads that are duplicates as two fragments
+may be from the same location in the genome, but be from two different cells. By default, `dupsifter` does not look for
+barcodes; however, an option is available (`-B/--has-barcode`) when duplicate marking data with barcodes. `dupsifter`
+handles barcodes in the following way:
+
+1. Looks for the `CB` SAM tag.
+2. If not found, looks for the `CR` SAM tag:
+3. If neither are found, parse the read name. The barcode must be the last element in the name, where the elements are
+   separated by `:`.
+4. If a barcode can't be found in any of these locations, a warning is printed and a default value is used (thereby
+   negating any benefits of using barcodes).
+
+In all three cases, up to 16 bases are packed into a single integer for defing the barcode. If your barcode is longer
+than 16 bases, it will be truncated to a length of 16. Additionally, separators (only `+` and `-` are allowed) are
+treated as `N`'s and count towards the maximum length of 16.
+
+<!-- Room for improvement: -->
+<!--   - Allow barcodes longer than 16 base pairs. -->
+<!--   - Handle barcodes with dual indexes. -->
+<!--   - Include UMI capabilities. -->
+
+## Bisulfite Strand Determination
+
+The bisulfite strand for a read (both single-end and paired-end reads) is determined with the following priority:
+
+1. bwa-meth flag (`YD`)
+2. bsmap flag (`ZS`)
+3. bismark flag (`XG`)
+4. Inference from number of C&#8594;T (`nCT`) and G&#8594;A (`nGA`) substitutions (OT/CTOT if `nCT >= nGA`, else
+   OB/CTOB)
+
+For paired-end reads, the bisulfite strand is individually determined for both read 1 (`bss1`) and read 2 (`bss2`), then
+any differences between the two are resolved.
+
+1. If `bss1 == bss2`, then `bss1` is used.
+2. If only `bss1` is found, then `bss1` is used.
+3. If only `bss2` is found, then `bss2` is used.
+4. If neither `bss1` or `bss2` are found, the assume OT/CTOT.
+5. If both `bss1` and `bss2` are found, but `bss1 != bss2`, then the sum of the base qualities is used to determine
+   which to use. If `sum(read 1 base qualities) > sum(read 2 base qualities)`, then `bss1` is used, else `bss2` is used.
