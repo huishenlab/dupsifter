@@ -40,11 +40,11 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
-  "location": "navbar",
+  "location": "sidebar",
   "copy-button": false,
   "collapse-after": 3,
-  "panel-placement": "end",
-  "type": "overlay",
+  "panel-placement": "start",
+  "type": "textbox",
   "limit": 50,
   "keyboard-shortcut": [
     "f",
@@ -71,56 +71,10 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-sidebar docked nav-fixed">
+<body class="nav-sidebar docked">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">Dupsifter Documentation</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
-<span class="menu-text">Home</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link active" href="./install.html" aria-current="page"> 
-<span class="menu-text">Download/Install</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./usage.html"> 
-<span class="menu-text">Usage</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./methodology.html"> 
-<span class="menu-text">Methodology</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./releases.html"> 
-<span class="menu-text">Releases</span></a>
-  </li>  
-</ul>
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/huishenlab/dupsifter"> <i class="bi bi-github" role="img">
-</i> 
-<span class="menu-text"></span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
-</div>
-      </div> <!-- /container-fluid -->
-    </nav>
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
@@ -136,33 +90,44 @@ ul.task-list li input[type="checkbox"] {
   </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
-        <div class="mt-2 flex-shrink-0 align-items-center">
-        <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
-        </div>
-        </div>
-        <div class="sidebar-tools-collapse">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Dupsifter Documentation</a> 
+        <div class="sidebar-tools-main">
     <div class="dropdown">
       <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label=""><i class="bi bi-github"></i></a>
       <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
           <li>
-            <a class="dropdown-item sidebar-tools-collapse-item" href="https://github.com/huishenlab/dupsifter">
+            <a class="dropdown-item sidebar-tools-main-item" href="https://github.com/huishenlab/dupsifter">
             Source Code
             </a>
           </li>
           <li>
-            <a class="dropdown-item sidebar-tools-collapse-item" href="https://github.com/huishenlab/dupsifter/issues">
+            <a class="dropdown-item sidebar-tools-main-item" href="https://github.com/huishenlab/dupsifter/issues">
             Report a Bug
             </a>
           </li>
       </ul>
     </div>
 </div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Home</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./install.html" class="sidebar-item-text sidebar-link">
@@ -183,6 +148,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./examples.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Examples</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./releases.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Releases</span></a>
   </div>
@@ -193,7 +164,22 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#input-output" id="toc-input-output" class="nav-link active" data-scroll-target="#input-output">Input / Output</a></li>
+  <li><a href="#run-statistics" id="toc-run-statistics" class="nav-link" data-scroll-target="#run-statistics">Run Statistics</a></li>
+  <li><a href="#pcr-duplicate-marking-philosophy" id="toc-pcr-duplicate-marking-philosophy" class="nav-link" data-scroll-target="#pcr-duplicate-marking-philosophy">PCR Duplicate Marking Philosophy</a>
+  <ul class="collapse">
+  <li><a href="#descriptions" id="toc-descriptions" class="nav-link" data-scroll-target="#descriptions">Descriptions</a></li>
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  </ul></li>
+  <li><a href="#reference-padding-and-binning" id="toc-reference-padding-and-binning" class="nav-link" data-scroll-target="#reference-padding-and-binning">Reference Padding and Binning</a></li>
+  <li><a href="#cell-barcodes" id="toc-cell-barcodes" class="nav-link" data-scroll-target="#cell-barcodes">Cell Barcodes</a></li>
+  <li><a href="#bisulfite-strand-determination" id="toc-bisulfite-strand-determination" class="nav-link" data-scroll-target="#bisulfite-strand-determination">Bisulfite Strand Determination</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -217,8 +203,84 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="input-output" class="level2">
+<h2 class="anchored" data-anchor-id="input-output">Input / Output</h2>
+<p><code>dupsifter</code> is able to accept input from <code>stdin</code> or from an input SAM/BAM file. Output can be directed either to <code>stdout</code> or to an output SAM/BAM. Input and output options can be mixed as needed (i.e., input BAM to streamed output). Note, the input to <code>dupsifter</code> is expected to be read-name grouped (i.e., reads with same name next to one another in the BAM).</p>
+</section>
+<section id="run-statistics" class="level2">
+<h2 class="anchored" data-anchor-id="run-statistics">Run Statistics</h2>
+<p>Each run of <code>dupsifter</code> calculates statistics related to the number of duplicates and the types of reads processed. By default, the output file is named <code>dupsifter.stat</code> if the output is streamed of <code>basename.dupsifter.stat</code> if the output file is defined (<code>-o basename.bam</code>). The statistics file name can also be defined with the <code>-O</code> option (i.e., <code>dupsifter -O output.dupsifter.stat ref.fa input.bam</code>). If using the <code>-O</code> option, the file should end with <code>.dupsifter.stat</code>. If both <code>-o</code> and <code>-O</code> are provided, then the <code>-O</code> file name will be used.</p>
+</section>
+<section id="pcr-duplicate-marking-philosophy" class="level2">
+<h2 class="anchored" data-anchor-id="pcr-duplicate-marking-philosophy">PCR Duplicate Marking Philosophy</h2>
+<p>At its most basic, PCR duplicates are those that match in all of the following categories (descriptions below):</p>
+<ol type="1">
+<li>Read 1 Bin Number</li>
+<li>Read 1 Bin Position</li>
+<li>Read 2 Bin Number</li>
+<li>Read 2 Bin Position</li>
+<li>Read 1 Leftmost in Pair?</li>
+<li>Orientation</li>
+<li>Single-end?</li>
+<li>Cell barcode</li>
+</ol>
+<section id="descriptions" class="level3">
+<h3 class="anchored" data-anchor-id="descriptions">Descriptions</h3>
+<ul>
+<li><em>Read 1/2 Bin Number:</em> Bin number determination described in the next section.</li>
+<li><em>Read 1/2 Bin Position:</em> Position in bin described in the next section.</li>
+<li><em>Read 1 Leftmost in Pair?:</em> If paired-end, is read 1 the leftmost read? If single-end, then this is always false (0).</li>
+<li><em>Orientation:</em> How reads are oriented, which can be one of four possibilities: (read1-read2) forward-forward, reverse- reverse, forward-reverse, reverse-forward. For reference, forward-reverse is generally considered a “proper pair.”</li>
+<li><em>Single-end?:</em> Is the read a single-end read?</li>
+<li><em>Cell barcode:</em> Cell barcode for read. More details given below.</li>
+</ul>
+</section>
+<section id="notes" class="level3">
+<h3 class="anchored" data-anchor-id="notes">Notes</h3>
+<p>PCR duplicates are found for single-end and paired-end reads using the same set of categories, with a few minor notes. First, single-end reads and paired-end reads with one unmapped read in the pair are always considered to be “read 1” (read 2 is set to default values). The orientation can then be used to distinguish between reads on the forward and reverse strands. Second, the bin number and position are calculated individually for reads 1 and 2 in paired-end mode, which allows split and discordant reads to be properly marked as duplicates.</p>
+<p>With respect to which read (or read pair) is chosen as the “non-duplicate,” <code>dupsifter</code> follows the likes of <code>samblaster</code> and <code>deduplicate_bismark</code>. Rather than choosing the read with the highest quality (usually using the base qualities to determine quality), <code>dupsifter</code> sets the first read found in a set of duplicates as the non-duplicate. The authors of <code>samblaster</code> showed that choosing the first read, instead of the highest quality read, has <a href="https://github.com/GregoryFaust/samblaster/blob/master/SAMBLASTER_Supplemental.pdf">little impact</a> on the quality of reads going into downstream analyses. Further, it requires only one pass through the data, instead of two passes, which is required for methods that select the highest quality read.</p>
+</section>
+</section>
+<section id="reference-padding-and-binning" class="level2">
+<h2 class="anchored" data-anchor-id="reference-padding-and-binning">Reference Padding and Binning</h2>
+<p>Padding the length of chromosomes and other contigs occurs due to the possibility of soft clipped reads. <code>dupsifter</code> uses the unclipped read length in order to determine duplicates, which requires adding or subtracting the number of clipped bases from the end or start position, respectively. In the extreme case where this occurs at the start or end of the chromosome/contig, the position can occur outside of the defined chromosome bounds. Therefore, the maximum read length (set by the <code>-l/--max-read-length</code>) is added to each end of the chromosome/contig to account for this possibility. In the instance a read is longer than the maximum read length, the code will produce an error requesting the user to rerun with a longer maximum read length set.</p>
+<p>Generally, duplicate marking tools bin the genome based on the number of contigs (1 contig = 1 bin). For genomes with a small number of contigs, this isn’t a problem. However, for genomes with a large number of contigs (e.g., plant genomes), this becomes impractical. <code>dupsifter</code>, on the other hand, takes a different approach (based on the solution proposed in <a href="https://github.com/GregoryFaust/samblaster/issues/21">this issue</a> raised on <code>samblaster</code>’s GitHub page). In this method, the entire genome is combined into one supercontig, which is then divided into equal sized bins. By combining the contigs in the order listed in the SAM header, an offset from the start of the first contig can be calculated for each additional contig. This offset includes padding at the start and end of each previous contig (described above), plus the padding at the start of the current contig. By adding the position on the contig (using the read’s CIGAR string) to the offset, the specific bin the read falls into can be determined, as well as the position within the bin itself. By way of example, the human genome from GENCODE contains over 600 contigs (both primary chromosomes and additional contigs). Rather than having 600+ bins, there are approximately 25 bins using the described method.</p>
+</section>
+<section id="cell-barcodes" class="level2">
+<h2 class="anchored" data-anchor-id="cell-barcodes">Cell Barcodes</h2>
+<p>Cell barcodes are commonly used in single-cell sequencing in order to multiplex many cells into a pool, primarily to increase throughput and to overcome sequencer input requirements. It also allows for streamlined processing, as many cells can be processed at once. These barcodes must be included when defining reads that are duplicates as two fragments may be from the same location in the genome, but be from two different cells. By default, <code>dupsifter</code> does not look for barcodes; however, an option is available (<code>-B/--has-barcode</code>) when duplicate marking data with barcodes. <code>dupsifter</code> handles barcodes in the following way:</p>
+<ol type="1">
+<li>Looks for the <code>CB</code> SAM tag.</li>
+<li>If not found, looks for the <code>CR</code> SAM tag:</li>
+<li>If neither are found, parse the read name. The barcode must be the last element in the name, where the elements are separated by <code>:</code>.</li>
+<li>If a barcode can’t be found in any of these locations, a warning is printed and a default value is used (thereby negating any benefits of using barcodes).</li>
+</ol>
+<p>In all three cases, up to 16 bases are packed into a single integer for defing the barcode. If your barcode is longer than 16 bases, it will be truncated to a length of 16. Additionally, separators (only <code>+</code> and <code>-</code> are allowed) are treated as <code>N</code>’s and count towards the maximum length of 16.</p>
+<!-- Room for improvement: -->
+<!--   - Allow barcodes longer than 16 base pairs. -->
+<!--   - Handle barcodes with dual indexes. -->
+<!--   - Include UMI capabilities. -->
+</section>
+<section id="bisulfite-strand-determination" class="level2">
+<h2 class="anchored" data-anchor-id="bisulfite-strand-determination">Bisulfite Strand Determination</h2>
+<p>The bisulfite strand for a read (both single-end and paired-end reads) is determined with the following priority:</p>
+<ol type="1">
+<li>bwa-meth flag (<code>YD</code>)</li>
+<li>bsmap flag (<code>ZS</code>)</li>
+<li>bismark flag (<code>XG</code>)</li>
+<li>Inference from number of C→T (<code>nCT</code>) and G→A (<code>nGA</code>) substitutions (OT/CTOT if <code>nCT &gt;= nGA</code>, else OB/CTOB)</li>
+</ol>
+<p>For paired-end reads, the bisulfite strand is individually determined for both read 1 (<code>bss1</code>) and read 2 (<code>bss2</code>), then any differences between the two are resolved.</p>
+<ol type="1">
+<li>If <code>bss1 == bss2</code>, then <code>bss1</code> is used.</li>
+<li>If only <code>bss1</code> is found, then <code>bss1</code> is used.</li>
+<li>If only <code>bss2</code> is found, then <code>bss2</code> is used.</li>
+<li>If neither <code>bss1</code> or <code>bss2</code> are found, the assume OT/CTOT.</li>
+<li>If both <code>bss1</code> and <code>bss2</code> are found, but <code>bss1 != bss2</code>, then the sum of the base qualities is used to determine which to use. If <code>sum(read 1 base qualities) &gt; sum(read 2 base qualities)</code>, then <code>bss1</code> is used, else <code>bss2</code> is used.</li>
+</ol>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -620,7 +682,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/huishenlab/dupsifter">
+    <a class="nav-link active" href="https://github.com/huishenlab/dupsifter" aria-current="page">
       <i class="bi bi-github" role="img">
 </i> 
     </a>
