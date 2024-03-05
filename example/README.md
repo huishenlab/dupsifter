@@ -51,7 +51,7 @@ samtools sort -@ 2 -o bsbolt.sorted.markdup.bam
 It should be noted that `dupsifter` expects it's input to be read-name grouped
 (i.e., reads with the same name next to one another in the BAM). For `biscuit`,
 `bismark`, `bsbolt`, and `bwa-meth`, this is how the reads are output. However,
-`gemBS` performs position sorting during it's alignment. Therefore, if you want
+`gemBS` performs position sorting during its alignment. Therefore, if you want
 to use `dupsifter` with BAMs from `gemBS`, then you will have to group the reads
 by name either with `samtools sort` or `samtools collate`. An example with
 `samtools sort` is shown below:
