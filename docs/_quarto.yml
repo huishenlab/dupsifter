@@ -25,6 +25,8 @@ website:
         text: Usage
       - href: methodology.qmd
         text: Methodology
+      - href: examples.qmd
+        text: Examples
       - href: releases.qmd
         text: Releases
     tools:
