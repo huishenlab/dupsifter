@@ -42,7 +42,7 @@ Note 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SA
 ## Option Descriptions
 
 | Short Option |    Long Option    | Argument Type | Description                                                                        |
-|:------------:|:-----------------:|:-------------:|------------------------------------------------------------------------------------|
+|:------------:|:------------------|:-------------:|------------------------------------------------------------------------------------|
 |     -o       |     --output      |    string     | Name of output file (either .sam or .bam)                                          |
 |     -O       |  --stats-output   |    string     | Name of file to write statistics to (end with `.dupsifter.stat`)                   |
 |     -s       |   --single-end    |     none      | Run for single-end data (only do this if you know the data is SE)                  |
