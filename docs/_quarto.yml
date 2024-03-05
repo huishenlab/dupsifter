@@ -14,10 +14,11 @@ website:
         href: https://github.com/huishenlab/dupsifter
   sidebar:
     style: "docked"
-    background: "secondary"
-    foreground: "primary"
+    background: "#E3E3E3"
     search: true
     contents:
+      - href: index.qmd
+        text: Home
       - href: install.qmd
         text: Download/Install
       - href: usage.qmd
@@ -33,21 +34,6 @@ website:
             url: https://github.com/huishenlab/dupsifter
           - text: Report a Bug
             url: https://github.com/huishenlab/dupsifter/issues
-  navbar:
-    left:
-      - href: index.qmd
-        text: Home
-      - href: install.qmd
-        text: Download/Install
-      - href: usage.qmd
-        text: Usage
-      - href: methodology.qmd
-        text: Methodology
-      - href: releases.qmd
-        text: Releases
-    right:
-      - icon: github
-        href: https://github.com/huishenlab/dupsifter
 
 format:
   html:
