@@ -46,6 +46,7 @@ format:
     code-copy: true
     code-block-border-left: "#000000"
     code-block-bg: "#F3F3F3"
+    number-sections: true
 
 
 
