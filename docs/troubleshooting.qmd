@@ -1,0 +1,70 @@
+---
+title: "Troubleshooting"
+---
+
+## Runtime Errors
+
+### "Unable to read from/write to ..."
+
+Arises when either the input or output file/stream can't be opened. This may occur for a variety of reasons, including
+missing input files, incorrectly named files, hard disk space that is too small to open the output file, or a lack of
+permissions to write to a directory.
+
+### "Please provide a reference"
+
+`dupsifter` needs a reference FASTA in order to infer the bisulfite strand if a strand tag is not found in the read. Add
+a reference to your command line invocation and try again. See the [Usage](usage.qmd) page for help with running
+`dupsifter`.
+
+### "Reference must end in .fa/.fa.gz/.fasta/.fasta.gz"
+
+This serves as a basic check that the correct file type is being used as the reference input. Check you have your inputs
+in the correct order and that any reference FASTA files have the proper extensions.
+
+### "Read with length (number) is longer than max read length"
+
+Arises when `dupsifter` encounters a read that is longer than the specified max read length. This ensures that no reads
+would run beyond the specified padding around the chromosome lengths. Rerunning `dupsifter` with a longer max read
+length (the `--max-read-length` option) should resolve this issue.
+
+### "Can't find read 1 and/or read 2 with read ID ..."
+
+Arises when input that isn't read-name grouped is provided to `dupsifter`. This can be resolved by name sorting or
+collating your SAM/BAM with `samtools sort -n` or `samtools collate` and then providing the sorted input to `dupsifter`.
+
+### "No reads found in ..."
+
+The input file has no reads. This may be either from a completely file or a SAM/BAM file that has a header, but no
+reads. Double check the contents of your input.
+
+### "Read information is missing"
+
+Can either occur for single/mate-unmapped reads or paired-end reads. Arises from an error reading a SAM entry. Check
+your input file to ensure it is not corrupted.
+
+### "Unknown cigar operation"
+
+Arises when `dupsifter` encounters a CIGAR operation that it doesn't recognize. This error is most likely to occur in
+versions 1.2.0 and earlier when you use input from tools that make use of extended CIGAR operations (`=` and `X`). If
+this is your issue, upgrading to at least version 1.2.1 should resolve your problem.
+
+### "Unknown orientation found"
+
+Arises when a read orientation (see the [Methodology](methodology.qmd) page for details on read orientation) is
+encountered that `dupsifter` does not recognize. Please [open an issue](https://github.com/huishenlab/dupsifter/issues)
+if you encounter this error.
+
+### "Unable to create argument list for PG string"
+
+`dupsifter` failed to collect all command line arguments and form the `PG` SAM tag string. Try running `dupsifter`
+again.
+
+### "Failed to add PG tag to output header"
+
+`dupsifter` could not write `PG` SAM tag to the SAM header for output. Likely due to a corruption in the SAM header
+of the input file itself or a lack of sufficient memory to add the `PG` tag contents to the header.
+
+### "Header writing failed"
+
+`dupsifter` could not write the SAM header for output. May occur due to an inability to write to the output file or a
+corrupt SAM header.

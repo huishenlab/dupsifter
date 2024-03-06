@@ -27,6 +27,8 @@ website:
         text: Methodology
       - href: examples.qmd
         text: Examples
+      - href: troubleshooting.qmd
+        text: Troubleshooting
       - href: releases.qmd
         text: Releases
     tools:
