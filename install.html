@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.550">
+<meta name="generator" content="quarto-1.4.551">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -237,7 +237,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="external-dependencies" class="level2">
 <h2 class="anchored" data-anchor-id="external-dependencies">External Dependencies</h2>
-<p>Note, if you plan to use the Docker container or install via <code>conda</code>/<code>mamba</code> you can skip this section as all dependencies are wrapped up in these methods.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you plan to use the <a href="#containers">Docker container</a> or install via <a href="#bioconda"><code>conda</code>/<code>mamba</code></a> you can skip this section as all dependencies are wrapped up in these methods.</p>
+</div>
+</div>
 <p>If you plan to compile your own copy of <code>dupsifter</code> or run the pre-compiled binaries, there are several external dependencies that are needed:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>zlib</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>libbz2</span>
@@ -258,16 +270,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="precompiled-binaries">Precompiled Binaries</h3>
 <p>Precompiled binaries are available for macOS and Linux:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># macOS</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-OL</span> <span class="va">$(</span><span class="ex">curl</span> <span class="at">-s</span> https://api.github.com/repos/huishenlab/dupsifter/releases/latest <span class="kw">|</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grep</span> browser_download_url <span class="kw">|</span> <span class="fu">grep</span> darwin_amd64 <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> <span class="st">'"'</span> <span class="at">-f</span> 4<span class="va">)</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> dupsifter_<span class="pp">*</span> dupsifter</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x dupsifter</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Linux</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-OL</span> <span class="va">$(</span><span class="ex">curl</span> <span class="at">-s</span> https://api.github.com/repos/huishenlab/dupsifter/releases/latest <span class="kw">|</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grep</span> browser_download_url <span class="kw">|</span> <span class="fu">grep</span> linux_amd64 <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> <span class="st">'"'</span> <span class="at">-f</span> 4<span class="va">)</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> dupsifter_<span class="pp">*</span> dupsifter</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x dupsifter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-L</span> <span class="va">$(</span><span class="ex">curl</span> <span class="at">-s</span> https://api.github.com/repos/huishenlab/dupsifter/releases/latest <span class="kw">|</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grep</span> browser_download_url <span class="kw">|</span> <span class="fu">grep</span> darwin_amd64 <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> <span class="st">'"'</span> <span class="at">-f</span> 4<span class="va">)</span> <span class="at">--output</span> dupsifter</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x dupsifter</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Linux</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-L</span> <span class="va">$(</span><span class="ex">curl</span> <span class="at">-s</span> https://api.github.com/repos/huishenlab/dupsifter/releases/latest <span class="kw">|</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grep</span> browser_download_url <span class="kw">|</span> <span class="fu">grep</span> linux_amd64 <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> <span class="st">'"'</span> <span class="at">-f</span> 4<span class="va">)</span> <span class="at">--output</span> dupsifter</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x dupsifter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="build-from-source" class="level3">
 <h3 class="anchored" data-anchor-id="build-from-source">Build from Source</h3>
@@ -397,6 +407,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/huishenlab\.github\.io\/dupsifter\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -431,7 +459,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');

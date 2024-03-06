@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.550">
+<meta name="generator" content="quarto-1.4.551">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -208,7 +208,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content page-columns page-full" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -264,8 +264,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    barcode are included up to a maximum length of 16 bases/characters. Barcodes are taken from</span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    read 1 in paired-end sequencing only.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="option-descriptions" class="level2">
+<section id="option-descriptions" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="option-descriptions">Option Descriptions</h2>
+<div class="column-page-inset-right">
 <table class="table">
 <colgroup>
 <col style="width: 10%">
@@ -276,7 +277,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th style="text-align: center;">Short Option</th>
-<th style="text-align: center;">Long Option</th>
+<th style="text-align: left;">Long Option</th>
 <th style="text-align: center;">Argument Type</th>
 <th>Description</th>
 </tr>
@@ -284,78 +285,79 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">-o</td>
-<td style="text-align: center;">–output</td>
+<td style="text-align: left;">–output</td>
 <td style="text-align: center;">string</td>
 <td>Name of output file (either .sam or .bam)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">-O</td>
-<td style="text-align: center;">–stats-output</td>
+<td style="text-align: left;">–stats-output</td>
 <td style="text-align: center;">string</td>
 <td>Name of file to write statistics to (end with <code>.dupsifter.stat</code>)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">-s</td>
-<td style="text-align: center;">–single-end</td>
+<td style="text-align: left;">–single-end</td>
 <td style="text-align: center;">none</td>
 <td>Run for single-end data (only do this if you know the data is SE)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">-m</td>
-<td style="text-align: center;">–add-mate-tags</td>
+<td style="text-align: left;">–add-mate-tags</td>
 <td style="text-align: center;">none</td>
 <td>Add MC (mate CIGAR) and MQ mate MAPQ) mate tags to mated reads</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">-W</td>
-<td style="text-align: center;">–wgs-only</td>
+<td style="text-align: left;">–wgs-only</td>
 <td style="text-align: center;">none</td>
 <td>Process WGS data instead of WGBS (see Documentation for differences in processing)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">-l</td>
-<td style="text-align: center;">–max-read-length</td>
+<td style="text-align: left;">–max-read-length</td>
 <td style="text-align: center;">integer</td>
 <td>Maximum read length (handles padding for reference genome windows)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">-b</td>
-<td style="text-align: center;">–min-base-qual</td>
+<td style="text-align: left;">–min-base-qual</td>
 <td style="text-align: center;">integer</td>
 <td>Minimum bae quality (used in determiningg bisulfite strand if tags not provided)</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">-B</td>
-<td style="text-align: center;">–has-barcode</td>
+<td style="text-align: left;">–has-barcode</td>
 <td style="text-align: center;">none</td>
 <td>Use when reads have cell barcodes and you want to mark duplicates accordingly</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">-r</td>
-<td style="text-align: center;">–remove-dups</td>
+<td style="text-align: left;">–remove-dups</td>
 <td style="text-align: center;">none</td>
 <td>Remove reads that are flagged as duplicates</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">-v</td>
-<td style="text-align: center;">–verbose</td>
+<td style="text-align: left;">–verbose</td>
 <td style="text-align: center;">none</td>
 <td>Print extra messages when running</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">-h</td>
-<td style="text-align: center;">–help</td>
+<td style="text-align: left;">–help</td>
 <td style="text-align: center;">none</td>
 <td>Print usage help message and exit</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;"></td>
-<td style="text-align: center;">–version</td>
+<td style="text-align: left;">–version</td>
 <td style="text-align: center;">none</td>
 <td>Print <code>dupsifter</code> version and exit</td>
 </tr>
 </tbody>
 </table>
+</div>
 
 
 </section>
@@ -440,6 +442,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/huishenlab\.github\.io\/dupsifter\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -474,7 +494,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
