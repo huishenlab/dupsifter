@@ -2,7 +2,34 @@
 title: Duplicate Marking Methodology
 ---
 
-## Duplicate Marking Philosophy
+## Differences between WGS and WGBS Duplicate Marking
+
+Duplicate reads primarily come from two sources: polymerase chain reaction (PCR) and optical duplicates. Optical
+duplicates arise from the sequencer splitting a single cluster into two or more clusters (see the description in the
+[paper](https://doi.org/10.1093/bioinformatics/btad729) for where these clusters come from). While `dupsifter` is able
+to handle optical duplicates, they affect WGS and WGBS datasets in the same way. Therefore, this section will focus on
+PCR duplicates and the differences in duplicate marking reads from these two technologies.
+
+PCR amplification is frequently used in WGS and WGBS to increase the amount of input DNA, which increases the chance of
+a DNA fragment being sequenced, but incurs a cost of some fragments being sequencing more than once. PCR duplicates are
+the result of multiple copies of the same fragment being sequenced. For WGS experiments, PCR proceeds as shown in Panel
+A of @fig-wgs-wgbs-diffs. On the other hand, WGBS experiments include an additional step before PCR amplification is
+run. After the DNA is denatured, sodium bisulfite is added to the solution, converting unmethylated cytosines into
+uracils, which results in four distinct strands of DNA (see Panel B of @fig-wgs-wgbs-diffs). These four strands are:
+one strand deriving from the original top (OT), one deriving from the original bottom (OB), and the two complements of
+these strands (CTOT and CTOB, respectively). This additional step means there are two distinct copies of DNA for a given
+DNA fragment in WGBS versus only one in WGS. Therefore, for WGBS experiments, we must distinguish between reads coming
+from the OT and OB strands at the same location and true PCR duplicates.
+
+`dupsifter` handles these differences by also factoring in the bisulfite strand (OT/CTOT or OB/CTOB) when determining if
+a read is a duplicate. In the case where the user is running in WGS mode, `dupsifter` treates all reads as coming from
+the same original strand.
+
+::: {#fig-wgs-wgbs-diffs}
+![Part of Figure 1 from the `dupsifter` [paper](https://doi.org/10.1093/bioinformatics/btad729).](wgs_wgbs_diffs.png){width=750}
+:::
+
+## Duplicate Definition
 
 At its most basic, duplicates are those that match in all of the following categories (descriptions below):
 
@@ -41,6 +68,10 @@ non-duplicate. The authors of `samblaster` showed that choosing the first read, 
 [little impact](https://github.com/GregoryFaust/samblaster/blob/master/SAMBLASTER_Supplemental.pdf) on the quality of
 reads going into downstream analyses. Further, it requires only one pass through the data, instead of two passes, which
 is required for methods that select the highest quality read.
+
+Astute observers may have noticed there is no reference to bisulfite strand in the duplicate definition. This is a
+byproduct of the technical implementation of `dupsifter` and is due to the bisulfite strand being handled separately
+from the explicit definition of a duplicate.
 
 ## Reference Padding and Binning {#sec-binning}
 
