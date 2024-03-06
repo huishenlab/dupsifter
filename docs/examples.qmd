@@ -67,12 +67,6 @@ samtools sort -n -o gembs.name_sorted.bam gembs_position_sorted.bam
 dupsifter -o gembs.name_sorted.markdup.bam hg38.fa gembs.name_sorted.bam
 ```
 
-Note, if you supply a position sorted BAM to `dupsifter`, it will produce an error message along the lines of:
-```default
-[dupsifter] ERROR: Can't find read 1 and/or read 2 in 1 reads with read ID: <name of read>.
-Are these reads coordinate sorted?
-```
-
 ## Additional Usage
 
 ### Single-end vs Paired-end
