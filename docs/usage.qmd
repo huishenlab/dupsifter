@@ -42,18 +42,18 @@ Note 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SA
 ## Option Descriptions
 
 :::{.column-page-inset-right}
-| Short Option |    Long Option    | Argument Type | Description                                                                        |
-|:------------:|:------------------|:-------------:|------------------------------------------------------------------------------------|
-|     -o       |     --output      |    string     | Name of output file (either .sam or .bam)                                          |
-|     -O       |  --stats-output   |    string     | Name of file to write statistics to (end with `.dupsifter.stat`)                   |
-|     -s       |   --single-end    |     none      | Run for single-end data (only do this if you know the data is SE)                  |
-|     -m       |  --add-mate-tags  |     none      | Add MC (mate CIGAR) and MQ mate MAPQ) mate tags to mated reads                     |
-|     -W       |    --wgs-only     |     none      | Process WGS data instead of WGBS (see Documentation for differences in processing) |
-|     -l       | --max-read-length |    integer    | Maximum read length (handles padding for reference genome windows)                 |
-|     -b       |  --min-base-qual  |    integer    | Minimum bae quality (used in determiningg bisulfite strand if tags not provided)   |
-|     -B       |   --has-barcode   |     none      | Use when reads have cell barcodes and you want to mark duplicates accordingly      |
-|     -r       |   --remove-dups   |     none      | Remove reads that are flagged as duplicates                                        |
-|     -v       |     --verbose     |     none      | Print extra messages when running                                                  |
-|     -h       |      --help       |     none      | Print usage help message and exit                                                  |
-|              |     --version     |     none      | Print `dupsifter` version and exit                                                 |
+| Short Option |     Long Option     | Argument Type | Description                                                                        |
+|:------------:|:--------------------|:-------------:|------------------------------------------------------------------------------------|
+|    `-o`      | `--output`          |    string     | Name of output file (either .sam or .bam)                                          |
+|    `-O`      | `--stats-output`    |    string     | Name of file to write statistics to (end with `.dupsifter.stat`)                   |
+|    `-s`      | `--single-end`      |     none      | Run for single-end data (only do this if you know the data is SE)                  |
+|    `-m`      | `--add-mate-tags`   |     none      | Add MC (mate CIGAR) and MQ (mate MAPQ) tags to mated reads                         |
+|    `-W`      | `--wgs-only`        |     none      | Process WGS data instead of WGBS (see [Methodology](methodology.qmd) for differences in processing) |
+|    `-l`      | `--max-read-length` |    integer    | Maximum read length (handles padding for reference genome windows)                 |
+|    `-b`      | `--min-base-qual`   |    integer    | Minimum base quality (used in determining bisulfite strand if tags not provided)   |
+|    `-B`      | `--has-barcode`     |     none      | Use when reads have cell barcodes and you want to mark duplicates accordingly      |
+|    `-r`      | `--remove-dups`     |     none      | Remove reads that are flagged as duplicates                                        |
+|    `-v`      | `--verbose`         |     none      | Print extra messages when running                                                  |
+|    `-h`      | `--help`            |     none      | Print usage help message and exit                                                  |
+|              | `--version`         |     none      | Print `dupsifter` version and exit                                                 |
 :::
