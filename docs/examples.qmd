@@ -2,15 +2,17 @@
 title: "Examples"
 ---
 
-Below you will find various examples of how to use `dupsifter`. Example datasets can be found in the `example` directory
+Below you will find various examples of how to use `dupsifter`. Example datasets can be found in the
+[`example` directory](https://github.com/huishenlab/dupsifter/tree/main/example)
 of the `dupsifter` source code.
 
 ## Basic Usage
 
 Input to `dupsifter` comes from either the terminal's standard input (i.e., streamed input) or with an input BAM file.
-The default output is to stream the output, but it can also be written straight to an output file (`-o`/`--output`).
+The default output is to the terminal's standard output (i.e., streamed output), but it can also be written straight to
+an output file (the `-o`/`--output` option).
 
-Tools such as `biscuit` and `bwa-meth` stream their output. Examples of reading streamed input are:
+Examples of reading streamed input, such as from tools like `biscuit` and `bwa-meth` which stream their output, are:
 ```bash
 # Streamed input and streamed output with BISCUIT
 biscuit align -@ 8 -b 1 hg38.fa read1.fastq read2.fastq | \
@@ -27,7 +29,7 @@ dupsifter -o bwameth.unsorted.markdup.bam hg38.fa
 ```
 
 On the other hand, tools such as `bismark` and `bsbolt` default to writing a BAM file as output from their alignment.
-Below is an example of using an input BAM and writing to an output BAM or streaming the output to another tool:
+An example of using an input BAM and writing to an output BAM or streaming the output to another tool:
 ```bash
 # Input BAM and output BAM with Bismark
 bismark \
@@ -47,14 +49,13 @@ bsbolt Align \
     -F2 read2.fastq
 
 dupsifter hg38.fa bsbolt.unsorted.bam | \
-samtools sort -@ 2 -o bsbolt.sorted.markdup.bam
+samtools sort -@ 2 -o bsbolt.sorted.markdup.bam -
 ```
 
-It should be noted that `dupsifter` expects it's input to be read-name grouped (i.e., reads with the same name next to
-one another in the BAM). For `biscuit`, `bismark`, `bsbolt`, and `bwa-meth`, the reads are output in this way. However,
-`gemBS` performs position sorting during its alignment. Therefore, if you want to use `dupsifter` with BAMs from
-`gemBS`, then you will have to group the reads by name either with `samtools sort` or `samtools collate`. An example
-with `samtools sort` is shown below:
+`dupsifter` expects it's input to be read-name grouped (i.e., reads with the same name next to one another in the BAM),
+which is how reads are output from `biscuit`, `bismark`, `bsbolt`, and `bwa-meth`. `gemBS`, on the other hand, performs
+position sorting during its alignment. Therefore, if you want to use `dupsifter` with BAMs from `gemBS`, you will have
+to group the reads by name with either `samtools sort` or `samtools collate`. An example with `samtools sort` is:
 ```bash
 # Alignment with gemBS
 # gembs.hg38.conf and gembs.sample.conf are configuration files that are specified ahead of time
@@ -69,7 +70,7 @@ dupsifter -o gembs.name_sorted.markdup.bam hg38.fa gembs.name_sorted.bam
 
 ## Additional Usage
 
-### Single-end vs Paired-end
+### Single-end vs Paired-end Reads
 
 `dupsifter` defaults to running for paired-end reads. In cases where single-end reads were aligned, include the
 `-s`/`--single-end` option:
@@ -85,8 +86,10 @@ adding mate tags during the duplicate marking stage:
 dupsifter --add-mate-tags -o ouput.bam hg38.fa input.bam
 ```
 
-Note, if a read already has one or both of the mate tags and `--add-mate-tags` is included, the pre-existing tags will
+:::{.callout-note}
+If a read already has one or both of the mate tags and `--add-mate-tags` is included, the pre-existing tags will
 not be overwritten.
+:::
 
 ### Duplicate Marking WGS Data
 
@@ -104,19 +107,23 @@ length with the `-l`/`--max-read-length` option:
 dupsifter --max-read-length 20000 -o output.bam hg38.fa input.bam
 ```
 
-Note, for current short-read technologies, the default value is more than sufficient.
+:::{.callout-note}
+For current short-read technologies, the default value is more than sufficient.
+:::
 
 ### Adjusting the Minimum Base Quality
 
 For cases where the bisulfite strand information is not included, `dupsifter` infers the strand based on the number of
 C&#8594;T and G&#8594;A substitutions. By default, all bases in a read are used for counting the number of each
-substitution. However, in the case of a user wanting to use bases with a higher base quality, you can adjust the minimum
-base quality with `-b`/`--min-base-qual`:
+substitution. However, in the case where a user wants to only use bases that meet a certain base quality threshold, you
+can adjust the minimum base quality with `-b`/`--min-base-qual`:
 ```bash
 dupsifter --min-base-qual 20 -o output.bam hg38.fa input.bam
 ```
 
-Note, this option is only used when the bisulfite strand has to be inferred and is ignored otherwise.
+:::{.callout-note}
+This option is only used when the bisulfite strand has to be inferred and is ignored otherwise.
+:::
 
 ### Duplicate Marking for Reads with Cell Barcodes
 
@@ -139,13 +146,24 @@ dupsifter --remove-dups -o output.bam hg38.fa input.bam
 
 ## Test Cases
 
-BAM files aligned with `biscuit`, `bismark`, `bsbolt`, `bwa-meth`, and `gembs`, as well as the FASTQ files used to
+BAM files aligned with `biscuit`, `bismark`, `bsbolt`, `bwa-meth`, and `gemBS`, as well as the FASTQ files used to
 generate them, have been provided for practicing using `dupsifter` and can be found in the `example` directory of the
-`dupsifter` source code. Below is the results found in the output stats file for each run. All examples are created from
-hg38 without contigs. For test cases, any hg38 reference that conforms to the UCSC naming scheme (i.e., `chr1` not `1`)
-should work to recreate the results shown.
+`dupsifter` source code. Below are the results found in the output stats file for each run. All examples are created
+from hg38 without contigs. For testing purposes, any hg38 reference that conforms to the UCSC naming scheme (i.e.,
+`chr1` not `1`) should work to recreate the results shown.
+
+:::{.callout-note icon=false}
+
+## Test Case Data Creation
 
 The following tool versions were used for the test cases:
+
+::: {.grid}
+
+::: {.g-col-3}
+:::
+
+::: {.g-col-6}
 
 | tool        | version  |
 |:-----------:|:--------:|
@@ -153,11 +171,16 @@ The following tool versions were used for the test cases:
 | `bismark`   | `0.24.0` |
 | `bsbolt`    | `1.6.0`  |
 | `bwa-meth`  | `0.2.6`  |
-| `gembs`     | `4.0.4`  |
+| `gemBS`     | `4.0.4`  |
 | `samtools`  | `1.17`   |
 | `dupsifter` | `1.2.0`  |
 
-### Test FASTQ Creation
+:::
+
+::: {.g-col-3}
+:::
+
+:::
 
 FASTQ files were were generated with [Sherman](https://github.com/FelixKrueger/Sherman):
 ```bash
@@ -173,6 +196,7 @@ Sherman \
 
 100 duplicates were then randomly selected using Python (random seed set to 2023) and appended to the FASTQ files
 created by Sherman. This produced a FASTQ with a duplicate rate of 10% (100 read pairs out of 1000).
+:::
 
 ### BISCUIT
 ```default
@@ -197,8 +221,9 @@ $ cat biscuit.dupsifter.stats
 [dupsifter] number of reads with no primary reads: 0
 ```
 
+:::{.callout-warning}
 To briefly highlight one of the pitfalls of marking duplicates, the reason there are not the expected 100 duplicates
-from the `biscuit` data (similar in `bismark`, `bsbolt`, and `bwa-meth`) is due to the aligner choosing different
+from the `biscuit` data (similarly in `bismark`, `bsbolt`, and `bwa-meth`) is due to the aligner choosing different
 mapping locations for reads with multiple, equally likely potential locations. An example is shown here:
 ```default
 103_chr3:92733152-92733265  99  chr3  92815142  0  150M  =  92815106  114  (remainder not shown)
@@ -206,6 +231,7 @@ mapping locations for reads with multiple, equally likely potential locations. A
 dup_103_chr3:92733152-92733265  99  chr3  93567084  0  150M  =  93567048  114  (remainder not shown)
 dup_103_chr3:92733152-92733265  147  chr3  93567048  0  150M  =  93567084  114  (remainder not shown)
 ```
+:::
 
 ### Bismark
 ```default
@@ -230,6 +256,7 @@ $ cat bismark.dupsifter.stats
 [dupsifter] number of reads with no primary reads: 0
 ```
 
+:::{.callout-warning}
 During alignment, `bismark` splits the FASTQ into chunks when aligning with more than one thread. The aligned reads are
 then merged into one output BAM; however, the read order is not necessarily the same as in the FASTQ. This provides an
 opportunity to highlight `dupsifter` choosing the first read found with a given signature as the "non-duplicate." In
@@ -243,9 +270,10 @@ dup_80_chr16:52422066-52422154/1  147  chr16  52422005  42  150M  =  52422066  -
 80_chr16:52422066-52422154/1  1171  chr16  52422005  42  150M  =  52422066  -211  (remainder not shown)
 ```
 
-Note, while in this simulated example, there is a known order to the reads, in real experiments the original template
-strand that PCR duplicates were created from cannot be distinguished, so choosing the first appearance of a given
-signature is a reasonable choice to make for the "non-duplicate."
+While there is a known order to the reads in this simulated example, the original template strand that PCR duplicates
+were created from in a real experiment cannot be distinguished. Therefore, choosing the first appearance of a given
+signature is a reasonable choice for the "non-duplicate."
+:::
 
 ### BSBolt
 ```default
