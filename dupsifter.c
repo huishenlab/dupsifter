@@ -367,7 +367,7 @@ uint8_t infer_bsstrand(refcache_t *rs, bam_hdr_t *hdr, bam1_t *b, uint32_t min_b
                 qpos += oplen;
                 break;
             default:
-                fatal_error("[dupsifter] ERROR: Unknown cigar, %u\n", op);
+                fatal_error("[dupsifter] ERROR: Unknown cigar operation, %u\n", op);
         }
     }
     if (nC2T >= nG2A) { return 0; }
