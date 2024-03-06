@@ -2,7 +2,7 @@
 title: "Dupsifter Documentation"
 ---
 
-`dupsifter` is a command line tool for marking PCR duplicates in both WGS and WGBS datasets. It is based on the
+`dupsifter` is a command line tool for marking duplicates in both WGS and WGBS datasets. It is based on the
 [samblaster](https://github.com/GregoryFaust/samblaster) methodology for finding and marking duplicates.
 
 ## Publication
