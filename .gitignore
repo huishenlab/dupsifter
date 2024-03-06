@@ -56,3 +56,6 @@ dkms.conf
 
 # Quarto website documentation
 docs/_site
+
+# macOS garbage
+.*DS_Store
