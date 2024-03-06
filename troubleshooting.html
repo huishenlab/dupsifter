@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Dupsifter Documentation - Usage</title>
+<title>Dupsifter Documentation - Troubleshooting</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,40 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -114,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./usage.html">Usage</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./troubleshooting.html">Troubleshooting</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -170,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./usage.html" class="sidebar-item-text sidebar-link active">
+  <a href="./usage.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Usage</span></a>
   </div>
 </li>
@@ -188,7 +154,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link">
+  <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Troubleshooting</span></a>
   </div>
 </li>
@@ -208,19 +174,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#input-output" id="toc-input-output" class="nav-link active" data-scroll-target="#input-output"><span class="header-section-number">1</span> Input / Output</a></li>
-  <li><a href="#run-statistics" id="toc-run-statistics" class="nav-link" data-scroll-target="#run-statistics"><span class="header-section-number">2</span> Run Statistics</a></li>
-  <li><a href="#help" id="toc-help" class="nav-link" data-scroll-target="#help"><span class="header-section-number">3</span> Help</a></li>
-  <li><a href="#option-descriptions" id="toc-option-descriptions" class="nav-link" data-scroll-target="#option-descriptions"><span class="header-section-number">4</span> Option Descriptions</a></li>
+  <li><a href="#runtime-errors" id="toc-runtime-errors" class="nav-link active" data-scroll-target="#runtime-errors"><span class="header-section-number">1</span> Runtime Errors</a>
+  <ul class="collapse">
+  <li><a href="#unable-to-read-fromwrite-to" id="toc-unable-to-read-fromwrite-to" class="nav-link" data-scroll-target="#unable-to-read-fromwrite-to"><span class="header-section-number">1.1</span> “Unable to read from/write to …”</a></li>
+  <li><a href="#please-provide-a-reference" id="toc-please-provide-a-reference" class="nav-link" data-scroll-target="#please-provide-a-reference"><span class="header-section-number">1.2</span> “Please provide a reference”</a></li>
+  <li><a href="#reference-must-end-in-.fa.fa.gz.fasta.fasta.gz" id="toc-reference-must-end-in-.fa.fa.gz.fasta.fasta.gz" class="nav-link" data-scroll-target="#reference-must-end-in-.fa.fa.gz.fasta.fasta.gz"><span class="header-section-number">1.3</span> “Reference must end in .fa/.fa.gz/.fasta/.fasta.gz”</a></li>
+  <li><a href="#read-with-length-number-is-longer-than-max-read-length" id="toc-read-with-length-number-is-longer-than-max-read-length" class="nav-link" data-scroll-target="#read-with-length-number-is-longer-than-max-read-length"><span class="header-section-number">1.4</span> “Read with length (number) is longer than max read length”</a></li>
+  <li><a href="#cant-find-read-1-andor-read-2-with-read-id" id="toc-cant-find-read-1-andor-read-2-with-read-id" class="nav-link" data-scroll-target="#cant-find-read-1-andor-read-2-with-read-id"><span class="header-section-number">1.5</span> “Can’t find read 1 and/or read 2 with read ID …”</a></li>
+  <li><a href="#no-reads-found-in" id="toc-no-reads-found-in" class="nav-link" data-scroll-target="#no-reads-found-in"><span class="header-section-number">1.6</span> “No reads found in …”</a></li>
+  <li><a href="#read-information-is-missing" id="toc-read-information-is-missing" class="nav-link" data-scroll-target="#read-information-is-missing"><span class="header-section-number">1.7</span> “Read information is missing”</a></li>
+  <li><a href="#unknown-cigar-operation" id="toc-unknown-cigar-operation" class="nav-link" data-scroll-target="#unknown-cigar-operation"><span class="header-section-number">1.8</span> “Unknown cigar operation”</a></li>
+  <li><a href="#unknown-orientation-found" id="toc-unknown-orientation-found" class="nav-link" data-scroll-target="#unknown-orientation-found"><span class="header-section-number">1.9</span> “Unknown orientation found”</a></li>
+  <li><a href="#unable-to-create-argument-list-for-pg-string" id="toc-unable-to-create-argument-list-for-pg-string" class="nav-link" data-scroll-target="#unable-to-create-argument-list-for-pg-string"><span class="header-section-number">1.10</span> “Unable to create argument list for PG string”</a></li>
+  <li><a href="#failed-to-add-pg-tag-to-output-header" id="toc-failed-to-add-pg-tag-to-output-header" class="nav-link" data-scroll-target="#failed-to-add-pg-tag-to-output-header"><span class="header-section-number">1.11</span> “Failed to add PG tag to output header”</a></li>
+  <li><a href="#header-writing-failed" id="toc-header-writing-failed" class="nav-link" data-scroll-target="#header-writing-failed"><span class="header-section-number">1.12</span> “Header writing failed”</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content page-columns page-full" id="quarto-document-content">
+<main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Usage</h1>
+<h1 class="title">Troubleshooting</h1>
 </div>
 
 
@@ -237,154 +214,58 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="input-output" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="input-output"><span class="header-section-number">1</span> Input / Output</h2>
-<p><code>dupsifter</code> is able to accept input from <code>stdin</code> or from an input SAM/BAM file. Output can be directed either to <code>stdout</code> or to an output SAM/BAM. Input and output options can be mixed as needed (i.e., input BAM to streamed output).</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The input to <code>dupsifter</code> is expected to be read-name grouped (i.e., reads with same name next to one another in the BAM). If you supply a position sorted BAM, it will produce an error message along the lines of:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>[dupsifter] ERROR: Can't find read 1 and/or read 2 in 1 reads with read ID: &lt;name of read&gt;.</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Are these reads coordinate sorted?</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
+<section id="runtime-errors" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="runtime-errors"><span class="header-section-number">1</span> Runtime Errors</h2>
+<section id="unable-to-read-fromwrite-to" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="unable-to-read-fromwrite-to"><span class="header-section-number">1.1</span> “Unable to read from/write to …”</h3>
+<p>Arises when either the input or output file/stream can’t be opened. This may occur for a variety of reasons, including missing input files, incorrectly named files, hard disk space that is too small to open the output file, or a lack of permissions to write to a directory.</p>
 </section>
-<section id="run-statistics" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="run-statistics"><span class="header-section-number">2</span> Run Statistics</h2>
-<p>Each run of <code>dupsifter</code> calculates statistics related to the number of duplicates and the types of reads processed. By default, the output file is named <code>dupsifter.stat</code> if the output is streamed or <code>basename.dupsifter.stat</code> if the output file is defined (<code>-o basename.bam</code>). The statistics file name can also be defined with the <code>-O</code> option (i.e., <code>dupsifter -O output.dupsifter.stat ref.fa input.bam</code>). If using the <code>-O</code> option, the file should end with <code>.dupsifter.stat</code>. If both <code>-o</code> and <code>-O</code> are provided, then the <code>-O</code> file name will be used.</p>
+<section id="please-provide-a-reference" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="please-provide-a-reference"><span class="header-section-number">1.2</span> “Please provide a reference”</h3>
+<p><code>dupsifter</code> needs a reference FASTA in order to infer the bisulfite strand if a strand tag is not found in the read. Add a reference to your command line invocation and try again. See the <a href="./usage.html">Usage</a> page for help with running <code>dupsifter</code>.</p>
 </section>
-<section id="help" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="help"><span class="header-section-number">3</span> Help</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Program: dupsifter</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Version: 1.2.1</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Contact: Jacob Morrison &lt;jacob.morrison@vai.org&gt;</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>dupsifter [options] &lt;ref.fa&gt; [in.bam]</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>Output options:</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    -o, --output STR             name of output file [stdout]</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    -O, --stats-output STR       name of file to write statistics to (see Note 3 for details)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>Input options:</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    -s, --single-end             run for single-end data</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    -m, --add-mate-tags          add MC and MQ mate tags to mate reads</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    -W, --wgs-only               process WGS reads instead of WGBS</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    -l, --max-read-length INT    maximum read length for paired end duplicate-marking [10000]</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    -b, --min-base-qual INT      minimum base quality [0]</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    -B, --has-barcode            reads in file have barcodes (see Note 4 for details)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    -r, --remove-dups            toggle to remove marked duplicate</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    -v, --verbose                print extra messages</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    -h, --help                   this help</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        --version                print version info and exit</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>Note 1, [in.bam] must be name sorted. If not provided, assume the input is stdin.</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>Note 2, assumes either ALL reads are paired-end (default) or single-end.</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    If a singleton read is found in paired-end mode, the code will break nicely.</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>Note 3, defaults to dupsifter.stat if streaming or (-o basename).dupsifter.stat</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    if the -o option is provided. If -o and -O are provided, then -O will be used.</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>Note 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SAM tag, then</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    tries to parse the read name. If the barcode is in the read name, it must be the last element</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    and be separated by a ':' (i.e., @12345:678:9101112:1234_1:N:0:ACGTACGT). Any separators</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    found in the barcode (e.g., '+' or '-') are treated as 'N's and the additional parts of the</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    barcode are included up to a maximum length of 16 bases/characters. Barcodes are taken from</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    read 1 in paired-end sequencing only.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="reference-must-end-in-.fa.fa.gz.fasta.fasta.gz" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="reference-must-end-in-.fa.fa.gz.fasta.fasta.gz"><span class="header-section-number">1.3</span> “Reference must end in .fa/.fa.gz/.fasta/.fasta.gz”</h3>
+<p>This serves as a basic check that the correct file type is being used as the reference input. Check you have your inputs in the correct order and that any reference FASTA files have the proper extensions.</p>
 </section>
-<section id="option-descriptions" class="level2 page-columns page-full" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="option-descriptions"><span class="header-section-number">4</span> Option Descriptions</h2>
-<div class="column-page-inset-right">
-<table class="table">
-<thead>
-<tr class="header">
-<th style="text-align: center;">Short Option</th>
-<th style="text-align: left;">Long Option</th>
-<th style="text-align: center;">Argument Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;"><code>-o</code></td>
-<td style="text-align: left;"><code>--output</code></td>
-<td style="text-align: center;">string</td>
-<td>Name of output file (either .sam or .bam)</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><code>-O</code></td>
-<td style="text-align: left;"><code>--stats-output</code></td>
-<td style="text-align: center;">string</td>
-<td>Name of file to write statistics to (end with <code>.dupsifter.stat</code>)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><code>-s</code></td>
-<td style="text-align: left;"><code>--single-end</code></td>
-<td style="text-align: center;">none</td>
-<td>Run for single-end data (only do this if you know the data is SE)</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><code>-m</code></td>
-<td style="text-align: left;"><code>--add-mate-tags</code></td>
-<td style="text-align: center;">none</td>
-<td>Add MC (mate CIGAR) and MQ (mate MAPQ) tags to mated reads</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><code>-W</code></td>
-<td style="text-align: left;"><code>--wgs-only</code></td>
-<td style="text-align: center;">none</td>
-<td>Process WGS data instead of WGBS (see <a href="./methodology.html">Methodology</a> for differences in processing)</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><code>-l</code></td>
-<td style="text-align: left;"><code>--max-read-length</code></td>
-<td style="text-align: center;">integer</td>
-<td>Maximum read length (handles padding for reference genome windows)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><code>-b</code></td>
-<td style="text-align: left;"><code>--min-base-qual</code></td>
-<td style="text-align: center;">integer</td>
-<td>Minimum base quality (used in determining bisulfite strand if tags not provided)</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><code>-B</code></td>
-<td style="text-align: left;"><code>--has-barcode</code></td>
-<td style="text-align: center;">none</td>
-<td>Use when reads have cell barcodes and you want to mark duplicates accordingly</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><code>-r</code></td>
-<td style="text-align: left;"><code>--remove-dups</code></td>
-<td style="text-align: center;">none</td>
-<td>Remove reads that are flagged as duplicates</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"><code>-v</code></td>
-<td style="text-align: left;"><code>--verbose</code></td>
-<td style="text-align: center;">none</td>
-<td>Print extra messages when running</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;"><code>-h</code></td>
-<td style="text-align: left;"><code>--help</code></td>
-<td style="text-align: center;">none</td>
-<td>Print usage help message and exit</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;"></td>
-<td style="text-align: left;"><code>--version</code></td>
-<td style="text-align: center;">none</td>
-<td>Print <code>dupsifter</code> version and exit</td>
-</tr>
-</tbody>
-</table>
-</div>
+<section id="read-with-length-number-is-longer-than-max-read-length" class="level3" data-number="1.4">
+<h3 data-number="1.4" class="anchored" data-anchor-id="read-with-length-number-is-longer-than-max-read-length"><span class="header-section-number">1.4</span> “Read with length (number) is longer than max read length”</h3>
+<p>Arises when <code>dupsifter</code> encounters a read that is longer than the specified max read length. This ensures that no reads would run beyond the specified padding around the chromosome lengths. Rerunning <code>dupsifter</code> with a longer max read length (the <code>--max-read-length</code> option) should resolve this issue.</p>
+</section>
+<section id="cant-find-read-1-andor-read-2-with-read-id" class="level3" data-number="1.5">
+<h3 data-number="1.5" class="anchored" data-anchor-id="cant-find-read-1-andor-read-2-with-read-id"><span class="header-section-number">1.5</span> “Can’t find read 1 and/or read 2 with read ID …”</h3>
+<p>Arises when input that isn’t read-name grouped is provided to <code>dupsifter</code>. This can be resolved by name sorting or collating your SAM/BAM with <code>samtools sort -n</code> or <code>samtools collate</code> and then providing the sorted input to <code>dupsifter</code>.</p>
+</section>
+<section id="no-reads-found-in" class="level3" data-number="1.6">
+<h3 data-number="1.6" class="anchored" data-anchor-id="no-reads-found-in"><span class="header-section-number">1.6</span> “No reads found in …”</h3>
+<p>The input file has no reads. This may be either from a completely file or a SAM/BAM file that has a header, but no reads. Double check the contents of your input.</p>
+</section>
+<section id="read-information-is-missing" class="level3" data-number="1.7">
+<h3 data-number="1.7" class="anchored" data-anchor-id="read-information-is-missing"><span class="header-section-number">1.7</span> “Read information is missing”</h3>
+<p>Can either occur for single/mate-unmapped reads or paired-end reads. Arises from an error reading a SAM entry. Check your input file to ensure it is not corrupted.</p>
+</section>
+<section id="unknown-cigar-operation" class="level3" data-number="1.8">
+<h3 data-number="1.8" class="anchored" data-anchor-id="unknown-cigar-operation"><span class="header-section-number">1.8</span> “Unknown cigar operation”</h3>
+<p>Arises when <code>dupsifter</code> encounters a CIGAR operation that it doesn’t recognize. This error is most likely to occur in versions 1.2.0 and earlier when you use input from tools that make use of extended CIGAR operations (<code>=</code> and <code>X</code>). If this is your issue, upgrading to at least version 1.2.1 should resolve your problem.</p>
+</section>
+<section id="unknown-orientation-found" class="level3" data-number="1.9">
+<h3 data-number="1.9" class="anchored" data-anchor-id="unknown-orientation-found"><span class="header-section-number">1.9</span> “Unknown orientation found”</h3>
+<p>Arises when a read orientation (see the <a href="./methodology.html">Methodology</a> page for details on read orientation) is encountered that <code>dupsifter</code> does not recognize. Please <a href="https://github.com/huishenlab/dupsifter/issues">open an issue</a> if you encounter this error.</p>
+</section>
+<section id="unable-to-create-argument-list-for-pg-string" class="level3" data-number="1.10">
+<h3 data-number="1.10" class="anchored" data-anchor-id="unable-to-create-argument-list-for-pg-string"><span class="header-section-number">1.10</span> “Unable to create argument list for PG string”</h3>
+<p><code>dupsifter</code> failed to collect all command line arguments and form the <code>PG</code> SAM tag string. Try running <code>dupsifter</code> again.</p>
+</section>
+<section id="failed-to-add-pg-tag-to-output-header" class="level3" data-number="1.11">
+<h3 data-number="1.11" class="anchored" data-anchor-id="failed-to-add-pg-tag-to-output-header"><span class="header-section-number">1.11</span> “Failed to add PG tag to output header”</h3>
+<p><code>dupsifter</code> could not write <code>PG</code> SAM tag to the SAM header for output. Likely due to a corruption in the SAM header of the input file itself or a lack of sufficient memory to add the <code>PG</code> tag contents to the header.</p>
+</section>
+<section id="header-writing-failed" class="level3" data-number="1.12">
+<h3 data-number="1.12" class="anchored" data-anchor-id="header-writing-failed"><span class="header-section-number">1.12</span> “Header writing failed”</h3>
+<p><code>dupsifter</code> could not write the SAM header for output. May occur due to an inability to write to the output file or a corrupt SAM header.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

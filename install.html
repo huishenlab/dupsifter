@@ -188,6 +188,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troubleshooting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./releases.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Releases</span></a>
   </div>
@@ -202,13 +208,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#external-dependencies" id="toc-external-dependencies" class="nav-link active" data-scroll-target="#external-dependencies">External Dependencies</a></li>
-  <li><a href="#download-and-install" id="toc-download-and-install" class="nav-link" data-scroll-target="#download-and-install">Download and Install</a>
+  <li><a href="#external-dependencies" id="toc-external-dependencies" class="nav-link active" data-scroll-target="#external-dependencies"><span class="header-section-number">1</span> External Dependencies</a></li>
+  <li><a href="#download-and-install" id="toc-download-and-install" class="nav-link" data-scroll-target="#download-and-install"><span class="header-section-number">2</span> Download and Install</a>
   <ul class="collapse">
-  <li><a href="#precompiled-binaries" id="toc-precompiled-binaries" class="nav-link" data-scroll-target="#precompiled-binaries">Precompiled Binaries</a></li>
-  <li><a href="#build-from-source" id="toc-build-from-source" class="nav-link" data-scroll-target="#build-from-source">Build from Source</a></li>
-  <li><a href="#containers" id="toc-containers" class="nav-link" data-scroll-target="#containers">Containers</a></li>
-  <li><a href="#bioconda" id="toc-bioconda" class="nav-link" data-scroll-target="#bioconda">Bioconda</a></li>
+  <li><a href="#precompiled-binaries" id="toc-precompiled-binaries" class="nav-link" data-scroll-target="#precompiled-binaries"><span class="header-section-number">2.1</span> Precompiled Binaries</a></li>
+  <li><a href="#build-from-source" id="toc-build-from-source" class="nav-link" data-scroll-target="#build-from-source"><span class="header-section-number">2.2</span> Build from Source</a></li>
+  <li><a href="#containers" id="toc-containers" class="nav-link" data-scroll-target="#containers"><span class="header-section-number">2.3</span> Containers</a></li>
+  <li><a href="#bioconda" id="toc-bioconda" class="nav-link" data-scroll-target="#bioconda"><span class="header-section-number">2.4</span> Bioconda</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -235,8 +241,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="external-dependencies" class="level2">
-<h2 class="anchored" data-anchor-id="external-dependencies">External Dependencies</h2>
+<section id="external-dependencies" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="external-dependencies"><span class="header-section-number">1</span> External Dependencies</h2>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -263,11 +269,11 @@ Note
 <div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>gcc</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>make</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="download-and-install" class="level2">
-<h2 class="anchored" data-anchor-id="download-and-install">Download and Install</h2>
+<section id="download-and-install" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="download-and-install"><span class="header-section-number">2</span> Download and Install</h2>
 <p>All releases are available on <a href="https://github.com/huishenlab/dupsifter/releases">GitHub</a>.</p>
-<section id="precompiled-binaries" class="level3">
-<h3 class="anchored" data-anchor-id="precompiled-binaries">Precompiled Binaries</h3>
+<section id="precompiled-binaries" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="precompiled-binaries"><span class="header-section-number">2.1</span> Precompiled Binaries</h3>
 <p>Precompiled binaries are available for macOS and Linux:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># macOS</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-L</span> <span class="va">$(</span><span class="ex">curl</span> <span class="at">-s</span> https://api.github.com/repos/huishenlab/dupsifter/releases/latest <span class="kw">|</span></span>
@@ -279,8 +285,8 @@ Note
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">grep</span> browser_download_url <span class="kw">|</span> <span class="fu">grep</span> linux_amd64 <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> <span class="st">'"'</span> <span class="at">-f</span> 4<span class="va">)</span> <span class="at">--output</span> dupsifter</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x dupsifter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="build-from-source" class="level3">
-<h3 class="anchored" data-anchor-id="build-from-source">Build from Source</h3>
+<section id="build-from-source" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="build-from-source"><span class="header-section-number">2.2</span> Build from Source</h3>
 <p><code>dupsifter</code> can also be downloaded and built from source.</p>
 <p>Via <code>git</code>:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:huishenlab/dupsifter.git</span>
@@ -293,20 +299,19 @@ Note
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> dupsifter-release</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="containers" class="level3">
-<h3 class="anchored" data-anchor-id="containers">Containers</h3>
+<section id="containers" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="containers"><span class="header-section-number">2.3</span> Containers</h3>
 <p>A <code>Dockerfile</code> is available to build a <code>dupsifter</code> container for the latest release version:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:huishenlab/dupsifter.git</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> dupsifter/container</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">--no-cache</span> <span class="at">--tag</span> dupsifter_latest <span class="at">--file</span> Dockerfile_latest .</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-it</span> dupsifter_latest /bin/bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>If you want to create a <code>Dockerfile</code> for a specific version of <code>dupsifter</code>, you can do that via:</p>
+<p>If preferred, you can instead create a <code>Dockerfile</code> for a specific release of <code>dupsifter</code>. For version <code>X.Y.Z</code>, you can do this via:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:huishenlab/dupsifter.git</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> dupsifter/container</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> create_container.py <span class="at">-v</span> X.Y.Z</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">--no-cache</span> <span class="at">--tag</span> dupsifter_vX.Y.Z <span class="at">--file</span> Dockerfile_vX.Y.Z .</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-it</span> dupsifter_vX.Y.Z /bin/bash</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><code>X.Y.Z</code> is the version number you want a container file for.</p>
 <p>If you don’t want to build the container yourself, a pre-built container is available on <a href="https://hub.docker.com/r/varishenlab/dupsifter">DockerHub</a> and can be pulled down with either Docker or Singularity:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Docker</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull varishenlab/dupsifter:dupsifter_v1.2.1</span>
@@ -318,8 +323,8 @@ Note
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="ex">Singularity</span><span class="op">&gt;</span> cd /path/to/dupsifter/code</span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="ex">Singularity</span><span class="op">&gt;</span> make</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="bioconda" class="level3">
-<h3 class="anchored" data-anchor-id="bioconda">Bioconda</h3>
+<section id="bioconda" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="bioconda"><span class="header-section-number">2.4</span> Bioconda</h3>
 <p><code>dupsifter</code> is also available via <code>conda</code>/<code>mamba</code> (starting with version 1.2.0):</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> bioconda dupsifter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 

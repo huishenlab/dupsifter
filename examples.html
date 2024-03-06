@@ -188,6 +188,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troubleshooting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./releases.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Releases</span></a>
   </div>
@@ -202,25 +208,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#basic-usage" id="toc-basic-usage" class="nav-link active" data-scroll-target="#basic-usage">Basic Usage</a></li>
-  <li><a href="#additional-usage" id="toc-additional-usage" class="nav-link" data-scroll-target="#additional-usage">Additional Usage</a>
+  <li><a href="#basic-usage" id="toc-basic-usage" class="nav-link active" data-scroll-target="#basic-usage"><span class="header-section-number">1</span> Basic Usage</a></li>
+  <li><a href="#additional-usage" id="toc-additional-usage" class="nav-link" data-scroll-target="#additional-usage"><span class="header-section-number">2</span> Additional Usage</a>
   <ul class="collapse">
-  <li><a href="#single-end-vs-paired-end" id="toc-single-end-vs-paired-end" class="nav-link" data-scroll-target="#single-end-vs-paired-end">Single-end vs Paired-end</a></li>
-  <li><a href="#adding-mate-tags" id="toc-adding-mate-tags" class="nav-link" data-scroll-target="#adding-mate-tags">Adding Mate Tags</a></li>
-  <li><a href="#duplicate-marking-wgs-data" id="toc-duplicate-marking-wgs-data" class="nav-link" data-scroll-target="#duplicate-marking-wgs-data">Duplicate Marking WGS Data</a></li>
-  <li><a href="#adjusting-the-maximum-read-length" id="toc-adjusting-the-maximum-read-length" class="nav-link" data-scroll-target="#adjusting-the-maximum-read-length">Adjusting the Maximum Read Length</a></li>
-  <li><a href="#adjusting-the-minimum-base-quality" id="toc-adjusting-the-minimum-base-quality" class="nav-link" data-scroll-target="#adjusting-the-minimum-base-quality">Adjusting the Minimum Base Quality</a></li>
-  <li><a href="#duplicate-marking-for-reads-with-cell-barcodes" id="toc-duplicate-marking-for-reads-with-cell-barcodes" class="nav-link" data-scroll-target="#duplicate-marking-for-reads-with-cell-barcodes">Duplicate Marking for Reads with Cell Barcodes</a></li>
-  <li><a href="#removing-duplicates" id="toc-removing-duplicates" class="nav-link" data-scroll-target="#removing-duplicates">Removing Duplicates</a></li>
+  <li><a href="#single-end-vs-paired-end-reads" id="toc-single-end-vs-paired-end-reads" class="nav-link" data-scroll-target="#single-end-vs-paired-end-reads"><span class="header-section-number">2.1</span> Single-end vs Paired-end Reads</a></li>
+  <li><a href="#adding-mate-tags" id="toc-adding-mate-tags" class="nav-link" data-scroll-target="#adding-mate-tags"><span class="header-section-number">2.2</span> Adding Mate Tags</a></li>
+  <li><a href="#duplicate-marking-wgs-data" id="toc-duplicate-marking-wgs-data" class="nav-link" data-scroll-target="#duplicate-marking-wgs-data"><span class="header-section-number">2.3</span> Duplicate Marking WGS Data</a></li>
+  <li><a href="#adjusting-the-maximum-read-length" id="toc-adjusting-the-maximum-read-length" class="nav-link" data-scroll-target="#adjusting-the-maximum-read-length"><span class="header-section-number">2.4</span> Adjusting the Maximum Read Length</a></li>
+  <li><a href="#adjusting-the-minimum-base-quality" id="toc-adjusting-the-minimum-base-quality" class="nav-link" data-scroll-target="#adjusting-the-minimum-base-quality"><span class="header-section-number">2.5</span> Adjusting the Minimum Base Quality</a></li>
+  <li><a href="#duplicate-marking-for-reads-with-cell-barcodes" id="toc-duplicate-marking-for-reads-with-cell-barcodes" class="nav-link" data-scroll-target="#duplicate-marking-for-reads-with-cell-barcodes"><span class="header-section-number">2.6</span> Duplicate Marking for Reads with Cell Barcodes</a></li>
+  <li><a href="#removing-duplicates" id="toc-removing-duplicates" class="nav-link" data-scroll-target="#removing-duplicates"><span class="header-section-number">2.7</span> Removing Duplicates</a></li>
   </ul></li>
-  <li><a href="#test-cases" id="toc-test-cases" class="nav-link" data-scroll-target="#test-cases">Test Cases</a>
+  <li><a href="#test-cases" id="toc-test-cases" class="nav-link" data-scroll-target="#test-cases"><span class="header-section-number">3</span> Test Cases</a>
   <ul class="collapse">
-  <li><a href="#test-fastq-creation" id="toc-test-fastq-creation" class="nav-link" data-scroll-target="#test-fastq-creation">Test FASTQ Creation</a></li>
-  <li><a href="#biscuit" id="toc-biscuit" class="nav-link" data-scroll-target="#biscuit">BISCUIT</a></li>
-  <li><a href="#bismark" id="toc-bismark" class="nav-link" data-scroll-target="#bismark">Bismark</a></li>
-  <li><a href="#bsbolt" id="toc-bsbolt" class="nav-link" data-scroll-target="#bsbolt">BSBolt</a></li>
-  <li><a href="#bwa-meth" id="toc-bwa-meth" class="nav-link" data-scroll-target="#bwa-meth">bwa-meth</a></li>
-  <li><a href="#gembs" id="toc-gembs" class="nav-link" data-scroll-target="#gembs">gemBS</a></li>
+  <li><a href="#biscuit" id="toc-biscuit" class="nav-link" data-scroll-target="#biscuit"><span class="header-section-number">3.1</span> BISCUIT</a></li>
+  <li><a href="#bismark" id="toc-bismark" class="nav-link" data-scroll-target="#bismark"><span class="header-section-number">3.2</span> Bismark</a></li>
+  <li><a href="#bsbolt" id="toc-bsbolt" class="nav-link" data-scroll-target="#bsbolt"><span class="header-section-number">3.3</span> BSBolt</a></li>
+  <li><a href="#bwa-meth" id="toc-bwa-meth" class="nav-link" data-scroll-target="#bwa-meth"><span class="header-section-number">3.4</span> bwa-meth</a></li>
+  <li><a href="#gembs" id="toc-gembs" class="nav-link" data-scroll-target="#gembs"><span class="header-section-number">3.5</span> gemBS</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -247,11 +252,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Below you will find various examples of how to use <code>dupsifter</code>. Example datasets can be found in the <code>example</code> directory of the <code>dupsifter</code> source code.</p>
-<section id="basic-usage" class="level2">
-<h2 class="anchored" data-anchor-id="basic-usage">Basic Usage</h2>
-<p>Input to <code>dupsifter</code> comes from either the terminal’s standard input (i.e., streamed input) or with an input BAM file. The default output is to stream the output, but it can also be written straight to an output file (<code>-o</code>/<code>--output</code>).</p>
-<p>Tools such as <code>biscuit</code> and <code>bwa-meth</code> stream their output. Examples of reading streamed input are:</p>
+<p>Below you will find various examples of how to use <code>dupsifter</code>. Example datasets can be found in the <a href="https://github.com/huishenlab/dupsifter/tree/main/example"><code>example</code> directory</a> of the <code>dupsifter</code> source code.</p>
+<section id="basic-usage" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="basic-usage"><span class="header-section-number">1</span> Basic Usage</h2>
+<p>Input to <code>dupsifter</code> comes from either the terminal’s standard input (i.e., streamed input) or with an input BAM file. The default output is to the terminal’s standard output (i.e., streamed output), but it can also be written straight to an output file (the <code>-o</code>/<code>--output</code> option).</p>
+<p>Examples of reading streamed input, such as from tools like <code>biscuit</code> and <code>bwa-meth</code> which stream their output, are:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Streamed input and streamed output with BISCUIT</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">biscuit</span> align <span class="at">-@</span> 8 <span class="at">-b</span> 1 hg38.fa read1.fastq read2.fastq <span class="kw">|</span> <span class="dt">\</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> hg38.fa <span class="kw">|</span> <span class="dt">\</span></span>
@@ -264,7 +269,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    read1.fastq <span class="dt">\</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    read2.fastq <span class="kw">|</span> <span class="dt">\</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">-o</span> bwameth.unsorted.markdup.bam hg38.fa</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>On the other hand, tools such as <code>bismark</code> and <code>bsbolt</code> default to writing a BAM file as output from their alignment. Below is an example of using an input BAM and writing to an output BAM or streaming the output to another tool:</p>
+<p>On the other hand, tools such as <code>bismark</code> and <code>bsbolt</code> default to writing a BAM file as output from their alignment. An example of using an input BAM and writing to an output BAM or streaming the output to another tool:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Input BAM and output BAM with Bismark</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">bismark</span> <span class="dt">\</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">--parallel</span> 2 <span class="dt">\</span></span>
@@ -283,8 +288,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">-F2</span> read2.fastq</span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> hg38.fa bsbolt.unsorted.bam <span class="kw">|</span> <span class="dt">\</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="ex">samtools</span> sort <span class="at">-@</span> 2 <span class="at">-o</span> bsbolt.sorted.markdup.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>It should be noted that <code>dupsifter</code> expects it’s input to be read-name grouped (i.e., reads with the same name next to one another in the BAM). For <code>biscuit</code>, <code>bismark</code>, <code>bsbolt</code>, and <code>bwa-meth</code>, the reads are output in this way. However, <code>gemBS</code> performs position sorting during its alignment. Therefore, if you want to use <code>dupsifter</code> with BAMs from <code>gemBS</code>, then you will have to group the reads by name either with <code>samtools sort</code> or <code>samtools collate</code>. An example with <code>samtools sort</code> is shown below:</p>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="ex">samtools</span> sort <span class="at">-@</span> 2 <span class="at">-o</span> bsbolt.sorted.markdup.bam <span class="at">-</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>dupsifter</code> expects it’s input to be read-name grouped (i.e., reads with the same name next to one another in the BAM), which is how reads are output from <code>biscuit</code>, <code>bismark</code>, <code>bsbolt</code>, and <code>bwa-meth</code>. <code>gemBS</code>, on the other hand, performs position sorting during its alignment. Therefore, if you want to use <code>dupsifter</code> with BAMs from <code>gemBS</code>, you will have to group the reads by name with either <code>samtools sort</code> or <code>samtools collate</code>. An example with <code>samtools sort</code> is:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alignment with gemBS</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># gembs.hg38.conf and gembs.sample.conf are configuration files that are specified ahead of time</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The output BAM from gemBS in this example is gembs.position_sorted.bam</span></span>
@@ -294,57 +299,105 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">samtools</span> sort <span class="at">-n</span> <span class="at">-o</span> gembs.name_sorted.bam gembs_position_sorted.bam</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">-o</span> gembs.name_sorted.markdup.bam hg38.fa gembs.name_sorted.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Note, if you supply a position sorted BAM to <code>dupsifter</code>, it will produce an error message along the lines of:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>[dupsifter] ERROR: Can't find read 1 and/or read 2 in 1 reads with read ID: &lt;name of read&gt;.</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Are these reads coordinate sorted?</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="additional-usage" class="level2">
-<h2 class="anchored" data-anchor-id="additional-usage">Additional Usage</h2>
-<section id="single-end-vs-paired-end" class="level3">
-<h3 class="anchored" data-anchor-id="single-end-vs-paired-end">Single-end vs Paired-end</h3>
+<section id="additional-usage" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="additional-usage"><span class="header-section-number">2</span> Additional Usage</h2>
+<section id="single-end-vs-paired-end-reads" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="single-end-vs-paired-end-reads"><span class="header-section-number">2.1</span> Single-end vs Paired-end Reads</h3>
 <p><code>dupsifter</code> defaults to running for paired-end reads. In cases where single-end reads were aligned, include the <code>-s</code>/<code>--single-end</code> option:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--single-end</span> <span class="at">-o</span> ouput.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--single-end</span> <span class="at">-o</span> ouput.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="adding-mate-tags" class="level3">
-<h3 class="anchored" data-anchor-id="adding-mate-tags">Adding Mate Tags</h3>
+<section id="adding-mate-tags" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="adding-mate-tags"><span class="header-section-number">2.2</span> Adding Mate Tags</h3>
 <p>For aligners that don’t generate mate tags (<code>MC</code> and <code>MQ</code>), <code>dupsifter</code> includes an option (<code>-m</code>/<code>--add-mate-tags</code>) for adding mate tags during the duplicate marking stage:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--add-mate-tags</span> <span class="at">-o</span> ouput.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Note, if a read already has one or both of the mate tags and <code>--add-mate-tags</code> is included, the pre-existing tags will not be overwritten.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--add-mate-tags</span> <span class="at">-o</span> ouput.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If a read already has one or both of the mate tags and <code>--add-mate-tags</code> is included, the pre-existing tags will not be overwritten.</p>
+</div>
+</div>
 </section>
-<section id="duplicate-marking-wgs-data" class="level3">
-<h3 class="anchored" data-anchor-id="duplicate-marking-wgs-data">Duplicate Marking WGS Data</h3>
+<section id="duplicate-marking-wgs-data" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="duplicate-marking-wgs-data"><span class="header-section-number">2.3</span> Duplicate Marking WGS Data</h3>
 <p>While <code>dupsifter</code> was written for WGBS data, it can also be used to mark WGS data with the <code>-W</code>/<code>--wgs-only</code> option:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">bwa</span> mem hg38.fa read1.fq.gz read2.fq.gz <span class="kw">|</span> <span class="dt">\</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--wgs-only</span> <span class="at">-o</span> output.bam hg38.fa</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">bwa</span> mem hg38.fa read1.fq.gz read2.fq.gz <span class="kw">|</span> <span class="dt">\</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--wgs-only</span> <span class="at">-o</span> output.bam hg38.fa</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="adjusting-the-maximum-read-length" class="level3">
-<h3 class="anchored" data-anchor-id="adjusting-the-maximum-read-length">Adjusting the Maximum Read Length</h3>
+<section id="adjusting-the-maximum-read-length" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="adjusting-the-maximum-read-length"><span class="header-section-number">2.4</span> Adjusting the Maximum Read Length</h3>
 <p>For long-read data, the default maximum read length may not be sufficient. In this case, you can increase the maximum length with the <code>-l</code>/<code>--max-read-length</code> option:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--max-read-length</span> 20000 <span class="at">-o</span> output.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Note, for current short-read technologies, the default value is more than sufficient.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--max-read-length</span> 20000 <span class="at">-o</span> output.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For current short-read technologies, the default value is more than sufficient.</p>
+</div>
+</div>
 </section>
-<section id="adjusting-the-minimum-base-quality" class="level3">
-<h3 class="anchored" data-anchor-id="adjusting-the-minimum-base-quality">Adjusting the Minimum Base Quality</h3>
-<p>For cases where the bisulfite strand information is not included, <code>dupsifter</code> infers the strand based on the number of C→T and G→A substitutions. By default, all bases in a read are used for counting the number of each substitution. However, in the case of a user wanting to use bases with a higher base quality, you can adjust the minimum base quality with <code>-b</code>/<code>--min-base-qual</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--min-base-qual</span> 20 <span class="at">-o</span> output.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Note, this option is only used when the bisulfite strand has to be inferred and is ignored otherwise.</p>
+<section id="adjusting-the-minimum-base-quality" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="adjusting-the-minimum-base-quality"><span class="header-section-number">2.5</span> Adjusting the Minimum Base Quality</h3>
+<p>For cases where the bisulfite strand information is not included, <code>dupsifter</code> infers the strand based on the number of C→T and G→A substitutions. By default, all bases in a read are used for counting the number of each substitution. However, in the case where a user wants to only use bases that meet a certain base quality threshold, you can adjust the minimum base quality with <code>-b</code>/<code>--min-base-qual</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--min-base-qual</span> 20 <span class="at">-o</span> output.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This option is only used when the bisulfite strand has to be inferred and is ignored otherwise.</p>
+</div>
+</div>
 </section>
-<section id="duplicate-marking-for-reads-with-cell-barcodes" class="level3">
-<h3 class="anchored" data-anchor-id="duplicate-marking-for-reads-with-cell-barcodes">Duplicate Marking for Reads with Cell Barcodes</h3>
+<section id="duplicate-marking-for-reads-with-cell-barcodes" class="level3" data-number="2.6">
+<h3 data-number="2.6" class="anchored" data-anchor-id="duplicate-marking-for-reads-with-cell-barcodes"><span class="header-section-number">2.6</span> Duplicate Marking for Reads with Cell Barcodes</h3>
 <p>For experiments that include cell barcodes, <code>dupsifter</code> is able to include the cell barcode as part of its signature with the <code>-B</code>/<code>--has-barcode</code> option:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--has-barcode</span> <span class="at">-o</span> output.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--has-barcode</span> <span class="at">-o</span> output.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>For more details on how the cell barcode can be included in the read entry, see <code>dupsifter --help</code> or the <a href="./methodology.html">Methodology</a> page.</p>
 </section>
-<section id="removing-duplicates" class="level3">
-<h3 class="anchored" data-anchor-id="removing-duplicates">Removing Duplicates</h3>
+<section id="removing-duplicates" class="level3" data-number="2.7">
+<h3 data-number="2.7" class="anchored" data-anchor-id="removing-duplicates"><span class="header-section-number">2.7</span> Removing Duplicates</h3>
 <p>Typically, downstream analysis tools will ignore reads flagged as duplicates that are left in the BAM file, but in cases where duplicates reads must be removed, you can remove duplicates with the <code>-r</code>/<code>--remove-dups</code> option:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--remove-dups</span> <span class="at">-o</span> output.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dupsifter</span> <span class="at">--remove-dups</span> <span class="at">-o</span> output.bam hg38.fa input.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
-<section id="test-cases" class="level2">
-<h2 class="anchored" data-anchor-id="test-cases">Test Cases</h2>
-<p>BAM files aligned with <code>biscuit</code>, <code>bismark</code>, <code>bsbolt</code>, <code>bwa-meth</code>, and <code>gembs</code>, as well as the FASTQ files used to generate them, have been provided for practicing using <code>dupsifter</code> and can be found in the <code>example</code> directory of the <code>dupsifter</code> source code. Below is the results found in the output stats file for each run. All examples are created from hg38 without contigs. For test cases, any hg38 reference that conforms to the UCSC naming scheme (i.e., <code>chr1</code> not <code>1</code>) should work to recreate the results shown.</p>
+<section id="test-cases" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="test-cases"><span class="header-section-number">3</span> Test Cases</h2>
+<p>BAM files aligned with <code>biscuit</code>, <code>bismark</code>, <code>bsbolt</code>, <code>bwa-meth</code>, and <code>gemBS</code>, as well as the FASTQ files used to generate them, have been provided for practicing using <code>dupsifter</code> and can be found in the <code>example</code> directory of the <code>dupsifter</code> source code. Below are the results found in the output stats file for each run. All examples are created from hg38 without contigs. For testing purposes, any hg38 reference that conforms to the UCSC naming scheme (i.e., <code>chr1</code> not <code>1</code>) should work to recreate the results shown.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Test Case Data Creation
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>The following tool versions were used for the test cases:</p>
+<div class="grid">
+<div class="g-col-3">
+
+</div>
+<div class="g-col-6">
 <table class="table">
 <thead>
 <tr class="header">
@@ -370,7 +423,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td style="text-align: center;"><code>0.2.6</code></td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;"><code>gembs</code></td>
+<td style="text-align: center;"><code>gemBS</code></td>
 <td style="text-align: center;"><code>4.0.4</code></td>
 </tr>
 <tr class="even">
@@ -383,86 +436,136 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<section id="test-fastq-creation" class="level3">
-<h3 class="anchored" data-anchor-id="test-fastq-creation">Test FASTQ Creation</h3>
+</div>
+<div class="g-col-3">
+
+</div>
+</div>
 <p>FASTQ files were were generated with <a href="https://github.com/FelixKrueger/Sherman">Sherman</a>:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Sherman</span> <span class="dt">\</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">-l</span> 150 <span class="dt">\</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">-n</span> 900 <span class="dt">\</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">--CG_conversion</span> 70 <span class="dt">\</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">--CH_conversion</span> 1 <span class="dt">\</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">--genome_folder</span> hg38_noContig <span class="dt">\</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">--paired_end</span> <span class="dt">\</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">--bwa_ending</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Sherman</span> <span class="dt">\</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">-l</span> 150 <span class="dt">\</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">-n</span> 900 <span class="dt">\</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">--CG_conversion</span> 70 <span class="dt">\</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">--CH_conversion</span> 1 <span class="dt">\</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">--genome_folder</span> hg38_noContig <span class="dt">\</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">--paired_end</span> <span class="dt">\</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">--bwa_ending</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>100 duplicates were then randomly selected using Python (random seed set to 2023) and appended to the FASTQ files created by Sherman. This produced a FASTQ with a duplicate rate of 10% (100 read pairs out of 1000).</p>
+</div>
+</div>
+<section id="biscuit" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="biscuit"><span class="header-section-number">3.1</span> BISCUIT</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>$ dupsifter \</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>$     -o biscuit.unsorted.markdup.bam \</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>$     -O biscuit.dupsifter.stats \</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>$     hg38_noContig.fa \</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>$     biscuit.unsorted.bam</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>$</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>$ cat biscuit.dupsifter.stats</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>[dupsifter] processing mode: paired-end</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual reads processed: 2000</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads mapped: 1000</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the forward strand: 0</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the reverse strand: 0</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads marked as duplicates: 97</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the forward strand marked as duplicates: 0</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the reverse strand marked as duplicates: 0</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual primary-alignment reads: 2000</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual secondary- and supplementary-alignment reads: 0</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no reads mapped: 0</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no primary reads: 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To briefly highlight one of the pitfalls of marking duplicates, the reason there are not the expected 100 duplicates from the <code>biscuit</code> data (similarly in <code>bismark</code>, <code>bsbolt</code>, and <code>bwa-meth</code>) is due to the aligner choosing different mapping locations for reads with multiple, equally likely potential locations. An example is shown here:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>103_chr3:92733152-92733265  99  chr3  92815142  0  150M  =  92815106  114  (remainder not shown)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>103_chr3:92733152-92733265  147  chr3  92815106  0  150M  =  92815142  114  (remainder not shown)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>dup_103_chr3:92733152-92733265  99  chr3  93567084  0  150M  =  93567048  114  (remainder not shown)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>dup_103_chr3:92733152-92733265  147  chr3  93567048  0  150M  =  93567084  114  (remainder not shown)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
 </section>
-<section id="biscuit" class="level3">
-<h3 class="anchored" data-anchor-id="biscuit">BISCUIT</h3>
-<div class="sourceCode" id="cb13"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>$ dupsifter \</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>$     -o biscuit.unsorted.markdup.bam \</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>$     -O biscuit.dupsifter.stats \</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>$     hg38_noContig.fa \</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>$     biscuit.unsorted.bam</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>$</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>$ cat biscuit.dupsifter.stats</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>[dupsifter] processing mode: paired-end</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual reads processed: 2000</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads mapped: 1000</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the forward strand: 0</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the reverse strand: 0</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads marked as duplicates: 97</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the forward strand marked as duplicates: 0</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the reverse strand marked as duplicates: 0</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual primary-alignment reads: 2000</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual secondary- and supplementary-alignment reads: 0</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no reads mapped: 0</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no primary reads: 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>To briefly highlight one of the pitfalls of marking duplicates, the reason there are not the expected 100 duplicates from the <code>biscuit</code> data (similar in <code>bismark</code>, <code>bsbolt</code>, and <code>bwa-meth</code>) is due to the aligner choosing different mapping locations for reads with multiple, equally likely potential locations. An example is shown here:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>103_chr3:92733152-92733265  99  chr3  92815142  0  150M  =  92815106  114  (remainder not shown)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>103_chr3:92733152-92733265  147  chr3  92815106  0  150M  =  92815142  114  (remainder not shown)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>dup_103_chr3:92733152-92733265  99  chr3  93567084  0  150M  =  93567048  114  (remainder not shown)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>dup_103_chr3:92733152-92733265  147  chr3  93567048  0  150M  =  93567084  114  (remainder not shown)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="bismark" class="level3">
-<h3 class="anchored" data-anchor-id="bismark">Bismark</h3>
-<div class="sourceCode" id="cb15"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>$ dupsifter \</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>$     -o bismark.unsorted.markdup.bam \</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>$     -O bismark.dupsifter.stats \</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>$     hg38_noContig.fa \</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>$     bismark.unsorted.bam</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>$</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>$ cat bismark.dupsifter.stats</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>[dupsifter] processing mode: paired-end</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual reads processed: 1924</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads mapped: 962</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the forward strand: 0</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the reverse strand: 0</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads marked as duplicates: 96</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the forward strand marked as duplicates: 0</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the reverse strand marked as duplicates: 0</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual primary-alignment reads: 1924</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual secondary- and supplementary-alignment reads: 0</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no reads mapped: 0</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no primary reads: 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="bismark" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="bismark"><span class="header-section-number">3.2</span> Bismark</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>$ dupsifter \</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>$     -o bismark.unsorted.markdup.bam \</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>$     -O bismark.dupsifter.stats \</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>$     hg38_noContig.fa \</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>$     bismark.unsorted.bam</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>$</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>$ cat bismark.dupsifter.stats</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>[dupsifter] processing mode: paired-end</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual reads processed: 1924</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads mapped: 962</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the forward strand: 0</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the reverse strand: 0</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads marked as duplicates: 96</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the forward strand marked as duplicates: 0</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the reverse strand marked as duplicates: 0</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual primary-alignment reads: 1924</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual secondary- and supplementary-alignment reads: 0</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no reads mapped: 0</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no primary reads: 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>During alignment, <code>bismark</code> splits the FASTQ into chunks when aligning with more than one thread. The aligned reads are then merged into one output BAM; however, the read order is not necessarily the same as in the FASTQ. This provides an opportunity to highlight <code>dupsifter</code> choosing the first read found with a given signature as the “non-duplicate.” In <code>read1.fastq</code>, all reads that were selected as duplicates of the simulated reads had <code>dup_</code> prepended to the name and were placed at the end of the FASTQ. However, during alignment, some of the reads ended up before the original read in the BAM. Below is an example of the original read being marked as a duplicate.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>dup_80_chr16:52422066-52422154/1  99  chr16  52422066  42  150M  =  52422005  211  (remainder not shown)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>dup_80_chr16:52422066-52422154/1  147  chr16  52422005  42  150M  =  52422066  -211  (remainder not shown)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>80_chr16:52422066-52422154/1  1123  chr16  52422066  42  150M  =  52422005  211  (remainder not shown)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>80_chr16:52422066-52422154/1  1171  chr16  52422005  42  150M  =  52422066  -211  (remainder not shown)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Note, while in this simulated example, there is a known order to the reads, in real experiments the original template strand that PCR duplicates were created from cannot be distinguished, so choosing the first appearance of a given signature is a reasonable choice to make for the “non-duplicate.”</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>dup_80_chr16:52422066-52422154/1  99  chr16  52422066  42  150M  =  52422005  211  (remainder not shown)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dup_80_chr16:52422066-52422154/1  147  chr16  52422005  42  150M  =  52422066  -211  (remainder not shown)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>80_chr16:52422066-52422154/1  1123  chr16  52422066  42  150M  =  52422005  211  (remainder not shown)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>80_chr16:52422066-52422154/1  1171  chr16  52422005  42  150M  =  52422066  -211  (remainder not shown)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>While there is a known order to the reads in this simulated example, the original template strand that PCR duplicates were created from in a real experiment cannot be distinguished. Therefore, choosing the first appearance of a given signature is a reasonable choice for the “non-duplicate.”</p>
+</div>
+</div>
 </section>
-<section id="bsbolt" class="level3">
-<h3 class="anchored" data-anchor-id="bsbolt">BSBolt</h3>
+<section id="bsbolt" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="bsbolt"><span class="header-section-number">3.3</span> BSBolt</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>$ dupsifter \</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>$     -o bsbolt.unsorted.markdup.bam \</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>$     -O bsbolt.dupsifter.stats \</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>$     hg38_noContig.fa \</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>$     bsbolt.unsorted.bam</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>$</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>$ cat bsbolt.dupsifter.stats</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>[dupsifter] processing mode: paired-end</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual reads processed: 2000</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads mapped: 977</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the forward strand: 0</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the reverse strand: 0</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads marked as duplicates: 97</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the forward strand marked as duplicates: 0</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the reverse strand marked as duplicates: 0</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual primary-alignment reads: 2000</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual secondary- and supplementary-alignment reads: 0</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no reads mapped: 23</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no primary reads: 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="bwa-meth" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="bwa-meth"><span class="header-section-number">3.4</span> bwa-meth</h3>
 <div class="sourceCode" id="cb17"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>$ dupsifter \</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>$     -o bsbolt.unsorted.markdup.bam \</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>$     -O bsbolt.dupsifter.stats \</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>$     -o bwameth.unsorted.markdup.bam \</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>$     -O bwameth.dupsifter.stats \</span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>$     hg38_noContig.fa \</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>$     bsbolt.unsorted.bam</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>$     bwameth.unsorted.bam</span>
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>$</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>$ cat bsbolt.dupsifter.stats</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>$ cat bwameth.dupsifter.stats</span>
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>[dupsifter] processing mode: paired-end</span>
 <span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual reads processed: 2000</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads mapped: 977</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads mapped: 1000</span>
 <span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the forward strand: 0</span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the reverse strand: 0</span>
 <span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads marked as duplicates: 97</span>
@@ -470,54 +573,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the reverse strand marked as duplicates: 0</span>
 <span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual primary-alignment reads: 2000</span>
 <span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual secondary- and supplementary-alignment reads: 0</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no reads mapped: 23</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no reads mapped: 0</span>
 <span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no primary reads: 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="bwa-meth" class="level3">
-<h3 class="anchored" data-anchor-id="bwa-meth">bwa-meth</h3>
-<div class="sourceCode" id="cb18"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>$ dupsifter \</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>$     -o bwameth.unsorted.markdup.bam \</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>$     -O bwameth.dupsifter.stats \</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>$     hg38_noContig.fa \</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>$     bwameth.unsorted.bam</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>$</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>$ cat bwameth.dupsifter.stats</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>[dupsifter] processing mode: paired-end</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual reads processed: 2000</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads mapped: 1000</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the forward strand: 0</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the reverse strand: 0</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads marked as duplicates: 97</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the forward strand marked as duplicates: 0</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the reverse strand marked as duplicates: 0</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual primary-alignment reads: 2000</span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual secondary- and supplementary-alignment reads: 0</span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no reads mapped: 0</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no primary reads: 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="gembs" class="level3">
-<h3 class="anchored" data-anchor-id="gembs">gemBS</h3>
-<div class="sourceCode" id="cb19"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>$ samtools sort -n -o gembs.name_sorted.bam gembs.position_sorted.bam</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>$</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>$ dupsifter \</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>$     -o gembs.name_sorted.markdup.bam \</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>$     -O gembs.dupsifter.stats \</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>$     hg38_noContig.fa \</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>$     gembs.name_sorted.bam</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>$</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>$ cat gembs.dupsifter.stats</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>[dupsifter] processing mode: paired-end</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual reads processed: 2000</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads mapped: 1000</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the forward strand: 0</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the reverse strand: 0</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads marked as duplicates: 100</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the forward strand marked as duplicates: 0</span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the reverse strand marked as duplicates: 0</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual primary-alignment reads: 2000</span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual secondary- and supplementary-alignment reads: 0</span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no reads mapped: 0</span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no primary reads: 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="gembs" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="gembs"><span class="header-section-number">3.5</span> gemBS</h3>
+<div class="sourceCode" id="cb18"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>$ samtools sort -n -o gembs.name_sorted.bam gembs.position_sorted.bam</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>$</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>$ dupsifter \</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>$     -o gembs.name_sorted.markdup.bam \</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>$     -O gembs.dupsifter.stats \</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>$     hg38_noContig.fa \</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>$     gembs.name_sorted.bam</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>$</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>$ cat gembs.dupsifter.stats</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>[dupsifter] processing mode: paired-end</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual reads processed: 2000</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads mapped: 1000</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the forward strand: 0</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with only one read mapped to the reverse strand: 0</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with both reads marked as duplicates: 100</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the forward strand marked as duplicates: 0</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads on the reverse strand marked as duplicates: 0</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual primary-alignment reads: 2000</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of individual secondary- and supplementary-alignment reads: 0</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no reads mapped: 0</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>[dupsifter] number of reads with no primary reads: 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>

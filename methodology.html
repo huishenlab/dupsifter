@@ -154,6 +154,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./troubleshooting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troubleshooting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./releases.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Releases</span></a>
   </div>
@@ -168,16 +174,15 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#input-output" id="toc-input-output" class="nav-link active" data-scroll-target="#input-output">Input / Output</a></li>
-  <li><a href="#run-statistics" id="toc-run-statistics" class="nav-link" data-scroll-target="#run-statistics">Run Statistics</a></li>
-  <li><a href="#pcr-duplicate-marking-philosophy" id="toc-pcr-duplicate-marking-philosophy" class="nav-link" data-scroll-target="#pcr-duplicate-marking-philosophy">PCR Duplicate Marking Philosophy</a>
+  <li><a href="#differences-between-wgs-and-wgbs-duplicate-marking" id="toc-differences-between-wgs-and-wgbs-duplicate-marking" class="nav-link active" data-scroll-target="#differences-between-wgs-and-wgbs-duplicate-marking"><span class="header-section-number">1</span> Differences between WGS and WGBS Duplicate Marking</a></li>
+  <li><a href="#duplicate-definition" id="toc-duplicate-definition" class="nav-link" data-scroll-target="#duplicate-definition"><span class="header-section-number">2</span> Duplicate Definition</a>
   <ul class="collapse">
-  <li><a href="#descriptions" id="toc-descriptions" class="nav-link" data-scroll-target="#descriptions">Descriptions</a></li>
-  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  <li><a href="#descriptions" id="toc-descriptions" class="nav-link" data-scroll-target="#descriptions"><span class="header-section-number">2.1</span> Descriptions</a></li>
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes"><span class="header-section-number">2.2</span> Notes</a></li>
   </ul></li>
-  <li><a href="#reference-padding-and-binning" id="toc-reference-padding-and-binning" class="nav-link" data-scroll-target="#reference-padding-and-binning">Reference Padding and Binning</a></li>
-  <li><a href="#cell-barcodes" id="toc-cell-barcodes" class="nav-link" data-scroll-target="#cell-barcodes">Cell Barcodes</a></li>
-  <li><a href="#bisulfite-strand-determination" id="toc-bisulfite-strand-determination" class="nav-link" data-scroll-target="#bisulfite-strand-determination">Bisulfite Strand Determination</a></li>
+  <li><a href="#sec-binning" id="toc-sec-binning" class="nav-link" data-scroll-target="#sec-binning"><span class="header-section-number">3</span> Reference Padding and Binning</a></li>
+  <li><a href="#bisulfite-strand-determination" id="toc-bisulfite-strand-determination" class="nav-link" data-scroll-target="#bisulfite-strand-determination"><span class="header-section-number">4</span> Bisulfite Strand Determination</a></li>
+  <li><a href="#sec-barcodes" id="toc-sec-barcodes" class="nav-link" data-scroll-target="#sec-barcodes"><span class="header-section-number">5</span> Cell Barcodes</a></li>
   </ul>
 </nav>
     </div>
@@ -203,17 +208,30 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="input-output" class="level2">
-<h2 class="anchored" data-anchor-id="input-output">Input / Output</h2>
-<p><code>dupsifter</code> is able to accept input from <code>stdin</code> or from an input SAM/BAM file. Output can be directed either to <code>stdout</code> or to an output SAM/BAM. Input and output options can be mixed as needed (i.e., input BAM to streamed output). Note, the input to <code>dupsifter</code> is expected to be read-name grouped (i.e., reads with same name next to one another in the BAM).</p>
+<section id="differences-between-wgs-and-wgbs-duplicate-marking" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="differences-between-wgs-and-wgbs-duplicate-marking"><span class="header-section-number">1</span> Differences between WGS and WGBS Duplicate Marking</h2>
+<p>Duplicate reads primarily come from two sources: polymerase chain reaction (PCR) and optical duplicates. Optical duplicates arise from the sequencer splitting a single cluster into two or more clusters (see the description in the <a href="https://doi.org/10.1093/bioinformatics/btad729">paper</a> for where these clusters come from). While <code>dupsifter</code> is able to handle optical duplicates, they affect WGS and WGBS datasets in the same way. Therefore, this section will focus on PCR duplicates and the differences in duplicate marking reads from these two technologies.</p>
+<p>PCR amplification is frequently used in WGS and WGBS to increase the amount of input DNA, which increases the chance of a DNA fragment being sequenced, but incurs a cost of some fragments being sequencing more than once. PCR duplicates are the result of multiple copies of the same fragment being sequenced. For WGS experiments, PCR proceeds as shown in Panel A of <a href="#fig-wgs-wgbs-diffs" class="quarto-xref">Figure&nbsp;1</a>. On the other hand, WGBS experiments include an additional step before PCR amplification is run. After the DNA is denatured, sodium bisulfite is added to the solution, converting unmethylated cytosines into uracils, which results in four distinct strands of DNA (see Panel B of <a href="#fig-wgs-wgbs-diffs" class="quarto-xref">Figure&nbsp;1</a>). These four strands are: one strand deriving from the original top (OT), one deriving from the original bottom (OB), and the two complements of these strands (CTOT and CTOB, respectively). This additional step means there are two distinct copies of DNA for a given DNA fragment in WGBS versus only one in WGS. Therefore, for WGBS experiments, we must distinguish between reads coming from the OT and OB strands at the same location and true PCR duplicates.</p>
+<p><code>dupsifter</code> handles these differences by also factoring in the bisulfite strand (OT/CTOT or OB/CTOB) when determining if a read is a duplicate. In the case where the user is running in WGS mode, <code>dupsifter</code> treates all reads as coming from the same original strand.</p>
+<div id="fig-wgs-wgbs-diffs" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-wgs-wgbs-diffs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="wgs_wgbs_diffs.png" class="img-fluid figure-img" width="750"></p>
+<figcaption>Part of Figure 1 from the <code>dupsifter</code> <a href="https://doi.org/10.1093/bioinformatics/btad729">paper</a>.</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-wgs-wgbs-diffs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
 </section>
-<section id="run-statistics" class="level2">
-<h2 class="anchored" data-anchor-id="run-statistics">Run Statistics</h2>
-<p>Each run of <code>dupsifter</code> calculates statistics related to the number of duplicates and the types of reads processed. By default, the output file is named <code>dupsifter.stat</code> if the output is streamed of <code>basename.dupsifter.stat</code> if the output file is defined (<code>-o basename.bam</code>). The statistics file name can also be defined with the <code>-O</code> option (i.e., <code>dupsifter -O output.dupsifter.stat ref.fa input.bam</code>). If using the <code>-O</code> option, the file should end with <code>.dupsifter.stat</code>. If both <code>-o</code> and <code>-O</code> are provided, then the <code>-O</code> file name will be used.</p>
-</section>
-<section id="pcr-duplicate-marking-philosophy" class="level2">
-<h2 class="anchored" data-anchor-id="pcr-duplicate-marking-philosophy">PCR Duplicate Marking Philosophy</h2>
-<p>At its most basic, PCR duplicates are those that match in all of the following categories (descriptions below):</p>
+<section id="duplicate-definition" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="duplicate-definition"><span class="header-section-number">2</span> Duplicate Definition</h2>
+<p>At its most basic, duplicates are those that match in all of the following categories (descriptions below):</p>
 <ol type="1">
 <li>Read 1 Bin Number</li>
 <li>Read 1 Bin Position</li>
@@ -224,45 +242,31 @@ ul.task-list li input[type="checkbox"] {
 <li>Single-end?</li>
 <li>Cell barcode</li>
 </ol>
-<section id="descriptions" class="level3">
-<h3 class="anchored" data-anchor-id="descriptions">Descriptions</h3>
+<section id="descriptions" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="descriptions"><span class="header-section-number">2.1</span> Descriptions</h3>
 <ul>
-<li><em>Read 1/2 Bin Number:</em> Bin number determination described in the next section.</li>
-<li><em>Read 1/2 Bin Position:</em> Position in bin described in the next section.</li>
-<li><em>Read 1 Leftmost in Pair?:</em> If paired-end, is read 1 the leftmost read? If single-end, then this is always false (0).</li>
-<li><em>Orientation:</em> How reads are oriented, which can be one of four possibilities: (read1-read2) forward-forward, reverse- reverse, forward-reverse, reverse-forward. For reference, forward-reverse is generally considered a “proper pair.”</li>
-<li><em>Single-end?:</em> Is the read a single-end read?</li>
-<li><em>Cell barcode:</em> Cell barcode for read. More details given below.</li>
+<li><strong>Read 1/2 Bin Number:</strong> Bin number determination described in <a href="#sec-binning" class="quarto-xref">Section&nbsp;3</a>.</li>
+<li><strong>Read 1/2 Bin Position:</strong> Position in bin described in <a href="#sec-binning" class="quarto-xref">Section&nbsp;3</a>.</li>
+<li><strong>Read 1 Leftmost in Pair?:</strong> If paired-end, is read 1 the leftmost read? If single-end, then this is always false (0).</li>
+<li><strong>Orientation:</strong> How reads are oriented, which can be one of four possibilities (given as read1-read2): forward-forward, reverse- reverse, forward-reverse, reverse-forward. For reference, forward-reverse is generally considered a “proper pair.”</li>
+<li><strong>Single-end?:</strong> Is the read a single-end read?</li>
+<li><strong>Cell barcode:</strong> Cell barcode for read. More details given in <a href="#sec-barcodes" class="quarto-xref">Section&nbsp;5</a>.</li>
 </ul>
 </section>
-<section id="notes" class="level3">
-<h3 class="anchored" data-anchor-id="notes">Notes</h3>
-<p>PCR duplicates are found for single-end and paired-end reads using the same set of categories, with a few minor notes. First, single-end reads and paired-end reads with one unmapped read in the pair are always considered to be “read 1” (read 2 is set to default values). The orientation can then be used to distinguish between reads on the forward and reverse strands. Second, the bin number and position are calculated individually for reads 1 and 2 in paired-end mode, which allows split and discordant reads to be properly marked as duplicates.</p>
-<p>With respect to which read (or read pair) is chosen as the “non-duplicate,” <code>dupsifter</code> follows the likes of <code>samblaster</code> and <code>deduplicate_bismark</code>. Rather than choosing the read with the highest quality (usually using the base qualities to determine quality), <code>dupsifter</code> sets the first read found in a set of duplicates as the non-duplicate. The authors of <code>samblaster</code> showed that choosing the first read, instead of the highest quality read, has <a href="https://github.com/GregoryFaust/samblaster/blob/master/SAMBLASTER_Supplemental.pdf">little impact</a> on the quality of reads going into downstream analyses. Further, it requires only one pass through the data, instead of two passes, which is required for methods that select the highest quality read.</p>
+<section id="notes" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="notes"><span class="header-section-number">2.2</span> Notes</h3>
+<p>Duplicates are found for single-end and paired-end reads using the same set of categories, with a few minor notes. First, single-end reads and paired-end reads with one unmapped read in the pair are always considered to be “read 1” (read 2 is set to default values). The orientation can then be used to distinguish between reads on the forward and reverse strands. Second, the bin number and position are calculated individually for reads 1 and 2 in paired-end mode, which allows split and discordant reads to be properly marked as duplicates.</p>
+<p>With respect to which read (or read pair) is chosen as the “non-duplicate,” <code>dupsifter</code> follows the likes of <code>samblaster</code> and <code>deduplicate_bismark</code>. Rather than choosing the read with the highest quality (which usually entails using the base qualities to determine “quality”), <code>dupsifter</code> sets the first read found in a set of duplicates as the non-duplicate. The authors of <code>samblaster</code> showed that choosing the first read, instead of the highest quality read, has <a href="https://github.com/GregoryFaust/samblaster/blob/master/SAMBLASTER_Supplemental.pdf">little impact</a> on the quality of reads going into downstream analyses. Further, it requires only one pass through the data, instead of two passes, which is required for methods that select the highest quality read.</p>
+<p>Astute observers may have noticed there is no reference to bisulfite strand in the duplicate definition. This is a byproduct of the technical implementation of <code>dupsifter</code> and is due to the bisulfite strand being handled separately from the explicit definition of a duplicate.</p>
 </section>
 </section>
-<section id="reference-padding-and-binning" class="level2">
-<h2 class="anchored" data-anchor-id="reference-padding-and-binning">Reference Padding and Binning</h2>
-<p>Padding the length of chromosomes and other contigs occurs due to the possibility of soft clipped reads. <code>dupsifter</code> uses the unclipped read length in order to determine duplicates, which requires adding or subtracting the number of clipped bases from the end or start position, respectively. In the extreme case where this occurs at the start or end of the chromosome/contig, the position can occur outside of the defined chromosome bounds. Therefore, the maximum read length (set by the <code>-l/--max-read-length</code>) is added to each end of the chromosome/contig to account for this possibility. In the instance a read is longer than the maximum read length, the code will produce an error requesting the user to rerun with a longer maximum read length set.</p>
-<p>Generally, duplicate marking tools bin the genome based on the number of contigs (1 contig = 1 bin). For genomes with a small number of contigs, this isn’t a problem. However, for genomes with a large number of contigs (e.g., plant genomes), this becomes impractical. <code>dupsifter</code>, on the other hand, takes a different approach (based on the solution proposed in <a href="https://github.com/GregoryFaust/samblaster/issues/21">this issue</a> raised on <code>samblaster</code>’s GitHub page). In this method, the entire genome is combined into one supercontig, which is then divided into equal sized bins. By combining the contigs in the order listed in the SAM header, an offset from the start of the first contig can be calculated for each additional contig. This offset includes padding at the start and end of each previous contig (described above), plus the padding at the start of the current contig. By adding the position on the contig (using the read’s CIGAR string) to the offset, the specific bin the read falls into can be determined, as well as the position within the bin itself. By way of example, the human genome from GENCODE contains over 600 contigs (both primary chromosomes and additional contigs). Rather than having 600+ bins, there are approximately 25 bins using the described method.</p>
+<section id="sec-binning" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="sec-binning"><span class="header-section-number">3</span> Reference Padding and Binning</h2>
+<p>Padding the length of chromosomes and other contigs is needed due to the possibility of soft clipped reads. <code>dupsifter</code> uses the unclipped read length in order to determine duplicates, which requires subtracting or adding the number of clipped bases from the start or end position, respectively. In the extreme case where a heavily clipped read is located at the start or end of a chromosome/contig, the adjusted position can occur outside of the defined chromosome bounds. Therefore, the maximum read length (set by the <code>-l/--max-read-length</code>) is added to each end of the chromosome/contig to account for this possibility. In the instance where a read is longer than the maximum read length, the code will produce an error requesting the user to rerun with a longer maximum read length set.</p>
+<p>Generally, duplicate marking tools bin the genome based on the number of contigs (1 contig = 1 bin). For genomes with a small number of contigs, this isn’t a problem. However, for genomes with a large number of contigs (e.g., plant genomes), this becomes impractical. <code>dupsifter</code>, on the other hand, takes a different approach (based on the solution proposed in <a href="https://github.com/GregoryFaust/samblaster/issues/21">this issue</a> raised on <code>samblaster</code>’s GitHub page). In this method, the entire genome is combined into one “supercontig”, which is then divided into bins of roughly equal size. By way of example, the human genome from GENCODE contains over 600 contigs (both primary chromosomes and additional contigs). Rather than having 600+ bins, there are approximately 25 bins using this method. With respect to the read position, by combining the contigs in the order listed in the SAM header, an offset from the start of the first contig can be calculated for each additional contig. This offset includes padding at the start and end of each previous contig (described above), plus the padding at the start of the current contig. By adding the position on the contig (using the read’s CIGAR string) to the offset, the specific bin the read falls into can be determined, as well as the position within the bin itself.</p>
 </section>
-<section id="cell-barcodes" class="level2">
-<h2 class="anchored" data-anchor-id="cell-barcodes">Cell Barcodes</h2>
-<p>Cell barcodes are commonly used in single-cell sequencing in order to multiplex many cells into a pool, primarily to increase throughput and to overcome sequencer input requirements. It also allows for streamlined processing, as many cells can be processed at once. These barcodes must be included when defining reads that are duplicates as two fragments may be from the same location in the genome, but be from two different cells. By default, <code>dupsifter</code> does not look for barcodes; however, an option is available (<code>-B/--has-barcode</code>) when duplicate marking data with barcodes. <code>dupsifter</code> handles barcodes in the following way:</p>
-<ol type="1">
-<li>Looks for the <code>CB</code> SAM tag.</li>
-<li>If not found, looks for the <code>CR</code> SAM tag:</li>
-<li>If neither are found, parse the read name. The barcode must be the last element in the name, where the elements are separated by <code>:</code>.</li>
-<li>If a barcode can’t be found in any of these locations, a warning is printed and a default value is used (thereby negating any benefits of using barcodes).</li>
-</ol>
-<p>In all three cases, up to 16 bases are packed into a single integer for defing the barcode. If your barcode is longer than 16 bases, it will be truncated to a length of 16. Additionally, separators (only <code>+</code> and <code>-</code> are allowed) are treated as <code>N</code>’s and count towards the maximum length of 16.</p>
-<!-- Room for improvement: -->
-<!--   - Allow barcodes longer than 16 base pairs. -->
-<!--   - Handle barcodes with dual indexes. -->
-<!--   - Include UMI capabilities. -->
-</section>
-<section id="bisulfite-strand-determination" class="level2">
-<h2 class="anchored" data-anchor-id="bisulfite-strand-determination">Bisulfite Strand Determination</h2>
+<section id="bisulfite-strand-determination" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="bisulfite-strand-determination"><span class="header-section-number">4</span> Bisulfite Strand Determination</h2>
 <p>The bisulfite strand for a read (both single-end and paired-end reads) is determined with the following priority:</p>
 <ol type="1">
 <li>bwa-meth flag (<code>YD</code>)</li>
@@ -273,11 +277,25 @@ ul.task-list li input[type="checkbox"] {
 <p>For paired-end reads, the bisulfite strand is individually determined for both read 1 (<code>bss1</code>) and read 2 (<code>bss2</code>), then any differences between the two are resolved.</p>
 <ol type="1">
 <li>If <code>bss1 == bss2</code>, then <code>bss1</code> is used.</li>
-<li>If only <code>bss1</code> is found, then <code>bss1</code> is used.</li>
-<li>If only <code>bss2</code> is found, then <code>bss2</code> is used.</li>
-<li>If neither <code>bss1</code> or <code>bss2</code> are found, the assume OT/CTOT.</li>
+<li>If only <code>bss1</code> (or <code>bss2</code>) is found, then <code>bss1</code> (or <code>bss2</code>) is used.</li>
+<li>If neither <code>bss1</code> or <code>bss2</code> are found, then assume OT/CTOT.</li>
 <li>If both <code>bss1</code> and <code>bss2</code> are found, but <code>bss1 != bss2</code>, then the sum of the base qualities is used to determine which to use. If <code>sum(read 1 base qualities) &gt; sum(read 2 base qualities)</code>, then <code>bss1</code> is used, else <code>bss2</code> is used.</li>
 </ol>
+</section>
+<section id="sec-barcodes" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="sec-barcodes"><span class="header-section-number">5</span> Cell Barcodes</h2>
+<p>Cell barcodes are commonly used in single-cell sequencing in order to multiplex many cells into a pool, primarily to increase throughput and to overcome sequencer input requirements. It also allows for streamlined processing, as many cells can be processed at once. These barcodes must be included when defining reads that are duplicates as two fragments may be from the same location in the genome, but come from two different cells. By default, <code>dupsifter</code> does not look for barcodes; however, an option is available (<code>-B/--has-barcode</code>) when duplicate marking data with barcodes. <code>dupsifter</code> handles barcodes in the following way:</p>
+<ol type="1">
+<li>Looks for the <code>CB</code> SAM tag.</li>
+<li>If not found, looks for the <code>CR</code> SAM tag.</li>
+<li>If neither are found, parse the read name. The barcode must be the last element in the name, where the elements are separated by <code>:</code>.</li>
+<li>If a barcode can’t be found in any of these locations, a warning is printed and a default value is used (thereby negating any benefits of using barcodes).</li>
+</ol>
+<p>In all three cases, up to 16 bases are packed into a single integer for defing the barcode. If your barcode is longer than 16 bases, it will be truncated to a length of 16. Additionally, separators (only <code>+</code> and <code>-</code> are allowed) are treated as <code>N</code>’s and count towards the maximum length of 16.</p>
+<!-- Room for improvement: -->
+<!--   - Allow barcodes longer than 16 base pairs. -->
+<!--   - Handle barcodes with dual indexes. -->
+<!--   - Include UMI capabilities. -->
 
 
 </section>
