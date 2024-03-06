@@ -2,28 +2,6 @@
 title: Duplicate Marking Methodology
 ---
 
-## Input / Output
-
-`dupsifter` is able to accept input from `stdin` or from an input SAM/BAM file. Output can be directed either to
-`stdout` or to an output SAM/BAM. Input and output options can be mixed as needed (i.e., input BAM to streamed output).
-
-:::{.callout-note}
-The input to `dupsifter` is expected to be read-name grouped (i.e., reads with same name next to one another in
-the BAM). If you supply a position sorted BAM, it will produce an error message along the lines of:
-```default
-[dupsifter] ERROR: Can't find read 1 and/or read 2 in 1 reads with read ID: <name of read>.
-Are these reads coordinate sorted?
-```
-:::
-
-## Run Statistics
-
-Each run of `dupsifter` calculates statistics related to the number of duplicates and the types of reads processed. By
-default, the output file is named `dupsifter.stat` if the output is streamed or `basename.dupsifter.stat` if the output
-file is defined (`-o basename.bam`). The statistics file name can also be defined with the `-O` option (i.e.,
-`dupsifter -O output.dupsifter.stat ref.fa input.bam`). If using the `-O` option, the file should end with
-`.dupsifter.stat`. If both `-o` and `-O` are provided, then the `-O` file name will be used.
-
 ## Duplicate Marking Philosophy
 
 At its most basic, duplicates are those that match in all of the following categories (descriptions below):
