@@ -912,6 +912,11 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
             return;
         }
 
+        // Extract packed barcode for single-end reads
+        if (conf->single_end && conf->has_barcode) {
+            packed_barcode = get_packed_barcode(r1, conf);
+        }
+        
         is_single = 1;
     } else {
         // Add MC and MQ tags if desired
