@@ -777,7 +777,7 @@ uint64_t get_packed_barcode(bam1_t *read1, ds_conf_t *conf) {
         uint8_t *full = s+1;
         s++;
         while (*s) {
-            if (*s != 'A' && *s != 'C' && *s != 'G' && *s != 'T' && *s != '+' && *s != '-') {
+            if (*s != 'N' && *s != 'A' && *s != 'C' && *s != 'G' && *s != 'T' && *s != '+' && *s != '-') {
                 fprintf(stderr, "[dupsifter] WARNING: Unable to parse barcode from CB tag ('barcode': %s). Using default barcode.\n", full);
 
                 return 0;
@@ -804,7 +804,7 @@ uint64_t get_packed_barcode(bam1_t *read1, ds_conf_t *conf) {
         uint8_t *full = s+1;
         s++;
         while (*s) {
-            if (*s != 'A' && *s != 'C' && *s != 'G' && *s != 'T' && *s != '+' && *s != '-') {
+            if (*s != 'N' && *s != 'A' && *s != 'C' && *s != 'G' && *s != 'T' && *s != '+' && *s != '-') {
                 fprintf(stderr, "[dupsifter] WARNING: Unable to parse barcode from CB tag ('barcode': %s). Using default barcode.\n", full);
 
                 return 0;
@@ -834,7 +834,7 @@ uint64_t get_packed_barcode(bam1_t *read1, ds_conf_t *conf) {
     if (last) {
         last++;
         while (*last) {
-            if (*last != 'A' && *last != 'C' && *last != 'G' && *last != 'T' && *last != '+' && *last != '-') {
+            if (*last != 'N' && *last != 'A' && *last != 'C' && *last != 'G' && *last != 'T' && *last != '+' && *last != '-') {
                 fprintf(stderr, "[dupsifter] WARNING: Unable to parse barcode from read name ('barcode': %s). Using default barcode.\n", full);
 
                 return 0;
