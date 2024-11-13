@@ -7,7 +7,7 @@ title: "Dupsifter Documentation"
 
 ## Publication
 
-If you use dupsifter, kindly [cite](https://doi.org/10.1093/bioinformatics/btad729):
+If you use `dupsifter`, kindly [cite](https://doi.org/10.1093/bioinformatics/btad729):
 
 ```default
 Jacob Morrison, Wanding Zhou, Benjamin K Johnson, Hui Shen,
