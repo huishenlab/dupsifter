@@ -1187,8 +1187,8 @@ static int usage() {
     fprintf(stderr, "    tries to parse the read name. If the barcode is in the read name, it must be the last element\n");
     fprintf(stderr, "    and be separated by a ':' (i.e., @12345:678:9101112:1234_1:N:0:ACGTACGT). Any separators\n");
     fprintf(stderr, "    found in the barcode (e.g., '+' or '-') are treated as 'N's and the additional parts of the\n");
-    fprintf(stderr, "    barcode are included up to a maximum length of 16 bases/characters. Barcodes are taken from\n");
-    fprintf(stderr, "    read 1 in paired-end sequencing only.\n");
+    fprintf(stderr, "    barcode are included up to a maximum length of 16 bases/characters. Barcodes can be read from\n");
+    fprintf(stderr, "    single-end or paired-end (pulled from read 1 only) sequencing.\n");
     fprintf(stderr, "\n");
 
     ds_conf_destroy(&conf);
