@@ -34,7 +34,7 @@ collating your SAM/BAM with `samtools sort -n` or `samtools collate` and then pr
 
 ### "No reads found in ..."
 
-The input file has no reads. This may be either from a completely file or a SAM/BAM file that has a header, but no
+The input file has no reads. This may be either from a completely empty file or a SAM/BAM file that has a header, but no
 reads. Double check the contents of your input.
 
 ### "Read information is missing"
