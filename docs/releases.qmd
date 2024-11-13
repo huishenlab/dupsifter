@@ -5,8 +5,12 @@ title: Releases
 `dupsifter` releases can be found on the [Releases page of GitHub](https://github.com/huishenlab/dupsifter/releases).
 For details regarding each release, see the "Find it on GitHub" link below each release.
 
-### Version 1.2.1
+### Version 1.3.0
 - *Latest release*
+- Released: 13 November 2024
+- [Find it on GitHub](https://github.com/huishenlab/dupsifter/releases/tag/v1.3.0.20241113)
+
+### Version 1.2.1
 - Released: 19 January 2024
 - [Find it on GitHub](https://github.com/huishenlab/dupsifter/releases/tag/v1.2.1.20240119)
 
