@@ -52,13 +52,13 @@ dupsifter hg38.fa bsbolt.unsorted.bam | \
 samtools sort -@ 2 -o bsbolt.sorted.markdup.bam -
 ```
 
-`dupsifter` expects it's input to be read-name grouped (i.e., reads with the same name next to one another in the BAM),
+`dupsifter` expects its input to be read-name grouped (i.e., reads with the same name next to one another in the BAM),
 which is how reads are output from `biscuit`, `bismark`, `bsbolt`, and `bwa-meth`. `gemBS`, on the other hand, performs
 position sorting during its alignment. Therefore, if you want to use `dupsifter` with BAMs from `gemBS`, you will have
 to group the reads by name with either `samtools sort` or `samtools collate`. An example with `samtools sort` is:
 ```bash
 # Alignment with gemBS
-# gembs.hg38.conf and gembs.sample.conf are configuration files that are specified ahead of time
+# gembs.hg38.conf and gembs.sample.conf are config files that are specified ahead of time
 # The output BAM from gemBS in this example is gembs.position_sorted.bam
 gemBS prepare -c gembs.hg38.conf -t gembs.sample.conf
 gemBS map
@@ -147,7 +147,7 @@ dupsifter --remove-dups -o output.bam hg38.fa input.bam
 ## Test Cases
 
 BAM files aligned with `biscuit`, `bismark`, `bsbolt`, `bwa-meth`, and `gemBS`, as well as the FASTQ files used to
-generate them, have been provided for practicing using `dupsifter` and can be found in the `example` directory of the
+generate them, have been provided for practice using `dupsifter` and can be found in the `example` directory of the
 `dupsifter` source code. Below are the results found in the output stats file for each run. All examples are created
 from hg38 without contigs. For testing purposes, any hg38 reference that conforms to the UCSC naming scheme (i.e.,
 `chr1` not `1`) should work to recreate the results shown.
@@ -181,6 +181,8 @@ The following tool versions were used for the test cases:
 :::
 
 :::
+
+`dupsifter` is now on version `1.3.0`. Changes from `1.2.1` to `1.3.0` will not affect the tests shown here.
 
 FASTQ files were were generated with [Sherman](https://github.com/FelixKrueger/Sherman):
 ```bash
