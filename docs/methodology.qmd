@@ -4,11 +4,11 @@ title: Duplicate Marking Methodology
 
 ## Differences between WGS and WGBS Duplicate Marking
 
-Duplicate reads primarily come from two sources: polymerase chain reaction (PCR) and optical duplicates. Optical
-duplicates arise from the sequencer splitting a single cluster into two or more clusters (see the description in the
-[paper](https://doi.org/10.1093/bioinformatics/btad729) for where these clusters come from). While `dupsifter` is able
-to handle optical duplicates, they affect WGS and WGBS datasets in the same way. Therefore, this section will focus on
-PCR duplicates and the differences in duplicate marking reads from these two technologies.
+Duplicate reads primarily come from two sources: polymerase chain reaction (PCR) amplification and optical duplicates.
+Optical duplicates arise from the sequencer splitting a single cluster into two or more clusters (see the description in
+the [paper](https://doi.org/10.1093/bioinformatics/btad729) for where these clusters come from). While `dupsifter` is
+able to handle optical duplicates, they affect WGS and WGBS datasets in the same way. Therefore, this section will focus
+on PCR duplicates and the differences in duplicate marking reads from these two technologies.
 
 PCR amplification is frequently used in WGS and WGBS to increase the amount of input DNA, which increases the chance of
 a DNA fragment being sequenced, but incurs a cost of some fragments being sequencing more than once. PCR duplicates are
@@ -21,7 +21,7 @@ these strands (CTOT and CTOB, respectively). This additional step means there ar
 DNA fragment in WGBS versus only one in WGS. Therefore, for WGBS experiments, we must distinguish between reads coming
 from the OT and OB strands at the same location and true PCR duplicates.
 
-`dupsifter` handles these differences by also factoring in the bisulfite strand (OT/CTOT or OB/CTOB) when determining if
+`dupsifter` handles these differences by factoring in the bisulfite strand (OT/CTOT or OB/CTOB) when determining if
 a read is a duplicate. In the case where the user is running in WGS mode, `dupsifter` treates all reads as coming from
 the same original strand.
 
