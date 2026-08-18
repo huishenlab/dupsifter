@@ -73,7 +73,7 @@ typedef struct {
     char     *reffn;               /* reference file name */
     char     *infn;                /* name of input file */
     char     *outfn;               /* name of output file */
-    char     *statfn;               /* name of statistics file */
+    char     *statfn;              /* name of statistics file */
     char      out_mode[6];         /* write mode of output file */
     char     *arg_list;            /* input argument list for PG tag */
     uint32_t  min_base_qual;       /* threshold for high quality bases */
