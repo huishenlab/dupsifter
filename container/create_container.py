@@ -39,7 +39,7 @@
 import argparse
 import os
 
-LATEST = '1.3.0'
+LATEST = '1.4.0'
 
 def valid_versions():
     """Valid versions of dupsifter and their corresponding tags.
@@ -56,6 +56,7 @@ def valid_versions():
         '1.2.0': 'v1.2.0.20230926',
         '1.2.1': 'v1.2.1.20240119',
         '1.3.0': 'v1.3.0.20241113',
+        '1.4.0': 'v1.4.0.20260818',
     }
 
 def cli():
