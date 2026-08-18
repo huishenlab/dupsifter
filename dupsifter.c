@@ -83,6 +83,7 @@ typedef struct {
     uint8_t   verbose;             /* level of messages to print */
     uint8_t   single_end;          /* process all reads as single-end */
     uint8_t   add_mate_tags;       /* add MC and MQ tags to mate reads */
+    uint8_t   add_yd_tag;          /* add YD tag if bisulfite strand is inferred */
     uint8_t   has_barcode;         /* barcode included in reads */
 
     uint32_t  n_reads_read;        /* Number of reads read from file */
@@ -111,6 +112,7 @@ void ds_conf_init(ds_conf_t *conf) {
     conf->verbose = 0;
     conf->single_end = 0;
     conf->add_mate_tags = 0;
+    conf->add_yd_tag = 0;
     conf->has_barcode = 0;
 
     conf->n_reads_read = 0;
@@ -948,6 +950,28 @@ void mark_dup(bam1_chain_t *bc, bam_hdr_t *hdr, ds_conf_t *conf, refcache_t *rs,
     uint8_t bss = 0;
     if (!conf->is_wgs) {
         bss = determine_bsstrand(rs, hdr, r1, r2, conf, 0);
+
+        if (conf->add_yd_tag) {
+            // This could probably be done more efficiently (like returning a
+            // special value from determine_bsstrand when the bisulfite strand
+            // is inferred). However, it does get the job done in a
+            // straightforward way
+            for (bam1_chain_t *curr = bc; curr != NULL; curr = curr->next) {
+                // Look for three commonly used tags for bisulfite strand info
+                //
+                // These are specifically searched for by dupsifter, and only if
+                // they are not found will it infer the bisulfite strand
+                uint8_t *yd = bam_aux_get(curr->read, "YD");
+                uint8_t *zs = bam_aux_get(curr->read, "ZS");
+                uint8_t *xg = bam_aux_get(curr->read, "XG");
+
+                // If no tags are found, THEN we add a YD tag value
+                if (!yd && !zs && !xg) {
+                    uint8_t tag_value = conversion_tags[bss];
+                    bam_aux_append(curr->read, "YD", 'A', 1, &tag_value);
+                }
+            }
+        }
     }
 
     uint8_t is_forward = 0; // used only for single reads to determine strand
@@ -1169,6 +1193,7 @@ static int usage() {
     fprintf(stderr, "Input options:\n");
     fprintf(stderr, "    -s, --single-end             run for single-end data\n");
     fprintf(stderr, "    -m, --add-mate-tags          add MC and MQ mate tags to mate reads\n");
+    fprintf(stderr, "    -y, --add-yd-tag             add YD tag if bisulfite strand is inferred\n");
     fprintf(stderr, "    -W, --wgs-only               process WGS reads instead of WGBS\n");
     fprintf(stderr, "    -l, --max-read-length INT    maximum read length for paired end duplicate-marking [%u]\n", conf.max_length);
     fprintf(stderr, "    -b, --min-base-qual INT      minimum base quality [%u]\n", conf.min_base_qual);
@@ -1207,6 +1232,7 @@ int main(int argc, char *argv[]) {
         {"stats-output"   , required_argument, NULL, 'O'},
         {"single-end"     , no_argument      , NULL, 's'},
         {"add-mate-tags"  , no_argument      , NULL, 'm'},
+        {"add-yd-tag"     , no_argument      , NULL, 'y'},
         {"wgs-only"       , no_argument      , NULL, 'W'},
         {"max-read-length", required_argument, NULL, 'l'},
         {"min-base-qual"  , required_argument, NULL, 'b'},
@@ -1219,7 +1245,7 @@ int main(int argc, char *argv[]) {
     };
 
     if (argc < 1) { return usage(); }
-    while ((c = getopt_long(argc, argv, "b:l:o:O:BWrsmqvh", loptions, NULL)) >= 0) {
+    while ((c = getopt_long(argc, argv, "b:l:o:O:BWrsmqvyh", loptions, NULL)) >= 0) {
         switch (c) {
             case 'b': conf.min_base_qual = (uint32_t)atoi(optarg); break;
             case 'l': conf.max_length = (uint32_t)atoi(optarg); break;
@@ -1230,6 +1256,7 @@ int main(int argc, char *argv[]) {
             case 'r': conf.rm_dup = 1; break;
             case 's': conf.single_end = 1; break;
             case 'm': conf.add_mate_tags = 1; break;
+            case 'y': conf.add_yd_tag = 1; break;
             case 'v': conf.verbose = 1; break;
             case 'h': return usage();
             case 1: print_version(); return 0;

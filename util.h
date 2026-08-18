@@ -34,6 +34,12 @@
 #include "sam.h"
 #include "version.h"
 
+// f - OT/CTOT (C>T)
+// r - OB/CTOB (G>A)
+// c - conflicting evidences, coexistence of both C>T and G>A
+// u - neither C>T or G>A exists
+static const char conversion_tags[4] = "frcu";
+
 // Convert a nucleotide char into a uint8_t
 // A / a ---> 0
 // C / c ---> 1
