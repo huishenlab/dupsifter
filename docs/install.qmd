@@ -16,6 +16,7 @@ zlib
 libbz2
 liblzma
 libcurl
+libdeflate (optional, but speeds up htslib)
 ```
 
 Some helpful tools for retrieving the pre-compiled binaries or the source code from GitHub are:
@@ -39,7 +40,12 @@ All releases are available on [GitHub](https://github.com/huishenlab/dupsifter/r
 
 Precompiled binaries are available for macOS and Linux:
 ```bash
-# macOS
+# macOS (v1.4.0 and later)
+curl -L $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |
+    grep browser_download_url | grep darwin_arm64 | cut -d '"' -f 4) --output dupsifter
+chmod +x dupsifter
+
+# macOS (v1.3.1 and earlier)
 curl -L $(curl -s https://api.github.com/repos/huishenlab/dupsifter/releases/latest |
     grep browser_download_url | grep darwin_amd64 | cut -d '"' -f 4) --output dupsifter
 chmod +x dupsifter
@@ -109,5 +115,5 @@ Singularity> make
 
 `dupsifter` is also available via `conda`/`mamba` (starting with version 1.2.0):
 ```bash
-conda install -c bioconda dupsifter
+conda install bioconda::dupsifter
 ```
