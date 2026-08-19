@@ -8,7 +8,7 @@ website:
   title: "Dupsifter Documentation"
   description: "Documentation site for dupsifter, a WGBS/WGS duplicate marking tool"
   page-footer:
-    left: "Copyright 2024, The Shen Lab at Van Andel Institute"
+    left: "Copyright 2024-2026, The Shen Lab at Van Andel Institute"
     right:
       - icon: github
         href: https://github.com/huishenlab/dupsifter
