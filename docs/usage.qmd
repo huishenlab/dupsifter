@@ -4,8 +4,8 @@ title: Usage
 
 ## Input / Output
 
-`dupsifter` is able to accept input from `stdin` or from an input SAM/BAM file. Output can be directed either to
-`stdout` or to an output SAM/BAM. Input and output options can be mixed as needed (i.e., input BAM to streamed output).
+`dupsifter` accepts input from `stdin` or from a SAM/BAM file. Output can be directed either to `stdout` or to a SAM/BAM
+file. Input and output options can be mixed as needed (i.e., input BAM to streamed output).
 
 :::{.callout-note}
 The input to `dupsifter` is expected to be read-name grouped (i.e., reads with same name next to one another in
@@ -14,21 +14,27 @@ the BAM). If you supply a position sorted BAM, it will produce an error message 
 [dupsifter] ERROR: Can't find read 1 and/or read 2 in 1 reads with read ID: <name of read>.
 Are these reads coordinate sorted?
 ```
+If you receive this error, `samtools sort -n ...` or `samtools collate ...` will resolve this issue.
 :::
 
 ## Run Statistics
 
-Each run of `dupsifter` calculates statistics related to the number of duplicates and the types of reads processed. By
-default, the output file is named `dupsifter.stat` if the output is streamed or `basename.dupsifter.stat` if the output
-file is defined (`-o basename.bam`). The statistics file name can also be defined with the `-O` option (i.e.,
-`dupsifter -O output.dupsifter.stat ref.fa input.bam`). If using the `-O` option, the file should end with
-`.dupsifter.stat`. If both `-o` and `-O` are provided, then the `-O` file name will be used.
+For each run, `dupsifter` writes statistics related to the number of duplicates and the types of reads processed to an
+output file. By default, the output file name is `dupsifter.stat` for streamed output or `basename.dupsifter.stat` for
+output written to a file (`-o basename.bam`). Users also may define the statistics file name with the `-O` option:
+
+```default
+dupsifter -O output.dupsifter.stat ref.fa input.bam
+```
+
+The file should end with `.dupsifter.stat` when the `-O` optino is used. If both `-o` and `-O` are provided, then the
+`-O` file name will be used for the statistics file.
 
 ## Help
 
 ```default
 Program: dupsifter
-Version: 1.3.0
+Version: 1.4.0
 Contact: Jacob Morrison <jacob.morrison@vai.org>
 
 dupsifter [options] <ref.fa> [in.bam]
@@ -39,6 +45,7 @@ Output options:
 Input options:
     -s, --single-end             run for single-end data
     -m, --add-mate-tags          add MC and MQ mate tags to mate reads
+    -y, --add-yd-tag             add YD tag if bisulfite strand is inferred
     -W, --wgs-only               process WGS reads instead of WGBS
     -l, --max-read-length INT    maximum read length for paired end duplicate-marking [10000]
     -b, --min-base-qual INT      minimum base quality [0]
@@ -70,6 +77,7 @@ Note 4, dupsifter first looks for a barcode in the CB SAM tag, then in the CR SA
 |    `-O`      | `--stats-output`    |    string     | Name of file to write statistics to (end with `.dupsifter.stat`)                   |
 |    `-s`      | `--single-end`      |     none      | Run for single-end data (only do this if you know the data is SE)                  |
 |    `-m`      | `--add-mate-tags`   |     none      | Add MC (mate CIGAR) and MQ (mate MAPQ) tags to mated reads                         |
+|    `-y`      | `--add-yd-tag`      |     none      | If the bisulfite strand is inferred, add inferred strand in `YD` tag               |
 |    `-W`      | `--wgs-only`        |     none      | Process WGS data instead of WGBS (see [Methodology](methodology.qmd) for differences in processing) |
 |    `-l`      | `--max-read-length` |    integer    | Maximum read length (handles padding for reference genome windows)                 |
 |    `-b`      | `--min-base-qual`   |    integer    | Minimum base quality (used in determining bisulfite strand if tags not provided)   |
