@@ -11,15 +11,15 @@ able to handle optical duplicates, they affect WGS and WGBS datasets in the same
 on PCR duplicates and the differences in duplicate marking reads from these two technologies.
 
 PCR amplification is frequently used in WGS and WGBS to increase the amount of input DNA, which increases the chance of
-a DNA fragment being sequenced, but incurs a cost of some fragments being sequencing more than once. PCR duplicates are
+a DNA fragment being sequenced at the cost of some fragments being sequencing more than once. PCR duplicates are
 the result of multiple copies of the same fragment being sequenced. For WGS experiments, PCR proceeds as shown in Panel
-A of @fig-wgs-wgbs-diffs. On the other hand, WGBS experiments include an additional step before PCR amplification is
-run. After the DNA is denatured, sodium bisulfite is added to the solution, converting unmethylated cytosines into
-uracils, which results in four distinct strands of DNA (see Panel B of @fig-wgs-wgbs-diffs). These four strands are:
-one strand deriving from the original top (OT), one deriving from the original bottom (OB), and the two complements of
-these strands (CTOT and CTOB, respectively). This additional step means there are two distinct copies of DNA for a given
-DNA fragment in WGBS versus only one in WGS. Therefore, for WGBS experiments, we must distinguish between reads coming
-from the OT and OB strands at the same location and true PCR duplicates.
+A of @fig-wgs-wgbs-diffs. On the other hand, WGBS experiments include an additional step before PCR amplification. After
+the DNA is denatured, sodium bisulfite is added to the solution, converting unmethylated cytosines into uracils, which
+results in four distinct strands of DNA (see Panel B of @fig-wgs-wgbs-diffs). These four strands are: one strand
+deriving from the original top (OT), one deriving from the original bottom (OB), and the two complements of these
+strands (CTOT and CTOB, respectively). This additional step means there are two distinct copies of DNA for a given DNA
+fragment in WGBS versus only one in WGS. Therefore, for WGBS experiments, we must distinguish between reads coming from
+the OT and OB strands at the same location and true PCR duplicates.
 
 `dupsifter` handles these differences by factoring in the bisulfite strand (OT/CTOT or OB/CTOB) when determining if
 a read is a duplicate. In the case where the user is running in WGS mode, `dupsifter` treates all reads as coming from
@@ -114,6 +114,9 @@ any differences between the two are resolved.
 3. If neither `bss1` or `bss2` are found, then assume OT/CTOT.
 4. If both `bss1` and `bss2` are found, but `bss1 != bss2`, then the sum of the base qualities is used to determine
    which to use. If `sum(read 1 base qualities) > sum(read 2 base qualities)`, then `bss1` is used, else `bss2` is used.
+
+Starting with version 1.4.0, the `-y`/`--add-yd-tag` allows the user to add the `YD` tag to reads where the bisulfite
+strand was inferred.
 
 ## Cell Barcodes {#sec-barcodes}
 
